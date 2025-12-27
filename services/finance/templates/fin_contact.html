@@ -1,0 +1,50 @@
+<!--services/finance/templates/fin_contact.html-->
+{% extends "fin_base.html" %}
+
+{% block fin_content %}
+<h1>Contact Tuka Finance</h1>
+
+<p>
+    Have questions or want to apply for a loan? Contact our finance team directly or fill
+    out the secure inquiry form below.
+</p>
+
+<h2>Finance Team Emails</h2>
+<ul>
+    <li>Loan Officer – loans@tukakombe.com</li>
+    <li>Support – support@tukakombe.com</li>
+    <li>General Enquiries – info@tukakombe.com</li>
+</ul>
+
+<hr>
+
+<h2>Loan Inquiry Form</h2>
+<form method="post" action="/finance/contact">
+    <div>
+        <label for="name">Full Name</label><br>
+        <input type="text" id="name" name="name" required>
+    </div>
+
+    <div>
+        <label for="email">Email Address</label><br>
+        <input type="email" id="email" name="email" required>
+    </div>
+
+    <div>
+        <label for="business_name">Business Name</label><br>
+        <input type="text" id="business_name" name="business_name" required>
+    </div>
+
+    <div>
+        <label for="loan_amount">Requested Loan Amount</label><br>
+        <input type="number" id="loan_amount" name="loan_amount" min="1" required>
+    </div>
+
+    <div>
+        <label for="purpose">Purpose of Loan</label><br>
+        <textarea id="purpose" name="purpose" rows="5" required></textarea>
+    </div>
+
+    <button type="submit">Submit Request</button>
+</form>
+{% endblock %}

@@ -1,0 +1,33 @@
+<!-- services/developers/templates/dev_base.html -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<nav class="dev-nav">
+    <ul>
+        <li>
+            <a href="/">TUKAKOMBE</a>
+        </li>
+        <li>
+            <a href="/developers">Home</a>
+        </li>
+        <li>
+            <a href="/developers/services">Services</a>
+        </li>
+        <li>
+            <a href="/developers/projects">Projects</a>
+        </li>
+        <li>
+            <a href="/developers/trade">Trade Hub</a>
+        </li>
+        <li>
+            <a href="/developers/contact">Contact</a>
+        </li>
+    </ul>
+</nav>
+
+<hr>
+
+{% block dev_content %}{% endblock %}
+
+{% endblock %}

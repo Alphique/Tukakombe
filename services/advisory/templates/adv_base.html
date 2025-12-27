@@ -1,0 +1,19 @@
+<!--services/advisory/templates/adv_base.html-->
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="advisory-nav">
+    <ul>
+        <li><a href="/">TUKAKOMBE</a></li>
+        <li><a href="/advisory">Home</a></li>
+        <li><a href="/advisory/services">Services</a></li>
+        <li><a href="/advisory/engagement">Engagement</a></li>
+        <li><a href="/advisory/case-studies">Case Studies</a></li>
+        <li><a href="/advisory/contact">Contact</a></li>
+    </ul>
+</nav>
+
+<hr>
+
+{% block adv_content %}{% endblock %}
+{% endblock %}

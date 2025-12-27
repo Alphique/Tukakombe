@@ -1,0 +1,44 @@
+<!--services/advisory/templates/adv_contact.html-->
+{% extends "adv_base.html" %}
+
+{% block adv_content %}
+<h1>Contact Tuka Business Advisory</h1>
+
+<p>
+    Have questions or need advisory support? Reach out to our experts using the form below or email us directly.
+</p>
+
+<h2>Advisory Team Emails</h2>
+<ul>
+    <li>Strategy & Planning – strategy@tukakombe.com</li>
+    <li>Financial Advisory – finance-advisory@tukakombe.com</li>
+    <li>General Enquiries – info@tukakombe.com</li>
+</ul>
+
+<hr>
+
+<h2>Advisory Request Form</h2>
+<form method="post" action="/advisory/contact">
+    <div>
+        <label for="name">Full Name</label><br>
+        <input type="text" id="name" name="full_name" required>
+    </div>
+
+    <div>
+        <label for="email">Email Address</label><br>
+        <input type="email" id="email" name="email" required>
+    </div>
+
+    <div>
+        <label for="business_name">Business Name</label><br>
+        <input type="text" id="business_name" name="business_name" required>
+    </div>
+
+    <div>
+        <label for="inquiry">Your Inquiry</label><br>
+        <textarea id="inquiry" name="inquiry" rows="5" required></textarea>
+    </div>
+
+    <button type="submit">Submit Request</button>
+</form>
+{% endblock %}

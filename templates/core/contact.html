@@ -1,0 +1,55 @@
+<!--templates/core/contact.html-->
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h1>Contact Tukakombe</h1>
+
+    <p>
+        Whether you’re exploring a partnership, seeking support, or have a general
+        inquiry, we’d be happy to hear from you.
+    </p>
+</section>
+
+<section>
+    <form method="post" action="/contact">
+        <div>
+            <label for="name">Full Name</label><br>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="email">Email Address</label><br>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label for="subject">Subject</label><br>
+            <input type="text" id="subject" name="subject">
+        </div>
+
+        <br>
+
+        <div>
+            <label for="message">Message</label><br>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+
+        <br>
+
+        <button type="submit">Send Message</button>
+    </form>
+</section>
+
+<section>
+    <h3>What happens next?</h3>
+    <p>
+        Once you submit this form, a member of the Tukakombe team will review
+        your inquiry and respond via email.
+    </p>
+</section>
+{% endblock %}

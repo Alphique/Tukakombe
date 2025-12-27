@@ -1,0 +1,42 @@
+<!-- services/developers/templates/dev_contact.html -->
+{% extends "dev_base.html" %}
+
+{% block dev_content %}
+<h1>Contact Tuka Developers</h1>
+
+<p>You can reach out directly to our team, or submit a project request using the form below:</p>
+
+<h3>Development Team Emails</h3>
+<ul>
+    <li>Lead Developer – dev@tukakombe.com</li>
+    <li>Systems Engineer – systems@tukakombe.com</li>
+    <li>Support – support@tukakombe.com</li>
+</ul>
+
+<hr>
+
+<h3>Project Inquiry Form</h3>
+<form method="post" action="/developers/contact">
+    <div>
+        <label for="name">Full Name</label><br>
+        <input type="text" id="name" name="name" required>
+    </div>
+
+    <div>
+        <label for="email">Email Address</label><br>
+        <input type="email" id="email" name="email" required>
+    </div>
+
+    <div>
+        <label for="project_title">Project Title</label><br>
+        <input type="text" id="project_title" name="project_title" required>
+    </div>
+
+    <div>
+        <label for="description">Project Description</label><br>
+        <textarea id="description" name="description" rows="5" required></textarea>
+    </div>
+
+    <button type="submit">Submit Request</button>
+</form>
+{% endblock %}

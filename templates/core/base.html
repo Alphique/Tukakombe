@@ -1,0 +1,37 @@
+<!--templates/core/base.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tukakombe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul style="display:flex; gap:20px; list-style:none;">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+
+            <li><a href="/finance">Tuka Finance</a></li>
+            <li><a href="/developers">Tuka Developers</a></li>
+            <li><a href="/advisory">Tuka Business Advisory</a></li>
+            <li><a href="/brand-studio">Tuka Brand Studio</a></li>
+
+            <li><a href="/blog">Blogs</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <p> (c) 2025 Tukakombe</p>
+</footer>
+
+</body>
+</html>
