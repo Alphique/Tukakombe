@@ -1,0 +1,29 @@
+<!-- services/finance/admin/templates/passreset_admin.html -->
+{% extends 'fin_base.html' %}
+
+{% block title %}Reset Admin Password{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Reset Admin Password</h2>
+
+    <form method="POST" action="{{ url_for('admin.passreset_admin') }}">
+        <div class="form-group mb-3">
+            <label for="admin_username">Admin Username</label>
+            <input type="text" class="form-control" id="admin_username" name="admin_username" placeholder="Enter admin username" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="new_password">New Password</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Reset Password</button>
+    </form>
+</div>
+{% endblock %}

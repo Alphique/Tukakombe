@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tukakombe | Support to Take Your Business to the Next Level</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --navy: #1a2a40;
+            --navy-dark: #0d1621;
+            --lime: #a2d242;
+            --white: #ffffff;
+            --text-gray: #94a3b8;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff;
+            color: var(--navy);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Header: Sophisticated Dark Theme for Logo Visibility --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 2000;
+            /* Using a dark translucent header so the logo is crisp */
+            background: rgba(13, 22, 33, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(162, 210, 66, 0.2);
+            padding: 12px 0;
+            transition: var(--transition);
+        }
+
+        nav {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+        }
+
+        /* Logo Branding Area */
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-box {
+            background: var(--white); /* White backing to ensure the logo image is perfectly visible */
+            padding: 5px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(162, 210, 66, 0.3);
+            transition: var(--transition);
+        }
+
+        .logo-box img {
+            height: 50px; /* Large and clear */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            color: var(--white);
+            text-transform: uppercase;
+        }
+
+        .logo-text span {
+            color: var(--lime);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--lime);
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy-dark);
+            border: 1px solid rgba(162, 210, 66, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            min-width: 220px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        .dropdown:hover .dropdown-menu { display: block; }
+
+        .dropdown-menu li { list-style: none; margin-bottom: 5px; }
+        .dropdown-menu li a {
+            padding: 10px;
+            display: block;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .dropdown-menu li a:hover {
+            background: rgba(162, 210, 66, 0.1);
+            color: var(--lime);
+        }
+
+        /* Call to Action */
+        .cta-nav {
+            background: var(--lime) !important;
+            color: var(--navy-dark) !important;
+            padding: 12px 25px !important;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(162, 210, 66, 0.3);
+        }
+
+        .cta-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(162, 210, 66, 0.5);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--navy-dark);
+            color: var(--white);
+            padding: 100px 25px 40px;
+            margin-top: 0;
+            border-top: 4px solid var(--lime);
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+        }
+
+        .footer-col h4 {
+            color: var(--lime);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .footer-col p { color: #94a3b8; font-size: 0.95rem; line-height: 1.8; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 12px; }
+        .footer-col ul li a { color: #cbd5e1; text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+        .footer-col ul li a:hover { color: var(--lime); padding-left: 5px; }
+
+        .social-box {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .social-btn:hover { background: var(--lime); color: var(--navy-dark); transform: scale(1.1); }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 60px auto 0;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        main {
+            margin-top: 0; /* Header overlaps hero intentionally for translucent effect */
+        }
+    </style>
+</head>
+<body>
+
+<header id="mainHeader">
+    <nav>
+        <a href="/" class="brand-wrapper">
+            <div class="logo-box">
+                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+            </div>
+            <div class="logo-text">TUKA<span>KOMBE</span></div>
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li class="dropdown">
+                <a href="#">Solutions <i class="fas fa-chevron-down" style="font-size: 0.6rem; margin-left: 5px;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/finance">Tuka Finance</a></li>
+                    <li><a href="/developers">Tuka Developers</a></li>
+                    <li><a href="/advisory">Business Advisory</a></li>
+                    <li><a href="/brand-studio">Brand Studio</a></li>
+                </ul>
+            </li>
+            <li><a href="/blog">Insights</a></li>
+            <li><a href="/contact" class="cta-nav">Partner With Us</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <div class="logo-text" style="font-size: 1.8rem; margin-bottom: 20px;">TUKA<span>KOMBE</span></div>
+            <p>Providing integrated financial, technological, and creative solutions to unlock long-term value for African SMEs.</p>
+            <div class="social-box">
+                <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Solutions</h4>
+            <ul>
+                <li><a href="/finance">Tuka Finance</a></li>
+                <li><a href="/developers">Tuka Developers</a></li>
+                <li><a href="/advisory">Business Advisory</a></li>
+                <li><a href="/brand-studio">Brand Studio</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Organization</h4>
+            <ul>
+                <li><a href="/about">Our Philosophy</a></li>
+                <li><a href="/blog">Latest News</a></li>
+                <li><a href="/contact">Get in Touch</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Location</h4>
+            <p style="font-size: 0.9rem;">
+                <i class="fas fa-map-marker-alt" style="color:var(--lime); margin-right: 10px;"></i> Lusaka, Zambia<br><br>
+                <i class="fas fa-envelope" style="color:var(--lime); margin-right: 10px;"></i> contact@tukakombe.com
+            </p>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2025 Tukakombe. Working together to build stronger businesses.</p>
+        <p>Expert Enterprise Solutions</p>
+    </div>
+</footer>
+
+<script>
+    // Header scroll dynamic effect
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('mainHeader');
+        if (window.scrollY > 80) {
+            header.style.background = "rgba(13, 22, 33, 0.98)";
+            header.style.padding = "8px 0";
+        } else {
+            header.style.background = "rgba(13, 22, 33, 0.95)";
+            header.style.padding = "12px 0";
+        }
+    });
+</script>
+
+</body>
+</html>

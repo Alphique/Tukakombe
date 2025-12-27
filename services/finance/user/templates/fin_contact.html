@@ -1,0 +1,50 @@
+<!-- services/finance/user/templates/fin_contact.html -->
+{% extends "fin_base.html" %}
+
+{% block fin_content %}
+<h1>Contact Tuka Finance</h1>
+
+<p>
+    Have questions or want to apply for a loan? Contact our finance team directly or fill
+    out the secure inquiry form below.
+</p>
+
+<h2>Finance Team Emails</h2>
+<ul>
+    <li>Loan Officer – loans@tukakombe.com</li>
+    <li>Support – support@tukakombe.com</li>
+    <li>General Enquiries – info@tukakombe.com</li>
+</ul>
+
+<hr>
+
+<h2>Loan Inquiry Form</h2>
+<form method="post" action="{{ url_for('finance.contact') }}">
+    <div class="form-group mb-3">
+        <label for="name">Full Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="business_name">Business Name</label>
+        <input type="text" class="form-control" id="business_name" name="business_name" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="loan_amount">Requested Loan Amount</label>
+        <input type="number" class="form-control" id="loan_amount" name="loan_amount" min="1" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="purpose">Purpose of Loan</label>
+        <textarea class="form-control" id="purpose" name="purpose" rows="5" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+</form>
+{% endblock %}

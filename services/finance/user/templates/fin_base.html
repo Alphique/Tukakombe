@@ -1,0 +1,53 @@
+<!-- services/finance/user/templates/fin_base.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<header class="finance-header">
+    <div class="container">
+        <h1><a href="{{ url_for('core.home') }}">TUKAKOMBE</a> Finance</h1>
+        <nav class="finance-nav">
+            <ul>
+                <li><a href="{{ url_for('finance.home') }}">Home</a></li>
+                <li><a href="{{ url_for('finance.loans') }}">Loans</a></li>
+                <li><a href="{{ url_for('finance.eligibility') }}">Eligibility</a></li>
+                <li><a href="{{ url_for('finance.faq') }}">FAQ</a></li>
+                <li><a href="{{ url_for('finance.contact') }}">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="finance-main container" style="display: flex; gap: 2rem;">
+    <main class="finance-content" style="flex: 3;">
+        {% block fin_content %}{% endblock %}
+    </main>
+
+    <aside class="finance-sidebar" style="flex: 1; border-left: 1px solid #ddd; padding-left: 1rem;">
+        <h3>Quick Links</h3>
+        <ul>
+            <li><a href="{{ url_for('finance.loans') }}">Apply for a Loan</a></li>
+            <li><a href="{{ url_for('finance.eligibility') }}">Check Eligibility</a></li>
+            <li><a href="{{ url_for('finance.faq') }}">FAQs</a></li>
+            <li><a href="{{ url_for('finance.contact') }}">Contact Us</a></li>
+        </ul>
+
+        <h3>Support</h3>
+        <p>Email: <a href="mailto:support@tukakombe.com">support@tukakombe.com</a></p>
+        <p>Phone: +260 123 456 789</p>
+
+        <h3>Resources</h3>
+        <ul>
+            <li><a href="#">Loan Calculator</a></li>
+            <li><a href="#">Financial Tips</a></li>
+            <li><a href="#">SME Guides</a></li>
+        </ul>
+    </aside>
+</div>
+
+<hr>
+
+<footer class="finance-footer" style="text-align:center; padding:1rem 0; background:#f8f8f8;">
+    <p>&copy; {{ current_year if current_year else "2025" }} Tuka Finance. All rights reserved.</p>
+    <p><a href="{{ url_for('finance_admin.login') }}">Admin Login</a> | <a href="{{ url_for('finance.contact') }}">Contact Finance Team</a></p>
+</footer>
+{% endblock %}

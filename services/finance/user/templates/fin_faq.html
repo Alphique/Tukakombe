@@ -1,0 +1,17 @@
+<!-- services/finance/user/templates/fin_faq.html -->
+{% extends "fin_base.html" %}
+
+{% block fin_content %}
+<h1>Frequently Asked Questions</h1>
+
+{% if faqs %}
+    {% for faq in faqs %}
+    <section>
+        <h2>{{ faq.question }}</h2>
+        <p>{{ faq.answer }}</p>
+    </section>
+    {% endfor %}
+{% else %}
+    <p>No FAQs available at the moment. Please <a href="{{ url_for('finance.contact') }}">contact us</a> for inquiries.</p>
+{% endif %}
+{% endblock %}

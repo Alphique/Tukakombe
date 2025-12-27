@@ -1,0 +1,62 @@
+<!-- services/finance/admin/templates/dashboard.html -->
+{% extends 'fin_base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Finance Admin Dashboard</h2>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <p class="card-text">{{ total_clients or 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Active Loans</h5>
+                    <p class="card-text">{{ total_loans or 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Approvals</h5>
+                    <p class="card-text">{{ pending_approvals or 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Documents Uploaded</h5>
+                    <p class="card-text">{{ total_documents or 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row">
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.client_info') }}" class="btn btn-outline-primary btn-block mb-2">Manage Clients</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.documents') }}" class="btn btn-outline-success btn-block mb-2">Manage Documents</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.passreset_admin') }}" class="btn btn-outline-warning btn-block mb-2">Reset Admin Password</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.passreset_client') }}" class="btn btn-outline-info btn-block mb-2">Reset Client Password</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

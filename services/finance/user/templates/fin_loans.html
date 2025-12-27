@@ -1,0 +1,38 @@
+<!-- services/finance/user/templates/fin_loans.html -->
+{% extends "fin_base.html" %}
+
+{% block fin_content %}
+<h1>Our Loan Products</h1>
+
+<p>We offer flexible loan products designed to support your business growth.</p>
+
+<section>
+    <h2>Business Startup Loans</h2>
+    <p>
+        For entrepreneurs starting a new venture. Quick approval and minimal documentation.
+    </p>
+</section>
+
+<section>
+    <h2>Working Capital Loans</h2>
+    <p>
+        Short-term financing to manage cash flow, payroll, and operational expenses.
+    </p>
+</section>
+
+<section>
+    <h2>Expansion & Growth Loans</h2>
+    <p>
+        Medium to long-term loans to help businesses scale, acquire assets, or enter new markets.
+    </p>
+</section>
+
+<section>
+    <h2>How to Apply</h2>
+    <p>
+        Start your application through our secure 
+        <a href="{{ url_for('finance.contact') }}">contact form</a> 
+        or login to your dashboard.
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,50 @@
+<!-- services/finance/user/templates/fin_eligibility.html -->
+{% extends "fin_base.html" %}
+
+{% block fin_content %}
+<h1>Eligibility Criteria</h1>
+
+<p>
+    To qualify for a Tuka Finance loan, your business should meet the following requirements:
+</p>
+
+<ul>
+    <li>Registered business operating for at least 6 months</li>
+    <li>Valid business registration documents</li>
+    <li>Bank account in business name</li>
+    <li>Minimum revenue threshold depending on loan type</li>
+    <li>Good credit history</li>
+</ul>
+
+<section>
+    <h2>Additional Notes</h2>
+    <p>
+        Our team reviews applications carefully and may request supplementary documents.
+        Contact us if you are unsure about eligibility.
+    </p>
+</section>
+
+<section>
+    <h2>Check Your Eligibility</h2>
+    <form method="POST" action="{{ url_for('finance.eligibility') }}">
+        <div class="form-group mb-3">
+            <label for="business_name">Business Name</label>
+            <input type="text" class="form-control" id="business_name" name="business_name" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="annual_turnover">Annual Revenue (ZMW)</label>
+            <input type="number" class="form-control" id="annual_turnover" name="annual_turnover" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="loan_type">Loan Type</label>
+            <select class="form-control" id="loan_type" name="loan_type" required>
+                <option value="">Select a loan type</option>
+                <option value="startup">Business Startup Loan</option>
+                <option value="working_capital">Working Capital Loan</option>
+                <option value="expansion">Expansion & Growth Loan</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Check Eligibility</button>
+    </form>
+</section>
+{% endblock %}
