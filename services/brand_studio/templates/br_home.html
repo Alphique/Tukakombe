@@ -1,21 +1,208 @@
-<!-- services/brand_studio/templates/br_home.html -->
-{% extends "br_base.html" %}
+{% extends "base.html" %}
 
-{% block br_content %}
-<h1>Tuka Brand Studio</h1>
+{% block content %}
+<style>
+    :root {
+        --navy: #1a2a40; 
+        --navy-dark: #0d1621;
+        --lime: #a2d242; 
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
 
-<p>
-    We build brands that speak clearly, look professional, and connect with the right audience.
-    From identity design to full brand systems, we help businesses stand out.
-</p>
+    /* Hero Section with Translucent Board Background */
+    .hero {
+        position: relative;
+        /* The dark overlay + the background image */
+        background: linear-gradient(rgba(13, 22, 33, 0.85), rgba(13, 22, 33, 0.92)), 
+                    url("{{ url_for('static', filename='images/image_7509fc.png') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed; /* Parallax effect for sophistication */
+        color: white;
+        padding: 180px 0 140px;
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        text-align: center;
+    }
 
-<section>
-    <h2>What We Do</h2>
-    <ul>
-        <li>Brand Identity & Visual Design</li>
-        <li>Corporate Branding & Merchandise</li>
-        <li>Digital & Print Design</li>
-        <li>Brand Strategy & Positioning</li>
-    </ul>
+    .hero-content {
+        max-width: 950px;
+        margin: 0 auto;
+        padding: 0 20px;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: var(--transition);
+    }
+
+    .hero-content.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .hero h1 {
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.1;
+        margin-bottom: 25px;
+    }
+
+    .hero h1 span {
+        color: var(--lime);
+        display: block; /* Makes "Next Level" stand out on its own line */
+    }
+
+    .hero p {
+        font-size: 1.35rem;
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 700px;
+        margin: 0 auto 40px;
+        font-weight: 300;
+    }
+
+    /* Service Card Grid */
+    .services-container {
+        margin-top: -80px;
+        position: relative;
+        z-index: 10;
+        padding: 0 20px;
+    }
+
+    .grid-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .service-card {
+        background: white;
+        padding: 45px 35px;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .service-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 40px 80px -15px rgba(162, 210, 66, 0.2);
+        border-color: var(--lime);
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        color: var(--lime);
+        font-size: 1.5rem;
+    }
+
+    .service-card h3 {
+        color: var(--navy);
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .brand-tag {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-top: auto;
+        padding-top: 20px;
+    }
+
+    /* Why Section */
+    .why-section {
+        padding: 120px 0;
+        background: #f8fafc;
+    }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: var(--transition); }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+
+    .cta-button {
+        background: var(--lime);
+        color: var(--navy);
+        padding: 18px 45px;
+        border-radius: 100px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        box-shadow: 0 10px 20px rgba(162, 210, 66, 0.3);
+    }
+
+    .cta-button:hover {
+        background: white;
+        transform: scale(1.05);
+    }
+</style>
+
+<section class="hero">
+    <div class="hero-content" id="heroText">
+        <p style="text-transform: uppercase; letter-spacing: 4px; font-size: 0.9rem; color: var(--lime); font-weight: 700; margin-bottom: 15px;">
+            Partnering for Growth
+        </p>
+        <h1>Support designed to take your business to the <span>Next Level</span></h1>
+        <p>A multi-disciplinary business solutions firm built to help entrepreneurs and growing enterprises scale sustainably.</p>
+        <a href="#services" class="cta-button">Explore Solutions</a>
+    </div>
 </section>
+
+<div class="services-container" id="services">
+    <div class="grid-layout">
+        <div class="service-card reveal">
+            <div class="card-icon"><i class="fas fa-vault"></i></div>
+            <h3>Tuka Finance</h3>
+            <p>Tailored loans, working capital financing, and SME financial reporting systems.</p>
+            <div class="brand-tag">By Tukakombe</div>
+        </div>
+
+        <div class="service-card reveal">
+            <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+            <h3>Tuka Developers</h3>
+            <p>Custom software, scalable business systems, and modern web application development.</p>
+            <div class="brand-tag">By Tukakombe</div>
+        </div>
+
+        <div class="service-card reveal">
+            <div class="card-icon"><i class="fas fa-briefcase"></i></div>
+            <h3>Tuka Advisory</h3>
+            <p>Strategy, feasibility studies, and professional project information memorandums.</p>
+            <div class="brand-tag">By Tukakombe</div>
+        </div>
+
+        <div class="service-card reveal">
+            <div class="card-icon"><i class="fas fa-pen-nib"></i></div>
+            <h3>Tuka Brand Studio</h3>
+            <p>Strategic identity development, creative content, and digital marketing excellence.</p>
+            <div class="brand-tag">By Tukakombe</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Reveal animations
+    window.addEventListener('load', () => {
+        document.getElementById('heroText').classList.add('visible');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 {% endblock %}
