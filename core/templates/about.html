@@ -1,45 +1,1489 @@
-<!--templates/core/about.html-->
 {% extends "base.html" %}
 
+{% block title %}About Tukakombe | Integrated Business Solutions{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* === Complete About Us Page - Enhanced Design === */
+    
+    /* Hero Section - Improved Layout */
+    .about-hero {
+        min-height: 85vh;
+        background: linear-gradient(135deg, rgba(26, 32, 44, 0.9) 0%, rgba(26, 32, 44, 0.7) 100%), 
+                    url('/static/images/board.png') center/cover no-repeat;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+        padding: 120px 40px 80px;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+
+    @media (max-width: 992px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 40px;
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(162, 210, 66, 0.2);
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: var(--navy-dark);
+        line-height: 1.8;
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+
+    .quote-container {
+        position: relative;
+        padding: 30px;
+        margin: 40px 0;
+        border-left: 4px solid var(--lime);
+        background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+        border-radius: var(--radius-lg);
+        color: var(--white);
+        overflow: hidden;
+    }
+
+    .quote-container::before {
+        content: '"';
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        font-size: 8rem;
+        color: rgba(162, 210, 66, 0.2);
+        font-family: Georgia, serif;
+        line-height: 1;
+        z-index: 1;
+    }
+
+    .quote-text {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0 0 10px 0;
+        font-style: italic;
+        position: relative;
+        z-index: 2;
+    }
+
+    .quote-attribution {
+        font-size: 1.1rem;
+        color: var(--lime-light);
+        font-style: normal;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+    }
+
+    .image-caption {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-top: 10px;
+        text-align: center;
+        opacity: 0.8;
+        font-style: italic;
+    }
+
+    .hero-image {
+        position: relative;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+        height: 500px;
+        background: var(--navy);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .hero-image:hover img {
+        transform: scale(1.05);
+    }
+
+    .hero-image::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(26, 32, 44, 0.1), rgba(162, 210, 66, 0.1));
+        z-index: 1;
+    }
+
+    /* Why We Exist Section - Creative Layout */
+    .why-exist {
+        padding: 100px 40px;
+        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                    url('/static/images/board.png') center/cover no-repeat;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    .why-exist::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(162, 210, 66, 0.1), rgba(26, 32, 44, 0.05));
+        z-index: 1;
+    }
+
+    .why-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .why-container h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 60px;
+        color: var(--navy);
+        position: relative;
+        display: inline-block;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .why-container h2::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+        border-radius: 2px;
+    }
+
+    .challenge-solution-commitment {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-bottom: 80px;
+        position: relative;
+    }
+
+    @media (max-width: 1200px) {
+        .challenge-solution-commitment {
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 600px;
+            margin: 0 auto 80px;
+        }
+    }
+
+    .info-card {
+        padding: 40px;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--white);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+    }
+
+    .info-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--lime);
+    }
+
+    .challenge-card {
+        border-top-color: #e53e3e;
+    }
+
+    .solution-card {
+        border-top-color: var(--lime);
+    }
+
+    .commitment-card {
+        border-top-color: var(--navy);
+        background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+        color: var(--white);
+    }
+
+    .card-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        font-size: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .challenge-card .card-icon {
+        background: linear-gradient(135deg, #fed7d7, #fc8181);
+        color: #c53030;
+    }
+
+    .solution-card .card-icon {
+        background: linear-gradient(135deg, var(--lime-light), var(--lime));
+        color: var(--navy-dark);
+    }
+
+    .commitment-card .card-icon {
+        background: linear-gradient(135deg, var(--white), var(--off-white));
+        color: var(--navy-dark);
+    }
+
+    .info-card h3 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: var(--navy);
+        line-height: 1.2;
+    }
+
+    .commitment-card h3 {
+        color: var(--white);
+    }
+
+    .info-card p {
+        color: var(--text-gray);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    .commitment-card p {
+        color: var(--text-light);
+    }
+
+    .commitment-highlight {
+        background: linear-gradient(135deg, var(--lime), var(--lime-light));
+        color: var(--navy-dark);
+        padding: 15px 25px;
+        border-radius: var(--radius-lg);
+        font-weight: 800;
+        font-size: 1.3rem;
+        text-align: center;
+        margin-top: 25px;
+        box-shadow: 0 8px 25px rgba(162, 210, 66, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .commitment-highlight:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(162, 210, 66, 0.4);
+    }
+
+    /* Services Section - Improved Color Scheme */
+    .services-section {
+        padding: 100px 40px;
+        background: var(--off-white);
+        position: relative;
+    }
+
+    .services-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+    }
+
+    .services-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .services-header h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: var(--navy);
+        line-height: 1.2;
+        position: relative;
+        display: inline-block;
+    }
+
+    .services-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+        border-radius: 2px;
+    }
+
+    .services-header p {
+        font-size: 1.2rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 30px auto 0;
+        line-height: 1.7;
+    }
+
+    .services-grid {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .service-card {
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(162, 210, 66, 0.1);
+        position: relative;
+        height: 100%;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--lime);
+    }
+
+    .service-header {
+        padding: 35px 35px 20px;
+        color: var(--white);
+        position: relative;
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+    }
+
+    .service-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--lime), var(--lime-light));
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        color: var(--navy-dark);
+        font-size: 1.6rem;
+        box-shadow: 0 8px 25px rgba(162, 210, 66, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .service-card:hover .service-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .service-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    .service-content {
+        padding: 25px 35px 35px;
+    }
+
+    .service-content p {
+        color: var(--text-gray);
+        line-height: 1.7;
+        margin-bottom: 20px;
+        font-size: 1rem;
+    }
+
+    .service-features {
+        margin: 20px 0;
+    }
+
+    .service-features li {
+        color: var(--text-gray);
+        margin-bottom: 8px;
+        padding-left: 25px;
+        position: relative;
+        font-size: 0.95rem;
+    }
+
+    .service-features li:before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--lime);
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .service-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, var(--lime), var(--lime-light));
+        color: var(--navy-dark);
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(162, 210, 66, 0.3);
+        margin-top: 10px;
+        border: 2px solid transparent;
+    }
+
+    .service-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(162, 210, 66, 0.4);
+        border-color: var(--lime-light);
+    }
+
+    /* Vision & Mission Section */
+    .vision-mission {
+        padding: 100px 40px;
+        background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vision-mission::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/static/images/board.png') center/cover no-repeat;
+        opacity: 0.1;
+    }
+
+    .vm-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    @media (max-width: 992px) {
+        .vm-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+    }
+
+    .vision-card, .mission-card {
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius-xl);
+        border: 2px solid rgba(162, 210, 66, 0.2);
+        transition: var(--transition);
+        text-align: center;
+    }
+
+    .vision-card:hover, .mission-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--lime);
+        transform: translateY(-8px);
+    }
+
+    .card-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: var(--lime-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .card-title i {
+        font-size: 2.2rem;
+    }
+
+    .vision-card p, .mission-card p {
+        color: var(--text-light);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    /* Process Section */
+    .how-we-work {
+        padding: 100px 40px;
+        background: var(--white);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: var(--navy);
+        line-height: 1.2;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+        border-radius: 2px;
+    }
+
+    .section-header p {
+        font-size: 1.2rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 30px auto 0;
+        line-height: 1.7;
+    }
+
+    .process-timeline {
+        max-width: 1000px;
+        margin: 60px auto 0;
+        position: relative;
+    }
+
+    .process-timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, var(--lime), var(--lime-light));
+        transform: translateX(-50%);
+    }
+
+    @media (max-width: 768px) {
+        .process-timeline::before {
+            left: 25px;
+        }
+    }
+
+    .process-step {
+        position: relative;
+        margin-bottom: 60px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 40px;
+    }
+
+    @media (max-width: 768px) {
+        .process-step {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+    }
+
+    .step-number {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--lime), var(--lime-light));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--navy-dark);
+        z-index: 2;
+        box-shadow: 0 8px 20px rgba(162, 210, 66, 0.3);
+        border: 3px solid var(--navy-dark);
+    }
+
+    @media (max-width: 768px) {
+        .step-number {
+            left: 25px;
+            transform: translateX(-50%);
+        }
+    }
+
+    .step-content {
+        padding: 30px;
+        background: var(--off-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+        border: 2px solid rgba(162, 210, 66, 0.1);
+    }
+
+    .step-content:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--lime);
+    }
+
+    .step-content h4 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: var(--navy);
+        position: relative;
+        padding-left: 25px;
+    }
+
+    .step-content h4::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--lime);
+        font-weight: bold;
+    }
+
+    .step-content p {
+        color: var(--text-gray);
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    .step-left {
+        text-align: right;
+    }
+
+    @media (max-width: 768px) {
+        .step-left {
+            text-align: left;
+        }
+    }
+
+    /* Clients Section */
+    .clients-section {
+        padding: 100px 40px;
+        background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+        color: var(--white);
+        position: relative;
+    }
+
+    .clients-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/static/images/board.png') center/cover no-repeat;
+        opacity: 0.1;
+    }
+
+    .section-header.white h2 {
+        color: var(--white);
+        position: relative;
+    }
+
+    .section-header.white h2::after {
+        background: linear-gradient(90deg, var(--lime-light), var(--lime));
+    }
+
+    .section-header.white p {
+        color: var(--text-light);
+    }
+
+    .clients-grid {
+        max-width: 1400px;
+        margin: 60px auto 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .client-card {
+        padding: 35px 25px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-xl);
+        transition: var(--transition);
+        border: 2px solid rgba(162, 210, 66, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .client-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--lime);
+        transform: translateY(-8px);
+    }
+
+    .client-icon {
+        font-size: 2.2rem;
+        color: var(--lime);
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .client-card:hover .client-icon {
+        transform: scale(1.2);
+    }
+
+    .client-card h4 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: var(--lime-light);
+    }
+
+    .client-card p {
+        color: var(--text-light);
+        line-height: 1.7;
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    /* Final CTA */
+    .about-cta {
+        padding: 100px 40px;
+        background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .about-cta::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* background: url('/static/images/board.png') center/cover no-repeat;*/
+        opacity: 0.1;
+    }
+
+    .cta-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-content h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 25px;
+        color: var(--white);
+        line-height: 1.2;
+    }
+
+    .cta-content p {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 40px;
+        line-height: 1.8;
+        opacity: 0.95;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-cta-primary, .btn-cta-secondary {
+        padding: 15px 35px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-cta-primary {
+        background: linear-gradient(135deg, var(--lime), var(--lime-light));
+        color: var(--navy-dark);
+        box-shadow: 0 8px 20px rgba(240, 240, 240, 0.3);
+        border: 2px solid transparent;
+    }
+
+    .btn-cta-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(162, 210, 66, 0.4);
+        border-color: var(--lime-light);
+    }
+
+    .btn-cta-secondary {
+        background: transparent;
+        color: var(--white);
+        border: 2px solid var(--lime);
+    }
+
+    .btn-cta-secondary:hover {
+        background: rgba(162, 210, 66, 0.1);
+        transform: translateY(-5px);
+        border-color: var(--lime-light);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+        }
+        
+        .why-container h2 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .about-hero {
+            padding: 100px 30px 60px;
+            min-height: auto;
+        }
+        
+        .why-exist,
+        .services-section,
+        .vision-mission,
+        .how-we-work,
+        .clients-section,
+        .about-cta {
+            padding: 80px 30px;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .quote-text {
+            font-size: 1.6rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.2rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+            max-width: 600px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 80px 20px 50px;
+        }
+        
+        .why-exist,
+        .services-section,
+        .vision-mission,
+        .how-we-work,
+        .clients-section,
+        .about-cta {
+            padding: 60px 20px;
+        }
+        
+        .hero-title {
+            font-size: 2.2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .quote-text {
+            font-size: 1.4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 1.9rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .service-header {
+            padding: 25px 25px 15px;
+            min-height: 140px;
+        }
+        
+        .service-content {
+            padding: 20px 25px 30px;
+        }
+        
+        .vision-card,
+        .mission-card {
+            padding: 30px 25px;
+        }
+        
+        .clients-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .cta-content h2 {
+            font-size: 2rem;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-cta-primary,
+        .btn-cta-secondary {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 1.9rem;
+        }
+        
+        .section-header h2 {
+            font-size: 1.7rem;
+        }
+        
+        .commitment-highlight {
+            font-size: 1.1rem;
+            padding: 12px 20px;
+        }
+        
+        .cta-content h2 {
+            font-size: 1.8rem;
+        }
+        
+        .info-card {
+            padding: 30px 20px;
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-left {
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-right {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animated {
+        opacity: 1;
+        transform: translate(0);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section>
-    <h1>About Tukakombe</h1>
-
-    <p>
-        Tukakombe was established to solve a common problem faced by businesses:
-        fragmented support across finance, technology, strategy, and branding.
-    </p>
-
-    <p>
-        Many businesses fail not because of lack of ambition, but because they
-        lack access to the right tools, guidance, and capital at the right time.
-        Tukakombe exists to change that.
-    </p>
+<!-- Hero Section - Enhanced -->
+<section class="about-hero">
+    <div class="hero-container">
+        <div class="hero-content fade-in-up">
+            <h1 class="hero-title">About Tukakombe</h1>
+            <p class="hero-subtitle">
+                Working together to build stronger businesses through integrated solutions that bridge gaps, 
+                connect silos, and create sustainable competitive advantages.
+            </p>
+            
+            <div class="quote-container">
+                <p class="quote-text">"Alone you can go fast but together we can go far"</p>
+                <p class="quote-attribution">— African Proverb</p>
+            </div>
+            
+            <div class="image-caption">Tukakombe Team Collaboration Board</div>
+        </div>
+        
+        <div class="hero-image fade-in-up">
+            <img src="/static/images/board.png" alt="Tukakombe Team Collaboration Board" loading="lazy">
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Our Mission</h2>
-    <p>
-        To support the growth, sustainability, and competitiveness of businesses
-        through integrated, practical, and scalable solutions.
-    </p>
+<!-- Why We Exist - Creative 3-Column Layout -->
+<section class="why-exist">
+    <div class="why-container">
+        <h2 class="fade-in-up">Why We Exist</h2>
+        
+        <div class="challenge-solution-commitment">
+            <div class="info-card challenge-card fade-in-left">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>The Challenge</h3>
+                <p>
+                    Across the African business landscape, many enterprises face fragmented support 
+                    structures — accessing finance, technology, branding, and advisory services from 
+                    disconnected providers. This often leads to misalignment, inefficiency, and stalled 
+                    growth.
+                </p>
+            </div>
+            
+            <div class="info-card solution-card fade-in-up">
+                <div class="card-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3>Our Solution</h3>
+                <p>
+                    Tukakombe was established to address this challenge by creating a unified 
+                    enterprise support model that brings critical business capabilities together 
+                    under one trusted brand, governed by shared standards and accountability.
+                </p>
+            </div>
+            
+            <div class="info-card commitment-card fade-in-right">
+                <div class="card-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>Our Commitment</h3>
+                <p>
+                    Tukakombe is committed to responsible enterprise support, realistic growth planning, 
+                    and long-term partnerships. We measure success not only by outcomes delivered, 
+                    but by the durability and resilience of the businesses we support.
+                </p>
+                
+                <div class="commitment-highlight">
+                    Working together to build stronger businesses
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Our Approach</h2>
-    <ul>
-        <li>We listen before we advise</li>
-        <li>We design solutions around real business needs</li>
-        <li>We focus on long-term value, not short-term wins</li>
-        <li>We partner with businesses as they grow</li>
-    </ul>
+<!-- Our Services - Better Color Coordination -->
+<section class="services-section">
+    <div class="services-header">
+        <h2 class="fade-in-up">Our Integrated Services</h2>
+        <p class="fade-in-up">
+            We provide comprehensive business support through four specialized service units, 
+            each operating independently within its area of expertise while drawing strength 
+            and governance from the Tukakombe brand.
+        </p>
+    </div>
+    
+    <div class="services-grid">
+        <!-- Tuka Finance -->
+        <div class="service-card fade-in-up">
+            <div class="service-header">
+                <div class="service-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="service-title">Tuka Finance</h3>
+            </div>
+            <div class="service-content">
+                <p>
+                    Comprehensive financial solutions including business restructuring, 
+                    financial modeling, asset management, and sustainable growth strategies 
+                    for SMEs and growing enterprises.
+                </p>
+                <div class="service-features">
+                    <li>Financial restructuring & planning</li>
+                    <li>Asset register development</li>
+                    <li>Financial statement preparation</li>
+                    <li>Growth strategy development</li>
+                </div>
+                <a href="/finance" class="service-link">
+                    <i class="fas fa-arrow-right"></i>
+                    Explore Tuka Finance
+                </a>
+            </div>
+        </div>
+        
+        <!-- Tuka Developers -->
+        <div class="service-card fade-in-up">
+            <div class="service-header">
+                <div class="service-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="service-title">Tuka Developers</h3>
+            </div>
+            <div class="service-content">
+                <p>
+                    Custom software development, digital transformation, and technology 
+                    infrastructure solutions tailored to business needs across education, 
+                    NGO, SME, and government sectors.
+                </p>
+                <div class="service-features">
+                    <li>Custom software development</li>
+                    <li>Digital transformation strategy</li>
+                    <li>System integration & automation</li>
+                    <li>Technology infrastructure</li>
+                </div>
+                <a href="/developers" class="service-link">
+                    <i class="fas fa-arrow-right"></i>
+                    Explore Tuka Developers
+                </a>
+            </div>
+        </div>
+        
+        <!-- Tuka Business Advisory -->
+        <div class="service-card fade-in-up">
+            <div class="service-header">
+                <div class="service-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3 class="service-title">Tuka Business Advisory</h3>
+            </div>
+            <div class="service-content">
+                <p>
+                    Strategic business advisory services focusing on operational optimization, 
+                    market expansion, and sustainable growth strategies for businesses at 
+                    various stages of development.
+                </p>
+                <div class="service-features">
+                    <li>Business strategy development</li>
+                    <li>Operational optimization</li>
+                    <li>Market expansion planning</li>
+                    <li>Performance improvement</li>
+                </div>
+                <a href="/advisory" class="service-link">
+                    <i class="fas fa-arrow-right"></i>
+                    Explore Tuka Advisory
+                </a>
+            </div>
+        </div>
+        
+        <!-- Tuka Brand Studios -->
+        <div class="service-card fade-in-up">
+            <div class="service-header">
+                <div class="service-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="service-title">Tuka Brand Studios</h3>
+            </div>
+            <div class="service-content">
+                <p>
+                    Complete branding and creative solutions including corporate identity 
+                    development, visual design, marketing materials, and digital presence 
+                    creation for businesses seeking market differentiation.
+                </p>
+                <div class="service-features">
+                    <li>Corporate branding & identity</li>
+                    <li>Visual design & marketing materials</li>
+                    <li>Website design & development</li>
+                    <li>Digital presence strategy</li>
+                </div>
+                <a href="/studio" class="service-link">
+                    <i class="fas fa-arrow-right"></i>
+                    Explore Tuka Studio
+                </a>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Who We Work With</h2>
-    <p>
-        Entrepreneurs, startups, SMEs, and growing enterprises seeking structured
-        support across finance, technology, advisory, and brand development.
-    </p>
+<!-- Vision & Mission -->
+<section class="vision-mission">
+    <div class="vm-grid">
+        <div class="vision-card fade-in-left">
+            <div class="card-title">
+                <i class="fas fa-eye"></i>
+                Our Vision
+            </div>
+            <p>
+                To become a trusted African enterprise solutions brand that empowers 
+                businesses to grow, perform, and succeed sustainably.
+            </p>
+        </div>
+        
+        <div class="mission-card fade-in-right">
+            <div class="card-title">
+                <i class="fas fa-bullseye"></i>
+                Our Mission
+            </div>
+            <p>
+                To provide integrated financial, technological, creative, and advisory 
+                solutions that enable businesses to make informed decisions, improve 
+                performance, and unlock long-term value.
+            </p>
+        </div>
+    </div>
 </section>
+
+<!-- How We Work -->
+<section class="how-we-work">
+    <div class="section-header">
+        <h2 class="fade-in-up">How We Work</h2>
+        <p class="fade-in-up">Our proven methodology for delivering transformative results</p>
+    </div>
+    
+    <div class="process-timeline">
+        <div class="process-step">
+            <div class="step-left">
+                <div class="step-content fade-in-left">
+                    <h4>Deep Discovery</h4>
+                    <p>
+                        We immerse ourselves in your business context, challenges, and aspirations. 
+                        This comprehensive understanding forms the foundation for all our solutions.
+                    </p>
+                </div>
+            </div>
+            <div class="step-number">1</div>
+            <div class="step-right"></div>
+        </div>
+
+        <div class="process-step">
+            <div class="step-left"></div>
+            <div class="step-number">2</div>
+            <div class="step-right">
+                <div class="step-content fade-in-right">
+                    <h4>Integrated Strategy</h4>
+                    <p>
+                        We connect the dots between finance, technology, and operations to create 
+                        a holistic strategy that addresses multiple challenges simultaneously.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="process-step">
+            <div class="step-left">
+                <div class="step-content fade-in-left">
+                    <h4>Collaborative Implementation</h4>
+                    <p>
+                        We work alongside your team, transferring knowledge and building capabilities. 
+                        We believe in partnerships, not just projects.
+                    </p>
+                </div>
+            </div>
+            <div class="step-number">3</div>
+            <div class="step-right"></div>
+        </div>
+
+        <div class="process-step">
+            <div class="step-left"></div>
+            <div class="step-number">4</div>
+            <div class="step-right">
+                <div class="step-content fade-in-right">
+                    <h4>Sustainable Growth</h4>
+                    <p>
+                        We ensure solutions are scalable and adaptable, delivering value long after 
+                        implementation through ongoing support and optimization.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Who We Work With -->
+<section class="clients-section">
+    <div class="section-header white">
+        <h2 class="fade-in-up">Who We Work With</h2>
+        <p class="fade-in-up">We partner with organizations across the spectrum, united by a shared ambition to build resilient and sustainable enterprises.</p>
+    </div>
+    
+    <div class="clients-grid">
+        <div class="client-card fade-in-up">
+            <div class="client-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <h4>SMEs & Growing Businesses</h4>
+            <p>
+                Small and medium-sized enterprises seeking integrated support for 
+                sustainable growth and market competitiveness.
+            </p>
+        </div>
+        
+        <div class="client-card fade-in-up">
+            <div class="client-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h4>Entrepreneurs & Startups</h4>
+            <p>
+                Founders and early-stage businesses building scalable foundations 
+                and establishing market presence.
+            </p>
+        </div>
+        
+        <div class="client-card fade-in-up">
+            <div class="client-icon">
+                <i class="fas fa-university"></i>
+            </div>
+            <h4>Educational Institutions</h4>
+            <p>
+                Schools, colleges, and universities seeking digital transformation 
+                and operational efficiency solutions.
+            </p>
+        </div>
+        
+        <div class="client-card fade-in-up">
+            <div class="client-icon">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h4>Non-Profit Organizations</h4>
+            <p>
+                NGOs and development initiatives requiring efficient systems for 
+                impact measurement and program management.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="about-cta">
+    <div class="cta-content">
+        <h2 class="fade-in-up">Ready to Work Together?</h2>
+        <p class="fade-in-up">
+            Join the growing number of businesses across Africa who have transformed their 
+            operations with our integrated approach. Let's build something exceptional together.
+        </p>
+        
+        <div class="cta-buttons">
+            <a href="/contact" class="btn-cta-primary fade-in-up">
+                <i class="fas fa-handshake"></i>
+                Partner With Us
+            </a>
+            <a href="/solutions" class="btn-cta-secondary fade-in-up">
+                <i class="fas fa-box-open"></i>
+                Explore Our Solutions
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation on scroll
+        const animatedElements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
+
+        // Animate process steps with delay
+        const processSteps = document.querySelectorAll('.process-step');
+        processSteps.forEach((step, index) => {
+            step.style.transitionDelay = (index * 0.2) + 's';
+            observer.observe(step);
+        });
+
+        // Add hover effects to cards
+        const cards = document.querySelectorAll('.service-card, .client-card, .vision-card, .mission-card, .info-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('animated')) return;
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Preload images for better loading
+        const images = [
+            '/static/images/board.png'
+        ];
+        
+        images.forEach(src => {
+            new Image().src = src;
+        });
+    });
+</script>
 {% endblock %}
