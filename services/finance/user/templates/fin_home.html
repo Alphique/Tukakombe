@@ -2,57 +2,2855 @@
 {% extends "fin_base.html" %}
 
 {% block fin_content %}
-<h1>Welcome to Tuka Finance</h1>
-
-<p>
-    Tuka Finance empowers SMEs with reliable financial solutions. Our secure
-    platform allows you to apply for business loans, track applications, and access
-    helpful resources to grow your business.
-</p>
-
-<section>
-    <h2>Why Choose Tuka Finance?</h2>
-    <ul>
-        <li>Fast and transparent loan processing</li>
-        <li>Tailored financing solutions for SMEs</li>
-        <li>Secure and user-friendly platform</li>
-        <li>Expert support for every step of your journey</li>
-        <li>Flexible repayment plans to suit your business</li>
-        <li>Dedicated relationship managers for personalized guidance</li>
-    </ul>
+<!-- Hero Section with Premium Visuals -->
+<section class="fin-hero premium">
+    <div class="hero-bg-particles" id="particles-js"></div>
+    
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-badge">
+                <span class="badge-text">FINANCIAL SERVICES DIVISION</span>
+                <div class="badge-glow"></div>
+            </div>
+            
+            <h1 class="hero-title">
+                <span class="title-line">Unlock Your Business</span>
+                <span class="title-line highlight">Financial Potential</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                Empowering Zambian SMEs with practical financial solutions that drive sustainable growth.
+            </p>
+            
+            <div class="hero-stats premium">
+                <div class="stat-item glow">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" data-count="250">0</div>
+                        <div class="stat-label">SMEs Empowered</div>
+                    </div>
+                </div>
+                
+                <div class="stat-item glow">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">ZMW 250M+</div>
+                        <div class="stat-label">Capital Deployed</div>
+                    </div>
+                </div>
+                
+                <div class="stat-item glow">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" data-count="96">0%</div>
+                        <div class="stat-label">Client Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-cta premium">
+                <a href="{{ url_for('finance.loans') }}" class="btn-hero-magnetic">
+                    <span class="btn-content">
+                        <i class="fas fa-rocket btn-icon"></i>
+                        <span class="btn-text">Explore Financing</span>
+                    </span>
+                    <span class="btn-glow"></span>
+                </a>
+                
+                <a href="{{ url_for('finance.eligibility') }}" class="btn-hero-secondary glass">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Start Assessment</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="hero-visual premium">
+            <div class="hero-3d-card">
+                <div class="card-3d">
+                    <div class="card-front">
+                        <div class="card-header">
+                            <div class="card-logo">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="card-title">
+                                <h3>TUKA FINANCE</h3>
+                                <p>Premium Partner</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-chip">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="card-number">
+                                <span>••••</span>
+                                <span>••••</span>
+                                <span>••••</span>
+                                <span>2024</span>
+                            </div>
+                            <div class="card-footer">
+                                <div class="card-holder">
+                                    <small>BUSINESS ACCOUNT</small>
+                                    <strong>ZMW 500,000</strong>
+                                </div>
+                                <div class="card-valid">
+                                    <small>CREDIT LINE</small>
+                                    <strong>12-24 MOS</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="hero-scroll-indicator">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <span>Scroll to explore</span>
+    </div>
 </section>
 
-<section>
-    <h2>Our Loan Products</h2>
-    <ul>
-        <li><a href="{{ url_for('finance.loans') }}">Business Startup Loans</a> – Quick approval for new ventures.</li>
-        <li><a href="{{ url_for('finance.loans') }}">Working Capital Loans</a> – Manage cash flow and operational expenses.</li>
-        <li><a href="{{ url_for('finance.loans') }}">Expansion & Growth Loans</a> – Scale your business and enter new markets.</li>
-    </ul>
+<!-- Services Showcase -->
+<section class="services-showcase">
+    <div class="container">
+        <div class="showcase-header">
+            <span class="showcase-subtitle pulse">OUR INTEGRATED APPROACH</span>
+            <h2 class="showcase-title">
+                <span class="text-gradient">Complete Financial</span>
+                <span class="text-outline">Ecosystem</span>
+            </h2>
+            <p class="showcase-description">
+                We don't just provide capital—we build financial capability through our five-pillar approach
+            </p>
+        </div>
+        
+        <div class="services-grid">
+            {% for service in [
+                {"icon": "hand-holding-usd", "title": "SME & Group Lending", "desc": "Flexible financing for individual SMEs and business groups", "color": "primary", "link": "loans"},
+                {"icon": "chart-line", "title": "Working Capital Solutions", "desc": "Operational funding aligned with business cycles", "color": "secondary", "link": "loans"},
+                {"icon": "file-invoice-dollar", "title": "Financial Statements", "desc": "Clear financial documentation and reporting", "color": "success", "link": "contact"},
+                {"icon": "database", "title": "Reporting Systems", "desc": "Custom financial tracking and control systems", "color": "warning", "link": "contact"},
+                {"icon": "graduation-cap", "title": "Financial Management", "desc": "Business financial literacy and advisory", "color": "info", "link": "contact"}
+            ] %}
+            <div class="service-card">
+                <div class="service-icon {{ service.color }}">
+                    <i class="fas fa-{{ service.icon }}"></i>
+                </div>
+                <div class="service-content">
+                    <h3>{{ service.title }}</h3>
+                    <p>{{ service.desc }}</p>
+                    <div class="service-features">
+                        {% if loop.index == 1 %}
+                        <span><i class="fas fa-check"></i> Individual Loans</span>
+                        <span><i class="fas fa-check"></i> Group Financing</span>
+                        <span><i class="fas fa-check"></i> Flexible Terms</span>
+                        {% elif loop.index == 2 %}
+                        <span><i class="fas fa-check"></i> Short-term</span>
+                        <span><i class="fas fa-check"></i> Inventory Funding</span>
+                        <span><i class="fas fa-check"></i> Cash Flow</span>
+                        {% elif loop.index == 3 %}
+                        <span><i class="fas fa-check"></i> Income Statements</span>
+                        <span><i class="fas fa-check"></i> Balance Sheets</span>
+                        <span><i class="fas fa-check"></i> Cash Flow</span>
+                        {% elif loop.index == 4 %}
+                        <span><i class="fas fa-check"></i> Custom Templates</span>
+                        <span><i class="fas fa-check"></i> Tracking Systems</span>
+                        <span><i class="fas fa-check"></i> Internal Controls</span>
+                        {% else %}
+                        <span><i class="fas fa-check"></i> Budgeting</span>
+                        <span><i class="fas fa-check"></i> Cost Control</span>
+                        <span><i class="fas fa-check"></i> Financial Literacy</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('finance.' + service.link) }}" class="service-link">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Get Started</h2>
-    <p>
-        Explore our <a href="{{ url_for('finance.loans') }}">loans</a>, check 
-        <a href="{{ url_for('finance.eligibility') }}">eligibility</a>,
-        or <a href="{{ url_for('finance.contact') }}">contact us</a> for guidance.
-    </p>
+<!-- Interactive Loan Calculator -->
+<section class="loan-calculator-section">
+    <div class="container">
+        <div class="calculator-header">
+            <h2>Smart <span class="text-gradient">Loan Calculator</span></h2>
+            <p>Adjust the sliders to see your personalized financing options</p>
+        </div>
+        
+        <div class="calculator-grid">
+            <div class="calculator-controls">
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Loan Amount</span>
+                        <span class="value-display" id="amountValue">ZMW 50,000</span>
+                    </label>
+                    <input type="range" id="loanAmount" min="0" max="50000" value="50000" step="1000" class="range-slider">
+                    <div class="range-ticks">
+                        <span>0</span>
+                        <span>10K</span>
+                        <span>20K</span>
+                        <span>30K</span>
+                        <span>40K</span>
+                        <span>50K</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Repayment Period</span>
+                        <span class="value-display" id="termValue">4 Weeks (1 Month)</span>
+                    </label>
+                    <input type="range" id="loanTerm" min="1" max="12" value="4" step="1" class="range-slider">
+                    <div class="range-ticks">
+                        <span>1W</span>
+                        <span>2W</span>
+                        <span>3W</span>
+                        <span>1M</span>
+                        <span>5W</span>
+                        <span>6W</span>
+                        <span>7W</span>
+                        <span>2M</span>
+                        <span>9W</span>
+                        <span>10W</span>
+                        <span>11W</span>
+                        <span>3M</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Interest Rate</span>
+                        <span class="value-display" id="rateValue">40%</span>
+                    </label>
+                    <div class="interest-info">
+                        <span class="interest-breakdown" id="interestBreakdown">
+                            15% (1 Week) • 20% (2 Weeks) • 35% (3 Weeks) • 40% (4 Weeks/Month)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calculator-results">
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>Your Estimated Payments</h3>
+                        <div class="result-badge">Live Calculation</div>
+                    </div>
+                    <div class="result-body">
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Principal Amount</span>
+                            </div>
+                            <div class="result-value" id="principalAmount">ZMW 50,000</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-percentage"></i>
+                                <span id="paymentFrequencyLabel">Total Interest Rate</span>
+                            </div>
+                            <div class="result-value" id="interestRateDisplay">40%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Total Interest</span>
+                            </div>
+                            <div class="result-value" id="totalInterest">ZMW 20,000</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="periodicPaymentLabel">Monthly Payment</span>
+                            </div>
+                            <div class="result-value" id="monthlyPayment">ZMW 23,333</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Total Repayment</span>
+                            </div>
+                            <div class="result-value" id="totalRepayment">ZMW 70,000</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Loan Duration</span>
+                            </div>
+                            <div class="result-value" id="loanDuration">4 Weeks (1 Month)</div>
+                        </div>
+                    </div>
+                    <div class="result-action">
+                        <a href="{{ url_for('finance.loans') }}" class="btn-calculate">
+                            Apply Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loan-terms-info">
+            <div class="terms-card">
+                <h4><i class="fas fa-info-circle"></i> Our Lending Terms</h4>
+                <div class="terms-grid">
+                    <div class="term-item">
+                        <div class="term-period">1 Week</div>
+                        <div class="term-rate">15% Interest</div>
+                        <div class="term-desc">Payable in full after 7 days</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">2 Weeks</div>
+                        <div class="term-rate">20% Interest</div>
+                        <div class="term-desc">Payable in full after 14 days</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">3 Weeks</div>
+                        <div class="term-rate">35% Interest</div>
+                        <div class="term-desc">Payable in full after 21 days</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">1 Month (4 Weeks)</div>
+                        <div class="term-rate">40% Interest</div>
+                        <div class="term-desc">Payable in monthly installments</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">2 Months</div>
+                        <div class="term-rate">80% Total Interest</div>
+                        <div class="term-desc">40% per month, 2 monthly payments</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">3 Months</div>
+                        <div class="term-rate">120% Total Interest</div>
+                        <div class="term-desc">40% per month, 3 monthly payments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Customer Success Stories</h2>
-    <p>
-        Hear from SMEs who have grown their businesses with Tuka Finance. Our clients have
-        successfully launched startups, expanded operations, and optimized cash flow.
-    </p>
+<!-- Premium Loan Products -->
+<section class="premium-products">
+    <div class="container">
+        <div class="products-header">
+            <div class="header-content">
+                <span class="header-badge">TAILORED SOLUTIONS</span>
+                <h2>Choose Your <span class="text-gradient">Growth Path</span></h2>
+                <p>Select from our premium financing packages designed for Zambian SMEs</p>
+            </div>
+        </div>
+        
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-badge">
+                    <i class="fas fa-crown"></i>
+                    MOST POPULAR
+                </div>
+                <div class="product-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="product-content">
+                    <h3>Quick Capital Access</h3>
+                    <p class="product-description">
+                        Fast working capital for urgent business needs with minimal documentation
+                    </p>
+                    
+                    <div class="product-specs">
+                        <div class="spec-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <span class="spec-label">Amount</span>
+                                <span class="spec-value">Up to ZMW 50K</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <span class="spec-label">Rate</span>
+                                <span class="spec-value">From 15% (1 Week)</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-bolt"></i>
+                            <div>
+                                <span class="spec-label">Approval</span>
+                                <span class="spec-value">24-48 Hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-features">
+                        <span><i class="fas fa-check"></i> No Collateral</span>
+                        <span><i class="fas fa-check"></i> Flexible Repayment</span>
+                        <span><i class="fas fa-check"></i> Digital Process</span>
+                    </div>
+                </div>
+                
+                <div class="product-actions">
+                    <a href="{{ url_for('finance.loans') }}" class="btn-product">
+                        <i class="fas fa-file-signature"></i>
+                        Apply Now
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-badge">
+                    <i class="fas fa-users"></i>
+                    GROUP FINANCING
+                </div>
+                <div class="product-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="product-content">
+                    <h3>Cooperative Growth Fund</h3>
+                    <p class="product-description">
+                        Collaborative financing for business groups, associations, and cooperatives
+                    </p>
+                    
+                    <div class="product-specs">
+                        <div class="spec-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <span class="spec-label">Amount</span>
+                                <span class="spec-value">ZMW 50K-200K</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <span class="spec-label">Rate</span>
+                                <span class="spec-value">From 9.5% (Monthly)</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-user-friends"></i>
+                            <div>
+                                <span class="spec-label">Min Members</span>
+                                <span class="spec-value">3</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-features">
+                        <span><i class="fas fa-check"></i> Group Liability</span>
+                        <span><i class="fas fa-check"></i> Training Included</span>
+                        <span><i class="fas fa-check"></i> Scale-up Support</span>
+                    </div>
+                </div>
+                
+                <div class="product-actions">
+                    <a href="{{ url_for('finance.loans') }}" class="btn-product">
+                        <i class="fas fa-file-signature"></i>
+                        Learn More
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-badge">
+                    <i class="fas fa-expand-alt"></i>
+                    GROWTH FOCUSED
+                </div>
+                <div class="product-icon">
+                    <i class="fas fa-expand-alt"></i>
+                </div>
+                <div class="product-content">
+                    <h3>Business Expansion</h3>
+                    <p class="product-description">
+                        Scale your operations, enter new markets, and expand your business capacity
+                    </p>
+                    
+                    <div class="product-specs">
+                        <div class="spec-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <span class="spec-label">Amount</span>
+                                <span class="spec-value">ZMW 100K-500K</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <span class="spec-label">Rate</span>
+                                <span class="spec-value">From 11.5% (Monthly)</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <span class="spec-label">Term</span>
+                                <span class="spec-value">12-36 Months</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-features">
+                        <span><i class="fas fa-check"></i> Growth Advisory</span>
+                        <span><i class="fas fa-check"></i> Market Expansion</span>
+                        <span><i class="fas fa-check"></i> Equipment Financing</span>
+                    </div>
+                </div>
+                
+                <div class="product-actions">
+                    <a href="{{ url_for('finance.loans') }}" class="btn-product">
+                        <i class="fas fa-file-signature"></i>
+                        Explore Options
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Get in Touch</h2>
-    <p>
-        Have questions or need guidance? Reach out via our <a href="{{ url_for('finance.contact') }}">contact form</a>
-        or speak to one of our relationship managers.
-    </p>
+<!-- Interactive Process Timeline -->
+<section class="process-timeline">
+    <div class="container">
+        <div class="timeline-header">
+            <h2>Our <span class="text-gradient">4-Step Process</span></h2>
+            <p>Simple, transparent, and designed for your success</p>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline">
+                <div class="timeline-step">
+                    <div class="timeline-dot">
+                        <div class="dot-pulse"></div>
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-number">01</div>
+                        <h3>Business Assessment</h3>
+                        <p>We analyze your business model, cash flow, and growth objectives</p>
+                        <div class="timeline-duration">1-2 Days</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-step">
+                    <div class="timeline-dot">
+                        <div class="dot-pulse"></div>
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-number">02</div>
+                        <h3>Solution Design</h3>
+                        <p>Tailored financial solution matching your operational reality</p>
+                        <div class="timeline-duration">2-3 Days</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-step">
+                    <div class="timeline-dot">
+                        <div class="dot-pulse"></div>
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-number">03</div>
+                        <h3>Partnership Setup</h3>
+                        <p>Implementation with ongoing support and adjustments</p>
+                        <div class="timeline-duration">3-5 Days</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-step">
+                    <div class="timeline-dot">
+                        <div class="dot-pulse"></div>
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-number">04</div>
+                        <h3>Growth Monitoring</h3>
+                        <p>Continuous support for sustainable business growth</p>
+                        <div class="timeline-duration">Ongoing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
+
+<!-- Animated Stats Counter -->
+<section class="animated-stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="counter-animated" data-count="250">0</div>
+                    <h4>SMEs Empowered</h4>
+                    <p>Growing businesses across Zambia</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="counter-animated">ZMW 250M+</div>
+                    <h4>Capital Deployed</h4>
+                    <p>Invested in Zambian businesses</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="counter-animated" data-count="40">0</div>
+                    <h4>Business Groups</h4>
+                    <p>Cooperative partnerships</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="counter-animated" data-count="96">0%</div>
+                    <h4>Client Satisfaction</h4>
+                    <p>Happy business partners</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonial Carousel -->
+<section class="testimonial-carousel">
+    <div class="container">
+        <div class="carousel-header">
+            <h2>Success <span class="text-gradient">Stories</span></h2>
+            <p>Hear from Zambian businesses we've partnered with</p>
+        </div>
+        
+        <div class="carousel-container">
+            <div class="carousel-track">
+                <div class="carousel-slide active">
+                    <div class="testimonial-card">
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>"Tuka Finance transformed our cooperative with group financing that perfectly aligned with our harvest cycles. Their structured approach made all the difference."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Chanda" alt="Chanda">
+                            </div>
+                            <div class="author-info">
+                                <h4>Chanda Kunda</h4>
+                                <p>Chairperson, Lusaka Farmers Cooperative</p>
+                                <div class="author-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-slide">
+                    <div class="testimonial-card">
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>"The working capital loan arrived exactly when we needed it. Tuka's financial management support helped us optimize cash flow and scale our operations."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Beauty" alt="Beauty">
+                            </div>
+                            <div class="author-info">
+                                <h4>Beauty Mwansa</h4>
+                                <p>Owner, Copperbelt Manufacturing</p>
+                                <div class="author-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-controls">
+                <button class="carousel-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="carousel-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                </div>
+                <button class="carousel-next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mega CTA Section -->
+<section class="mega-cta">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-text">
+                <h2 class="cta-title">
+                    Ready to <span class="text-stroke">Transform</span>
+                    <br>
+                    Your <span class="text-gradient">Business Finances?</span>
+                </h2>
+                <p class="cta-description">
+                    Join 250+ successful Zambian businesses that have achieved financial stability and sustainable growth with Tuka Finance
+                </p>
+                
+                <div class="cta-features">
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <span>Quick Application</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure Process</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-handshake"></i>
+                        <span>Partnership Focus</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-actions">
+                <a href="{{ url_for('finance.loans') }}" class="btn-cta-primary">
+                    <div class="btn-content">
+                        <i class="fas fa-rocket"></i>
+                        <span>Start Your Journey</span>
+                    </div>
+                </a>
+                
+                <div class="cta-contact">
+                    <a href="{{ url_for('finance.contact') }}" class="btn-cta-secondary">
+                        <i class="fas fa-comments"></i>
+                        Talk to Our Team
+                    </a>
+                    <div class="contact-info">
+                        <i class="fas fa-phone"></i>
+                        <span>+260 123 456 789</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* ===== PREMIUM REDESIGN ===== */
+    
+    /* CSS Variables */
+    :root {
+        --lime: #a2d242;
+        --lime-light: #c9ff66;
+        --lime-dark: #8ab82d;
+        --navy: #1a2a40;
+        --navy-dark: #0d1621;
+        --navy-light: #2a3a55;
+        --white: #ffffff;
+        --text-light: rgba(255, 255, 255, 0.9);
+        --text-muted: rgba(255, 255, 255, 0.7);
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.2);
+        --transition: all 0.3s ease;
+        --container-lg: 1200px;
+        --container-md: 768px;
+        --container-sm: 100%;
+    }
+    
+    /* Base Styles */
+    .container {
+        width: 100%;
+        max-width: var(--container-lg);
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Hero Section - Optimized */
+    .fin-hero.premium {
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+        position: relative;
+        overflow: hidden;
+        padding-top: 80px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .hero-content {
+        width: 100%;
+        max-width: var(--container-lg);
+        margin: 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+    
+    .hero-badge {
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+    
+    .badge-text {
+        display: inline-block;
+        padding: 8px 20px;
+        background: rgba(162, 210, 66, 0.1);
+        border: 1px solid rgba(162, 210, 66, 0.3);
+        border-radius: 30px;
+        color: var(--lime);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    .hero-title {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: var(--white);
+    }
+    
+    .title-line.highlight {
+        background: linear-gradient(135deg, var(--lime-light) 0%, var(--lime) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        color: var(--text-light);
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .hero-stats.premium {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 30px 0;
+    }
+    
+    .stat-item.glow {
+        text-align: center;
+        padding: 20px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+    }
+    
+    .stat-item.glow:hover {
+        transform: translateY(-5px);
+        border-color: var(--lime);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--lime-light), var(--lime));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        color: var(--navy-dark);
+        font-size: 1rem;
+    }
+    
+    .stat-number {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 800;
+        color: var(--lime);
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .hero-cta.premium {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-hero-magnetic {
+        position: relative;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+        color: var(--navy-dark);
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: var(--transition);
+        overflow: hidden;
+        flex: 1;
+        min-width: 200px;
+        justify-content: center;
+    }
+    
+    .btn-hero-magnetic:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-hero-secondary.glass {
+        padding: 15px 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(162, 210, 66, 0.3);
+        color: var(--white);
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: var(--transition);
+        flex: 1;
+        min-width: 200px;
+        justify-content: center;
+    }
+    
+    .btn-hero-secondary.glass:hover {
+        background: rgba(162, 210, 66, 0.2);
+        border-color: var(--lime);
+    }
+    
+    /* Hero Visual - Optimized */
+    .hero-visual.premium {
+        position: relative;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .hero-3d-card {
+        position: relative;
+        width: 280px;
+        perspective: 1000px;
+    }
+    
+    .card-3d {
+        width: 100%;
+        height: 180px;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: card-float 8s ease-in-out infinite;
+    }
+    
+    @keyframes card-float {
+        0%, 100% { transform: translateY(0) rotateY(5deg); }
+        50% { transform: translateY(-15px) rotateY(10deg); }
+    }
+    
+    .card-front {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--navy-light), var(--navy));
+        border: 2px solid rgba(162, 210, 66, 0.3);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .card-front::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .card-logo {
+        width: 35px;
+        height: 35px;
+        background: var(--lime);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--navy-dark);
+        font-size: 1rem;
+    }
+    
+    .card-title h3 {
+        color: var(--white);
+        margin: 0;
+        font-size: 1rem;
+    }
+    
+    .card-title p {
+        color: var(--lime);
+        margin: 0;
+        font-size: 11px;
+    }
+    
+    .card-chip {
+        font-size: 1.5rem;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: 15px;
+    }
+    
+    .card-number {
+        display: flex;
+        justify-content: space-between;
+        font-family: monospace;
+        font-size: 1.2rem;
+        color: var(--white);
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+    }
+    
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        color: var(--white);
+    }
+    
+    .card-holder small,
+    .card-valid small {
+        display: block;
+        font-size: 9px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+    }
+    
+    .floating-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(162, 210, 66, 0.1) 0%, transparent 70%);
+    }
+    
+    .shape-1 {
+        width: 80px;
+        height: 80px;
+        top: 10%;
+        right: 10%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape-2 {
+        width: 120px;
+        height: 120px;
+        bottom: 10%;
+        left: 10%;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    .shape-3 {
+        width: 60px;
+        height: 60px;
+        top: 50%;
+        right: 20%;
+        animation: float 7s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-15px) scale(1.1); }
+    }
+    
+    .hero-scroll-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 12px;
+    }
+    
+    .mouse {
+        width: 25px;
+        height: 40px;
+        border: 2px solid var(--lime);
+        border-radius: 15px;
+        margin: 0 auto 8px;
+        position: relative;
+    }
+    
+    .wheel {
+        width: 3px;
+        height: 8px;
+        background: var(--lime);
+        border-radius: 2px;
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: scroll-wheel 2s infinite;
+    }
+    
+    @keyframes scroll-wheel {
+        0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(15px); }
+    }
+    
+    /* Services Section - Optimized */
+    .services-showcase {
+        padding: 80px 0;
+        background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%);
+    }
+    
+    .showcase-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .showcase-subtitle {
+        display: inline-block;
+        padding: 6px 15px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 20px;
+        color: var(--lime);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+    
+    .showcase-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--white);
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+    
+    .showcase-description {
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: var(--container-lg);
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .service-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        padding: 25px;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lime), var(--lime-light));
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+    
+    .service-card:hover::before {
+        transform: translateX(0);
+    }
+    
+    .service-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--lime);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+    }
+    
+    .service-icon.primary {
+        background: rgba(162, 210, 66, 0.1);
+        color: var(--lime);
+    }
+    
+    .service-icon.secondary {
+        background: rgba(66, 153, 225, 0.1);
+        color: #4299e1;
+    }
+    
+    .service-icon.success {
+        background: rgba(72, 187, 120, 0.1);
+        color: #48bb78;
+    }
+    
+    .service-icon.warning {
+        background: rgba(237, 137, 54, 0.1);
+        color: #ed8936;
+    }
+    
+    .service-icon.info {
+        background: rgba(66, 153, 225, 0.1);
+        color: #4299e1;
+    }
+    
+    .service-content h3 {
+        color: var(--white);
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+    
+    .service-content p {
+        color: var(--text-light);
+        margin-bottom: 15px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+    
+    .service-features {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .service-features span {
+        color: var(--text-light);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .service-features i {
+        color: var(--lime);
+        font-size: 11px;
+    }
+    
+    .service-link {
+        color: var(--lime);
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+    
+    .service-link:hover {
+        gap: 10px;
+    }
+    
+    /* Loan Calculator - UPDATED for specific interest structure */
+    .loan-calculator-section {
+        padding: 80px 0;
+        background: var(--navy-dark);
+    }
+    
+    .calculator-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .calculator-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--white);
+        margin-bottom: 15px;
+    }
+    
+    .calculator-header p {
+        color: var(--text-light);
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    }
+    
+    .calculator-grid {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+        padding: 0 20px;
+    }
+    
+    .control-group {
+        margin-bottom: 30px;
+    }
+    
+    .control-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        color: var(--white);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .value-display {
+        color: var(--lime);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    
+    .range-slider {
+        width: 100%;
+        height: 6px;
+        -webkit-appearance: none;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        outline: none;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--lime);
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid var(--navy-dark);
+        box-shadow: 0 4px 10px rgba(162, 210, 66, 0.3);
+        transition: var(--transition);
+    }
+    
+    .range-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 15px rgba(162, 210, 66, 0.4);
+    }
+    
+    .range-ticks {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        color: var(--text-muted);
+        font-size: 11px;
+    }
+    
+    .interest-info {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(162, 210, 66, 0.2);
+    }
+    
+    .interest-breakdown {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        text-align: center;
+    }
+    
+    .result-card {
+        background: linear-gradient(135deg, var(--navy-light), var(--navy));
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        border: 1px solid rgba(162, 210, 66, 0.2);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .result-header h3 {
+        color: var(--white);
+        margin: 0;
+        font-size: 1.3rem;
+    }
+    
+    .result-badge {
+        background: var(--lime);
+        color: var(--navy-dark);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    
+    .result-body {
+        margin-bottom: 25px;
+    }
+    
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .result-item:last-child {
+        border-bottom: none;
+    }
+    
+    .result-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .result-label i {
+        color: var(--lime);
+        font-size: 0.9rem;
+    }
+    
+    .result-value {
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-align: right;
+    }
+    
+    .btn-calculate {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 25px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: var(--transition);
+        font-size: 0.95rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-calculate:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Loan Terms Info */
+    .loan-terms-info {
+        max-width: 1000px;
+        margin: 60px auto 0;
+        padding: 0 20px;
+    }
+    
+    .terms-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+    }
+    
+    .terms-card h4 {
+        color: var(--white);
+        font-size: 1.3rem;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .terms-card h4 i {
+        color: var(--lime);
+    }
+    
+    .terms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    
+    .term-item {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+        text-align: center;
+    }
+    
+    .term-item:hover {
+        transform: translateY(-5px);
+        border-color: var(--lime);
+        background: rgba(162, 210, 66, 0.05);
+    }
+    
+    .term-period {
+        color: var(--lime);
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .term-rate {
+        color: var(--white);
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+    
+    .term-desc {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    /* Premium Products - Optimized */
+    .premium-products {
+        padding: 80px 0;
+        background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy) 100%);
+    }
+    
+    .products-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .header-badge {
+        display: inline-block;
+        padding: 6px 15px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 20px;
+        color: var(--lime);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+    
+    .products-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--white);
+        margin-bottom: 15px;
+    }
+    
+    .products-header p {
+        color: var(--text-light);
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        max-width: var(--container-lg);
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .product-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--lime);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .product-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 12px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .product-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        color: var(--lime);
+    }
+    
+    .product-content h3 {
+        color: var(--white);
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+    
+    .product-description {
+        color: var(--text-light);
+        margin-bottom: 20px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+    
+    .product-specs {
+        margin-bottom: 20px;
+    }
+    
+    .spec-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .spec-item:last-child {
+        border-bottom: none;
+    }
+    
+    .spec-item i {
+        color: var(--lime);
+        font-size: 1rem;
+        width: 25px;
+    }
+    
+    .spec-label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 11px;
+    }
+    
+    .spec-value {
+        display: block;
+        color: var(--white);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    
+    .product-features {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .product-features span {
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+    }
+    
+    .product-features i {
+        color: var(--lime);
+        font-size: 11px;
+    }
+    
+    .btn-product {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 25px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: var(--transition);
+        width: 100%;
+        justify-content: center;
+        font-size: 0.95rem;
+    }
+    
+    .btn-product:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Timeline - Optimized */
+    .process-timeline {
+        padding: 80px 0;
+        background: var(--navy-dark);
+    }
+    
+    .timeline-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .timeline-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--white);
+        margin-bottom: 15px;
+    }
+    
+    .timeline-header p {
+        color: var(--text-light);
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    }
+    
+    .timeline-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+        padding: 0 20px;
+    }
+    
+    .timeline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+    
+    .timeline-step {
+        text-align: center;
+        padding: 25px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .timeline-step:hover {
+        transform: translateY(-5px);
+        border-color: var(--lime);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .timeline-dot {
+        width: 50px;
+        height: 50px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        position: relative;
+    }
+    
+    .timeline-dot i {
+        color: var(--lime);
+        font-size: 1.2rem;
+    }
+    
+    .dot-pulse {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--lime);
+        opacity: 0.2;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.2; }
+        70% { transform: scale(1.2); opacity: 0; }
+        100% { transform: scale(1); opacity: 0; }
+    }
+    
+    .timeline-number {
+        font-size: 13px;
+        color: var(--lime);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .timeline-content h3 {
+        color: var(--white);
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .timeline-content p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+    
+    .timeline-duration {
+        display: inline-block;
+        padding: 4px 12px;
+        background: rgba(162, 210, 66, 0.1);
+        color: var(--lime);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    /* Animated Stats - Optimized */
+    .animated-stats {
+        padding: 80px 0;
+        background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        max-width: var(--container-lg);
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 30px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(162, 210, 66, 0.1);
+        transition: var(--transition);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--lime);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-card .stat-icon {
+        margin: 0 auto 15px;
+    }
+    
+    .counter-animated {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        color: var(--lime);
+        margin-bottom: 8px;
+    }
+    
+    .stat-content h4 {
+        color: var(--white);
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .stat-content p {
+        color: var(--text-light);
+        font-size: 0.85rem;
+    }
+    
+    /* Testimonial Carousel - Optimized */
+    .testimonial-carousel {
+        padding: 80px 0;
+        background: var(--navy-dark);
+    }
+    
+    .carousel-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .carousel-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--white);
+        margin-bottom: 15px;
+    }
+    
+    .carousel-header p {
+        color: var(--text-light);
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    }
+    
+    .carousel-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        padding: 0 20px;
+    }
+    
+    .carousel-track {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+    
+    .carousel-slide {
+        min-width: 100%;
+    }
+    
+    .testimonial-card {
+        background: linear-gradient(135deg, var(--navy-light), var(--navy));
+        border-radius: var(--radius-lg);
+        padding: 40px 30px;
+        border: 1px solid rgba(162, 210, 66, 0.2);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .testimonial-quote {
+        color: var(--lime);
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    .testimonial-content p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        line-height: 1.5;
+        margin-bottom: 25px;
+        font-style: italic;
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .author-avatar img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid var(--lime);
+    }
+    
+    .author-info h4 {
+        color: var(--white);
+        margin: 0 0 5px 0;
+        font-size: 1rem;
+    }
+    
+    .author-info p {
+        color: var(--text-light);
+        margin: 0 0 8px 0;
+        font-size: 13px;
+    }
+    
+    .author-rating {
+        color: var(--lime);
+        font-size: 13px;
+    }
+    
+    .carousel-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .carousel-prev,
+    .carousel-next {
+        width: 45px;
+        height: 45px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .carousel-prev:hover,
+    .carousel-next:hover {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .carousel-dots {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .dot {
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .dot.active {
+        background: var(--lime);
+        transform: scale(1.1);
+    }
+    
+    /* Mega CTA - Optimized */
+    .mega-cta {
+        padding: 80px 0;
+        background: linear-gradient(135deg, var(--navy-dark) 0%, #0a1425 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mega-cta::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(162, 210, 66, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    
+    .cta-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        padding: 0 20px;
+    }
+    
+    .cta-title {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        color: var(--white);
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+    
+    .cta-description {
+        font-size: clamp(1rem, 1.5vw, 1.2rem);
+        color: var(--text-light);
+        max-width: 700px;
+        margin: 0 auto 30px;
+        line-height: 1.5;
+    }
+    
+    .cta-features {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+    
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--lime);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .feature i {
+        font-size: 1.1rem;
+    }
+    
+    .cta-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .btn-cta-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 40px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        text-decoration: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        transition: var(--transition);
+    }
+    
+    .btn-cta-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-cta-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 30px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+    
+    .btn-cta-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .contact-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--lime);
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-left: 20px;
+    }
+    
+    /* Text Effects */
+    .text-gradient {
+        background: linear-gradient(135deg, var(--lime-light) 0%, var(--lime) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .text-stroke {
+        color: transparent;
+        -webkit-text-stroke: 2px var(--lime);
+        text-stroke: 2px var(--lime);
+    }
+    
+    .text-outline {
+        color: transparent;
+        -webkit-text-stroke: 1px var(--white);
+        text-stroke: 1px var(--white);
+    }
+    
+    /* Enhanced Responsive Design */
+    
+    /* Tablet (768px - 1024px) */
+    @media (max-width: 1024px) {
+        .hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 40px;
+        }
+        
+        .hero-visual.premium {
+            height: 250px;
+            order: -1;
+        }
+        
+        .calculator-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        
+        .timeline {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .hero-stats.premium {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .contact-info {
+            margin-left: 0;
+            margin-top: 15px;
+        }
+        
+        .terms-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* Large Mobile (576px - 768px) */
+    @media (max-width: 768px) {
+        .hero-stats.premium {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .hero-cta.premium {
+            flex-direction: column;
+        }
+        
+        .btn-hero-magnetic,
+        .btn-hero-secondary.glass {
+            width: 100%;
+        }
+        
+        .services-grid,
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .timeline {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .cta-features {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .calculator-grid {
+            padding: 0 15px;
+        }
+        
+        .terms-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .result-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        
+        .result-value {
+            text-align: left;
+            margin-top: 5px;
+        }
+    }
+    
+    /* Small Mobile (0 - 576px) */
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-stats.premium {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+        }
+        
+        .counter-animated {
+            font-size: 2.2rem;
+        }
+        
+        .testimonial-card {
+            padding: 25px 20px;
+        }
+        
+        .cta-title {
+            font-size: 2rem;
+        }
+        
+        .calculator-controls,
+        .calculator-results {
+            padding: 15px;
+        }
+        
+        .product-card,
+        .service-card,
+        .stat-card,
+        .timeline-step {
+            padding: 20px;
+        }
+        
+        .range-ticks span {
+            font-size: 10px;
+        }
+        
+        .author-avatar img {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .carousel-prev,
+        .carousel-next {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .terms-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .terms-card {
+            padding: 20px;
+        }
+        
+        .interest-breakdown {
+            font-size: 0.8rem;
+        }
+    }
+    
+    /* Very Small Mobile (0 - 375px) */
+    @media (max-width: 375px) {
+        .hero-title {
+            font-size: 1.8rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .counter-animated {
+            font-size: 2rem;
+        }
+        
+        .showcase-title,
+        .calculator-header h2,
+        .products-header h2,
+        .timeline-header h2,
+        .carousel-header h2,
+        .cta-title {
+            font-size: 1.8rem;
+        }
+        
+        .btn-hero-magnetic,
+        .btn-hero-secondary.glass,
+        .btn-calculate,
+        .btn-product,
+        .btn-cta-primary,
+        .btn-cta-secondary {
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+        
+        .products-grid,
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Landscape Mode Optimization */
+    @media (max-height: 600px) and (orientation: landscape) {
+        .fin-hero.premium {
+            min-height: auto;
+            padding: 100px 0;
+        }
+        
+        .hero-content {
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+        }
+        
+        .hero-visual.premium {
+            height: 200px;
+        }
+        
+        .hero-3d-card {
+            width: 240px;
+        }
+        
+        .card-3d {
+            height: 150px;
+        }
+    }
+    
+    /* High DPI Screens */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .hero-title,
+        .showcase-title,
+        .calculator-header h2,
+        .products-header h2,
+        .timeline-header h2,
+        .carousel-header h2,
+        .cta-title {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .fin-hero.premium {
+            background: white !important;
+            color: black !important;
+            min-height: auto;
+        }
+        
+        .hero-title,
+        .hero-subtitle,
+        .stat-number,
+        .result-value,
+        .cta-title {
+            color: black !important;
+        }
+        
+        .btn-hero-magnetic,
+        .btn-hero-secondary.glass,
+        .btn-calculate,
+        .btn-product,
+        .btn-cta-primary {
+            background: #f0f0f0 !important;
+            color: black !important;
+            border: 1px solid #ccc !important;
+        }
+        
+        .testimonial-card,
+        .product-card,
+        .service-card,
+        .stat-card {
+            break-inside: avoid;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Particles.js
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 40, density: { enable: true, value_area: 800 } },
+                    color: { value: "#a2d242" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.3, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#a2d242",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1.5,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
+            });
+        }
+
+        // Animated Counters
+        const counters = document.querySelectorAll('.counter-animated[data-count]');
+        const speed = 150;
+        
+        const animateCounter = (counter) => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const count = parseInt(counter.innerText) || 0;
+            const increment = target / speed;
+            
+            if (count < target) {
+                counter.innerText = Math.ceil(count + increment);
+                setTimeout(() => animateCounter(counter), 10);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        
+        counters.forEach(counter => observer.observe(counter));
+
+        // Loan Calculator with specific business model
+        const loanAmount = document.getElementById('loanAmount');
+        const loanTerm = document.getElementById('loanTerm');
+        const principalAmount = document.getElementById('principalAmount');
+        const interestRateDisplay = document.getElementById('interestRateDisplay');
+        const totalInterest = document.getElementById('totalInterest');
+        const monthlyPayment = document.getElementById('monthlyPayment');
+        const totalRepayment = document.getElementById('totalRepayment');
+        const loanDuration = document.getElementById('loanDuration');
+        const amountValue = document.getElementById('amountValue');
+        const termValue = document.getElementById('termValue');
+        const rateValue = document.getElementById('rateValue');
+        const paymentFrequencyLabel = document.getElementById('paymentFrequencyLabel');
+        const periodicPaymentLabel = document.getElementById('periodicPaymentLabel');
+        
+        function formatCurrency(amount) {
+            return 'ZMW ' + amount.toLocaleString();
+        }
+        
+        // Interest rates based on weeks
+        const interestRates = {
+            1: 0.15,   // 1 week: 15%
+            2: 0.20,   // 2 weeks: 20%
+            3: 0.35,   // 3 weeks: 35%
+            4: 0.40,   // 4 weeks (1 month): 40%
+            8: 0.80,   // 2 months: 80% total (40% per month)
+            12: 1.20   // 3 months: 120% total (40% per month)
+        };
+        
+        // Get interest rate based on weeks
+        function getInterestRate(weeks) {
+            // Map weeks to available rates
+            if (weeks <= 1) return interestRates[1];
+            if (weeks <= 2) return interestRates[2];
+            if (weeks <= 3) return interestRates[3];
+            if (weeks <= 4) return interestRates[4];
+            if (weeks <= 8) return interestRates[8];
+            return interestRates[12]; // Max 12 weeks (3 months)
+        }
+        
+        // Get display term based on weeks
+        function getDisplayTerm(weeks) {
+            if (weeks === 1) return '1 Week';
+            if (weeks === 2) return '2 Weeks';
+            if (weeks === 3) return '3 Weeks';
+            if (weeks === 4) return '4 Weeks (1 Month)';
+            if (weeks === 8) return '2 Months';
+            if (weeks === 12) return '3 Months';
+            return `${weeks} Weeks`;
+        }
+        
+        // Get number of payments based on weeks
+        function getNumberOfPayments(weeks) {
+            if (weeks <= 3) return 1; // Lump sum for 1-3 weeks
+            if (weeks === 4) return 1; // Lump sum for 4 weeks
+            if (weeks === 8) return 2; // 2 monthly payments
+            return 3; // 3 monthly payments
+        }
+        
+        // Get payment frequency label
+        function getPaymentFrequencyLabel(weeks) {
+            if (weeks <= 3) return 'Interest Rate';
+            return 'Monthly Interest Rate';
+        }
+        
+        // Get periodic payment label
+        function getPeriodicPaymentLabel(weeks) {
+            if (weeks <= 4) return 'Total Payment';
+            return 'Monthly Payment';
+        }
+        
+        function calculateLoan() {
+            const amount = parseFloat(loanAmount.value);
+            const weeks = parseInt(loanTerm.value);
+            
+            // Get interest rate based on weeks
+            const interestRate = getInterestRate(weeks);
+            const numberOfPayments = getNumberOfPayments(weeks);
+            
+            // Calculate total interest and repayment
+            const interest = amount * interestRate;
+            const total = amount + interest;
+            const periodicPayment = total / numberOfPayments;
+            
+            // Update display values
+            amountValue.textContent = formatCurrency(amount);
+            termValue.textContent = getDisplayTerm(weeks);
+            rateValue.textContent = `${(interestRate * 100).toFixed(0)}%`;
+            
+            // Update labels based on term
+            paymentFrequencyLabel.textContent = getPaymentFrequencyLabel(weeks);
+            periodicPaymentLabel.textContent = getPeriodicPaymentLabel(weeks);
+            
+            // Update results
+            principalAmount.textContent = formatCurrency(amount);
+            interestRateDisplay.textContent = `${(interestRate * 100).toFixed(0)}%`;
+            totalInterest.textContent = formatCurrency(Math.round(interest));
+            monthlyPayment.textContent = formatCurrency(Math.round(periodicPayment));
+            totalRepayment.textContent = formatCurrency(Math.round(total));
+            loanDuration.textContent = getDisplayTerm(weeks);
+        }
+        
+        // Event listeners for calculator
+        loanAmount.addEventListener('input', calculateLoan);
+        loanTerm.addEventListener('input', calculateLoan);
+        
+        // Touch event support for mobile
+        loanAmount.addEventListener('touchmove', calculateLoan);
+        loanTerm.addEventListener('touchmove', calculateLoan);
+        
+        // Initialize calculator
+        calculateLoan();
+
+        // Testimonial Carousel
+        const carouselTrack = document.querySelector('.carousel-track');
+        const carouselSlides = document.querySelectorAll('.carousel-slide');
+        const carouselDots = document.querySelectorAll('.carousel-dots .dot');
+        const prevBtn = document.querySelector('.carousel-prev');
+        const nextBtn = document.querySelector('.carousel-next');
+        
+        let currentSlide = 0;
+        let autoRotateInterval;
+        
+        function updateCarousel() {
+            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            carouselDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % carouselSlides.length;
+            updateCarousel();
+        }
+        
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + carouselSlides.length) % carouselSlides.length;
+            updateCarousel();
+        }
+        
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        
+        // Touch support for carousel
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        carouselTrack.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        carouselTrack.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > 50) { // Minimum swipe distance
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        });
+        
+        carouselDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                updateCarousel();
+                resetAutoRotate();
+            });
+        });
+        
+        function startAutoRotate() {
+            autoRotateInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function resetAutoRotate() {
+            clearInterval(autoRotateInterval);
+            startAutoRotate();
+        }
+        
+        startAutoRotate();
+        
+        // Pause auto-rotate on hover/touch
+        carouselTrack.addEventListener('mouseenter', () => clearInterval(autoRotateInterval));
+        carouselTrack.addEventListener('mouseleave', startAutoRotate);
+        carouselTrack.addEventListener('touchstart', () => clearInterval(autoRotateInterval));
+        carouselTrack.addEventListener('touchend', () => setTimeout(startAutoRotate, 3000));
+
+        // Scroll Indicator
+        const scrollIndicator = document.querySelector('.hero-scroll-indicator');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                scrollIndicator.style.opacity = '0';
+                scrollIndicator.style.visibility = 'hidden';
+            } else {
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.visibility = 'visible';
+            }
+        });
+
+        // Add hover effects to all interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, .service-card, .product-card, .stat-card, .timeline-step, .term-item');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) { // Only on desktop
+                    element.style.transform = 'translateY(-3px)';
+                }
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Initialize timeline hover effect
+        const timelineSteps = document.querySelectorAll('.timeline-step');
+        
+        timelineSteps.forEach((step) => {
+            step.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    timelineSteps.forEach(s => s.classList.remove('active'));
+                    step.classList.add('active');
+                }
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+            
+            // Add entrance animations
+            const elements = document.querySelectorAll('.service-card, .product-card, .stat-card, .timeline-step, .testimonial-card, .term-item');
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Optimize for mobile touch
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', function() {
+            // Recalculate layout
+            setTimeout(() => {
+                calculateLoan();
+                updateCarousel();
+            }, 300);
+        });
+
+        // Performance optimization: Debounce resize events
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                calculateLoan();
+                updateCarousel();
+            }, 250);
+        });
+        
+        // Snap loan term to specific values (1, 2, 3, 4, 8, 12 weeks)
+        const allowedTerms = [1, 2, 3, 4, 8, 12];
+        
+        loanTerm.addEventListener('change', function() {
+            let value = parseInt(this.value);
+            // Find the closest allowed term
+            let closest = allowedTerms.reduce((prev, curr) => {
+                return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+            });
+            this.value = closest;
+            calculateLoan();
+        });
+    });
+</script>
 {% endblock %}

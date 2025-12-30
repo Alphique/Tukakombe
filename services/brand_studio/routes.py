@@ -1,11 +1,10 @@
-# services/brand_studio/routes.py
 from flask import Blueprint, render_template
 
 brand_bp = Blueprint(
     "brand_studio",
     __name__,
-    url_prefix="/brand-studio",
-    template_folder="templates"
+    url_prefix="/brand_studio",
+    template_folder="templates"  # points directly to services/brand_studio/templates/
 )
 
 @brand_bp.route("/")

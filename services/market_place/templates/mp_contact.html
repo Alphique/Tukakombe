@@ -1,0 +1,49 @@
+<!-- services/brand_studio/templates/br_contact.html -->
+{% extends "br_base.html" %}
+
+{% block br_content %}
+<h1>Contact Tuka Brand Studio</h1>
+
+<p>
+    Ready to build or refresh your brand? Contact our creative team or submit a brief below.
+</p>
+
+<h2>Brand Studio Emails</h2>
+<ul>
+    <li>Creative Director – creative@tukakombe.com</li>
+    <li>Design Team – design@tukakombe.com</li>
+    <li>General Enquiries – info@tukakombe.com</li>
+</ul>
+
+<hr>
+
+<h2>Creative Brief</h2>
+<form method="post" action="/brand-studio/contact">
+    <div>
+        <label>Full Name</label><br>
+        <input type="text" name="full_name" required>
+    </div>
+
+    <div>
+        <label>Email Address</label><br>
+        <input type="email" name="email" required>
+    </div>
+
+    <div>
+        <label>Company / Brand Name</label><br>
+        <input type="text" name="company" required>
+    </div>
+
+    <div>
+        <label>Project Type</label><br>
+        <input type="text" name="project_type" required>
+    </div>
+
+    <div>
+        <label>Creative Brief</label><br>
+        <textarea name="brief" rows="5" required></textarea>
+    </div>
+
+    <button type="submit">Submit Brief</button>
+</form>
+{% endblock %}

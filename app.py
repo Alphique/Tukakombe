@@ -43,6 +43,12 @@ def create_app():
     from services.finance.admin.routes import finance_admin_bp
     app.register_blueprint(finance_admin_bp)
 
+     # =============================
+    # MARKET PLACE SERVICES 
+    # =============================
+    from services.market_place.routes import market_bp
+    app.register_blueprint(market_bp)
+
     # =============================
     # BLOG
     # =============================

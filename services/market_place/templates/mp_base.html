@@ -1,0 +1,19 @@
+<!-- services/brand_studio/templates/br_base.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="brand-nav">
+    <ul>
+        <li><a href="/">TUKAKOMBE</a></li>
+        <li><a href="/brand-studio">Home</a></li>
+        <li><a href="/brand-studio/services">Services</a></li>
+        <li><a href="/brand-studio/portfolio">Portfolio</a></li>
+        <li><a href="/brand-studio/process">Process</a></li>
+        <li><a href="/brand-studio/contact">Contact</a></li>
+    </ul>
+</nav>
+
+<hr>
+
+{% block br_content %}{% endblock %}
+{% endblock %}
