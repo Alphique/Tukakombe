@@ -201,7 +201,7 @@
                         <span>Loan Amount</span>
                         <span class="value-display" id="amountValue">ZMW 50,000</span>
                     </label>
-                    <input type="range" id="loanAmount" min="0" max="50000" value="50000" step="1000" class="range-slider">
+                    <input type="range" id="loanAmount" min="0" max="50000" value="50000" step="100" class="range-slider">
                     <div class="range-ticks">
                         <span>0</span>
                         <span>10K</span>
@@ -241,7 +241,7 @@
                     </label>
                     <div class="interest-info">
                         <span class="interest-breakdown" id="interestBreakdown">
-                            15% (1 Week) • 20% (2 Weeks) • 35% (3 Weeks) • 40% (4 Weeks/Month)
+                            40% (4 Weeks/Month)
                         </span>
                     </div>
                 </div>
@@ -329,6 +329,21 @@
                         <div class="term-period">1 Month (4 Weeks)</div>
                         <div class="term-rate">40% Interest</div>
                         <div class="term-desc">Payable in monthly installments</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">1 Month 1 Week</div>
+                        <div class="term-rate">55% Total Interest</div>
+                        <div class="term-desc">40% + 15% for extra week</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">1 Month 2 Weeks</div>
+                        <div class="term-rate">60% Total Interest</div>
+                        <div class="term-desc">40% + 20% for 2 extra weeks</div>
+                    </div>
+                    <div class="term-item">
+                        <div class="term-period">1 Month 3 Weeks</div>
+                        <div class="term-rate">75% Total Interest</div>
+                        <div class="term-desc">40% + 35% for 3 extra weeks</div>
                     </div>
                     <div class="term-item">
                         <div class="term-period">2 Months</div>
@@ -806,16 +821,29 @@
         padding: 0 20px;
     }
     
-    /* Hero Section - Optimized */
+    /* Hero Section - UPDATED for translucent board image */
     .fin-hero.premium {
         min-height: 100vh;
         min-height: 100dvh;
-        background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+        background: linear-gradient(135deg, #1a2a40 0%, #1a2a40 100%);
         position: relative;
         overflow: hidden;
         padding-top: 80px;
         display: flex;
         align-items: center;
+    }
+    
+    .fin-hero.premium::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("/static/images/board.png") center/cover no-repeat;
+        opacity: 0.1; /* Very translucent - adjust this value (0.1 = 10% visible) */
+        pointer-events: none; /* Allows clicks to pass through */
+        z-index: 0;
     }
     
     .hero-content {
@@ -827,6 +855,8 @@
         grid-template-columns: 1fr 1fr;
         gap: 60px;
         align-items: center;
+        position: relative;
+        z-index: 1; /* Ensure content is above the background */
     }
     
     .hero-badge {
@@ -983,6 +1013,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 1; /* Ensure 3D card is above background */
     }
     
     .hero-3d-card {
@@ -1137,6 +1168,7 @@
         text-align: center;
         color: var(--text-muted);
         font-size: 12px;
+        z-index: 1; /* Ensure scroll indicator is above background */
     }
     
     .mouse {
@@ -2458,6 +2490,10 @@
             min-height: auto;
         }
         
+        .fin-hero.premium::before {
+            display: none;
+        }
+        
         .hero-title,
         .hero-subtitle,
         .stat-number,
@@ -2570,25 +2606,36 @@
             return 'ZMW ' + amount.toLocaleString();
         }
         
-        // Interest rates based on weeks
-        const interestRates = {
-            1: 0.15,   // 1 week: 15%
-            2: 0.20,   // 2 weeks: 20%
-            3: 0.35,   // 3 weeks: 35%
-            4: 0.40,   // 4 weeks (1 month): 40%
-            8: 0.80,   // 2 months: 80% total (40% per month)
-            12: 1.20   // 3 months: 120% total (40% per month)
-        };
-        
-        // Get interest rate based on weeks
+        // Updated Interest rates based on weeks with the exact logic you specified
         function getInterestRate(weeks) {
-            // Map weeks to available rates
-            if (weeks <= 1) return interestRates[1];
-            if (weeks <= 2) return interestRates[2];
-            if (weeks <= 3) return interestRates[3];
-            if (weeks <= 4) return interestRates[4];
-            if (weeks <= 8) return interestRates[8];
-            return interestRates[12]; // Max 12 weeks (3 months)
+            const baseRates = {
+                1: 0.15,   // 1 week
+                2: 0.20,   // 2 weeks
+                3: 0.35,   // 3 weeks
+                4: 0.40    // 4 weeks (1 month)
+            };
+            
+            // For 1-4 weeks, use base rates
+            if (weeks <= 4) return baseRates[weeks];
+            
+            // For 5-7 weeks (1 month + extra weeks)
+            if (weeks === 5) return 0.55;  // 40% + 15%
+            if (weeks === 6) return 0.60;  // 40% + 20%
+            if (weeks === 7) return 0.75;  // 40% + 35%
+            
+            // For exactly 8 weeks (2 months)
+            if (weeks === 8) return 0.80;
+            
+            // For exactly 12 weeks (3 months)
+            if (weeks === 12) return 1.20;
+            
+            // For 9-11 weeks (2 months + extra weeks)
+            if (weeks === 9) return 0.95;  // 80% + 15%
+            if (weeks === 10) return 1.00; // 80% + 20%
+            if (weeks === 11) return 1.15; // 80% + 35%
+            
+            // Default fallback (shouldn't reach here with slider 1-12)
+            return 0.40;
         }
         
         // Get display term based on weeks
@@ -2597,7 +2644,13 @@
             if (weeks === 2) return '2 Weeks';
             if (weeks === 3) return '3 Weeks';
             if (weeks === 4) return '4 Weeks (1 Month)';
+            if (weeks === 5) return '1 Month 1 Week';
+            if (weeks === 6) return '1 Month 2 Weeks';
+            if (weeks === 7) return '1 Month 3 Weeks';
             if (weeks === 8) return '2 Months';
+            if (weeks === 9) return '2 Months 1 Week';
+            if (weeks === 10) return '2 Months 2 Weeks';
+            if (weeks === 11) return '2 Months 3 Weeks';
             if (weeks === 12) return '3 Months';
             return `${weeks} Weeks`;
         }
@@ -2606,25 +2659,55 @@
         function getNumberOfPayments(weeks) {
             if (weeks <= 3) return 1; // Lump sum for 1-3 weeks
             if (weeks === 4) return 1; // Lump sum for 4 weeks
+            if (weeks <= 7) return 1; // Lump sum for 5-7 weeks (1 month + extra weeks)
             if (weeks === 8) return 2; // 2 monthly payments
-            return 3; // 3 monthly payments
+            if (weeks <= 11) return 2; // 2 monthly payments for 9-11 weeks (2 months + extra weeks)
+            return 3; // 3 monthly payments for 3 months
         }
         
         // Get payment frequency label
         function getPaymentFrequencyLabel(weeks) {
-            if (weeks <= 3) return 'Interest Rate';
-            return 'Monthly Interest Rate';
+            if (weeks <= 7) return 'Total Interest Rate';
+            return 'Total Interest Rate';
         }
         
         // Get periodic payment label
         function getPeriodicPaymentLabel(weeks) {
-            if (weeks <= 4) return 'Total Payment';
+            if (weeks <= 7) return 'Total Payment';
             return 'Monthly Payment';
         }
         
+        // Add helper function for interest breakdown display
+        function getInterestBreakdown(weeks) {
+            if (weeks === 1) return "15% (1 Week)";
+            if (weeks === 2) return "20% (2 Weeks)";
+            if (weeks === 3) return "35% (3 Weeks)";
+            if (weeks === 4) return "40% (4 Weeks/Month)";
+            if (weeks === 5) return "55% (40% + 15% for extra week)";
+            if (weeks === 6) return "60% (40% + 20% for 2 extra weeks)";
+            if (weeks === 7) return "75% (40% + 35% for 3 extra weeks)";
+            if (weeks === 8) return "80% (2 Months: 40% per month)";
+            if (weeks === 9) return "95% (80% + 15% for extra week)";
+            if (weeks === 10) return "100% (80% + 20% for 2 extra weeks)";
+            if (weeks === 11) return "115% (80% + 35% for 3 extra weeks)";
+            if (weeks === 12) return "120% (3 Months: 40% per month)";
+            return "40% (Monthly Rate)";
+        }
+        
+        // Real-time snapping for loan amount (multiples of 100)
+        let lastSnappedAmount = 50000;
+        
+        function snapToNearest100(value) {
+            return Math.round(value / 100) * 100;
+        }
+        
         function calculateLoan() {
-            const amount = parseFloat(loanAmount.value);
+            let amount = parseFloat(loanAmount.value);
             const weeks = parseInt(loanTerm.value);
+            
+            // Snap amount to nearest 100
+            amount = snapToNearest100(amount);
+            loanAmount.value = amount;
             
             // Get interest rate based on weeks
             const interestRate = getInterestRate(weeks);
@@ -2640,6 +2723,10 @@
             termValue.textContent = getDisplayTerm(weeks);
             rateValue.textContent = `${(interestRate * 100).toFixed(0)}%`;
             
+            // Update interest breakdown display with the formula
+            const breakdown = getInterestBreakdown(weeks);
+            document.getElementById('interestBreakdown').textContent = breakdown;
+            
             // Update labels based on term
             paymentFrequencyLabel.textContent = getPaymentFrequencyLabel(weeks);
             periodicPaymentLabel.textContent = getPeriodicPaymentLabel(weeks);
@@ -2653,13 +2740,39 @@
             loanDuration.textContent = getDisplayTerm(weeks);
         }
         
-        // Event listeners for calculator
-        loanAmount.addEventListener('input', calculateLoan);
+        // Event listeners for calculator with real-time snapping
+        loanAmount.addEventListener('input', function() {
+            let value = parseInt(this.value);
+            // Snap to nearest 100 in real-time
+            let snapped = snapToNearest100(value);
+            
+            // Only update if we've moved at least 100 from last snapped value
+            if (Math.abs(snapped - lastSnappedAmount) >= 100) {
+                lastSnappedAmount = snapped;
+                // Update the display immediately for smoother UX
+                amountValue.textContent = formatCurrency(snapped);
+                // Recalculate
+                calculateLoan();
+            }
+        });
+        
         loanTerm.addEventListener('input', calculateLoan);
         
         // Touch event support for mobile
         loanAmount.addEventListener('touchmove', calculateLoan);
         loanTerm.addEventListener('touchmove', calculateLoan);
+        
+        // Snap loan amount to nearest 100 on change
+        loanAmount.addEventListener('change', function() {
+            let value = parseInt(this.value);
+            let snapped = snapToNearest100(value);
+            // Ensure it's within bounds
+            if (snapped < 0) snapped = 0;
+            if (snapped > 50000) snapped = 50000;
+            this.value = snapped;
+            lastSnappedAmount = snapped;
+            calculateLoan();
+        });
         
         // Initialize calculator
         calculateLoan();
@@ -2839,8 +2952,8 @@
             }, 250);
         });
         
-        // Snap loan term to specific values (1, 2, 3, 4, 8, 12 weeks)
-        const allowedTerms = [1, 2, 3, 4, 8, 12];
+        // Snap loan term to specific values (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 weeks)
+        const allowedTerms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         
         loanTerm.addEventListener('change', function() {
             let value = parseInt(this.value);

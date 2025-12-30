@@ -3,206 +3,1220 @@
 {% block content %}
 <style>
     :root {
-        --navy: #1a2a40; 
+        --navy: #1a2a40;
         --navy-dark: #0d1621;
-        --lime: #a2d242; 
+        --navy-light: #2c3e5a;
+        --lime: #a2d242;
+        --lime-light: #c5e86c;
+        --lime-dark: #8eb936;
+        --teal: #4ecdc4;
+        --teal-light: #7be1da;
+        --white: #ffffff;
+        --off-white: #f8fafc;
+        --cream: #fef6e4;
         --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
-    /* Hero Section with Translucent Board Background */
-    .hero {
-        position: relative;
-        /* The dark overlay + the background image */
-        background: linear-gradient(rgba(13, 22, 33, 0.85), rgba(13, 22, 33, 0.92)), 
-                    url("{{ url_for('static', filename='images/image_7509fc.png') }}");
-        background-size: cover;
+    /* Brand Hero - Professional with Artistic Touch */
+    .brand-hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: 
+            linear-gradient(rgba(26, 42, 64, 0.97), rgba(13, 22, 33, 0.98)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 400px;
         background-position: center;
-        background-attachment: fixed; /* Parallax effect for sophistication */
-        color: white;
-        padding: 180px 0 140px;
-        clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
-        text-align: center;
-    }
-
-    .hero-content {
-        max-width: 950px;
-        margin: 0 auto;
-        padding: 0 20px;
-        opacity: 0;
-        transform: translateY(30px);
-        transition: var(--transition);
-    }
-
-    .hero-content.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .hero h1 {
-        font-size: clamp(2.5rem, 6vw, 4.5rem);
-        font-weight: 800;
-        letter-spacing: -1px;
-        line-height: 1.1;
-        margin-bottom: 25px;
-    }
-
-    .hero h1 span {
-        color: var(--lime);
-        display: block; /* Makes "Next Level" stand out on its own line */
-    }
-
-    .hero p {
-        font-size: 1.35rem;
-        color: rgba(255, 255, 255, 0.8);
-        max-width: 700px;
-        margin: 0 auto 40px;
-        font-weight: 300;
-    }
-
-    /* Service Card Grid */
-    .services-container {
-        margin-top: -80px;
+        background-attachment: fixed;
+        color: var(--white);
         position: relative;
-        z-index: 10;
-        padding: 0 20px;
+        overflow: hidden;
     }
 
-    .grid-layout {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 30px;
+    .hero-container {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0 40px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .creative-badge {
+        display: inline-block;
+        background: rgba(162, 210, 66, 0.15);
+        color: var(--lime);
+        padding: 10px 25px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 40px;
+        border-left: 4px solid var(--lime);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .creative-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(162, 210, 66, 0.3), transparent);
+        transition: 0.8s;
+    }
+
+    .creative-badge:hover::before {
+        left: 100%;
+    }
+
+    .brand-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 300;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        color: var(--white);
+    }
+
+    .brand-title strong {
+        font-weight: 800;
+        color: var(--lime);
+        display: block;
+        position: relative;
+    }
+
+    .brand-title strong::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: var(--lime);
+        border-radius: 2px;
+    }
+
+    .brand-subtitle {
+        font-size: 1.8rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 40px;
+        font-weight: 300;
+        max-width: 600px;
+    }
+
+    .brand-description {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.8;
+        max-width: 700px;
+        margin-bottom: 50px;
+        padding: 25px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        border-left: 3px solid var(--teal);
+    }
+
+    .by-line {
+        font-size: 1rem;
+        color: var(--lime);
+        font-style: italic;
+        position: relative;
+        padding-left: 30px;
+        display: inline-block;
+    }
+
+    .by-line::before {
+        content: "✦";
+        position: absolute;
+        left: 0;
+        color: var(--teal);
+        font-size: 1.2rem;
+    }
+
+    /* Subtle Artistic Elements */
+    .hero-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: 300px;
+        opacity: 0.08;
+        pointer-events: none;
+    }
+
+    /* Services Section - Clean & Professional */
+    .services-section {
+        padding: 120px 0;
+        background: 
+            linear-gradient(rgba(248, 250, 252, 0.98), rgba(254, 246, 228, 0.97)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 350px;
+        position: relative;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 80px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .section-title {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        color: var(--navy-dark);
+        font-weight: 300;
+        margin-bottom: 20px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: var(--lime);
+        border-radius: 2px;
+    }
+
+    .section-intro {
+        font-size: 1.3rem;
+        color: var(--navy-light);
+        max-width: 800px;
+        margin: 40px auto 0;
+        line-height: 1.6;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+    }
+
+    /* Service Cards - Professional Grid */
+    .services-grid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 40px;
+        position: relative;
+        z-index: 2;
     }
 
     .service-card {
-        background: white;
-        padding: 45px 35px;
-        border-radius: 24px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(0,0,0,0.05);
+        background: var(--white);
+        padding: 50px 40px;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         transition: var(--transition);
-        display: flex;
-        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        border-top: 3px solid transparent;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: 300px;
+        opacity: 0.05;
+        z-index: 0;
     }
 
     .service-card:hover {
-        transform: translateY(-12px);
-        box-shadow: 0 40px 80px -15px rgba(162, 210, 66, 0.2);
-        border-color: var(--lime);
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        border-top-color: var(--lime);
     }
 
-    .card-icon {
-        width: 60px;
-        height: 60px;
+    .service-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .service-number {
+        font-size: 4rem;
+        font-weight: 800;
+        color: rgba(26, 42, 64, 0.05);
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        line-height: 1;
+        font-family: 'Arial Black', sans-serif;
+    }
+
+    .service-icon {
+        width: 70px;
+        height: 70px;
         background: rgba(162, 210, 66, 0.1);
-        border-radius: 15px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         color: var(--lime);
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        transition: var(--transition);
+    }
+
+    .service-card:hover .service-icon {
+        background: rgba(78, 205, 196, 0.15);
+        color: var(--teal);
+        transform: rotate(10deg) scale(1.1);
     }
 
     .service-card h3 {
+        font-size: 1.6rem;
+        color: var(--navy-dark);
+        margin-bottom: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(162, 210, 66, 0.3);
+        display: inline-block;
+    }
+
+    .service-card p {
+        color: var(--navy-light);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+    }
+
+    .service-features {
+        list-style: none;
+        padding: 0;
+        margin-top: 25px;
+    }
+
+    .service-features li {
+        padding: 10px 0;
         color: var(--navy);
+        position: relative;
+        padding-left: 25px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        border-bottom: 1px dashed rgba(26, 42, 64, 0.1);
+    }
+
+    .service-features li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--lime);
+        font-weight: bold;
+        transition: var(--transition);
+    }
+
+    .service-features li:hover::before {
+        color: var(--teal);
+        transform: translateX(5px);
+    }
+
+    /* Portfolio Showcase - What We Deliver */
+    .portfolio-section {
+        padding: 120px 0;
+        background: 
+            linear-gradient(rgba(26, 42, 64, 0.02), rgba(13, 22, 33, 0.03)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 300px;
+    }
+
+    .portfolio-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+    }
+
+    .portfolio-item {
+        background: var(--white);
+        padding: 50px 40px;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+    }
+
+    .portfolio-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: 200px;
+        opacity: 0.04;
+    }
+
+    .portfolio-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-color: rgba(162, 210, 66, 0.3);
+    }
+
+    .portfolio-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(162, 210, 66, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        font-size: 2rem;
+        color: var(--lime);
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .portfolio-item:hover .portfolio-icon {
+        background: rgba(78, 205, 196, 0.15);
+        color: var(--teal);
+        transform: rotate(15deg);
+    }
+
+    .portfolio-item h4 {
         font-size: 1.4rem;
+        color: var(--navy-dark);
+        margin-bottom: 15px;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .portfolio-item p {
+        color: var(--navy-light);
+        line-height: 1.6;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Philosophy Section */
+    .philosophy-section {
+        padding: 120px 0;
+        background: 
+            linear-gradient(rgba(26, 42, 64, 0.98), rgba(13, 22, 33, 0.97)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 350px;
+        color: var(--white);
+        position: relative;
+    }
+
+    .philosophy-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .philosophy-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 300;
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .philosophy-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: var(--lime);
+        border-radius: 2px;
+    }
+
+    .philosophy-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-top: 60px;
+    }
+
+    .philosophy-item {
+        padding: 50px 30px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid var(--lime);
+        transition: var(--transition);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .philosophy-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: 200px;
+        opacity: 0.03;
+    }
+
+    .philosophy-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-5px);
+        border-left-color: var(--teal);
+    }
+
+    .philosophy-item i {
+        font-size: 2.5rem;
+        color: var(--lime);
+        margin-bottom: 25px;
+        display: block;
+        transition: var(--transition);
+    }
+
+    .philosophy-item:hover i {
+        color: var(--teal);
+        transform: scale(1.1);
+    }
+
+    .philosophy-item h4 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: var(--white);
+    }
+
+    .philosophy-item p {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+        font-size: 0.95rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Process Section - Clean Timeline */
+    .process-section {
+        padding: 120px 0;
+        background: 
+            linear-gradient(rgba(248, 250, 252, 0.98), rgba(254, 246, 228, 0.97)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 300px;
+        position: relative;
+    }
+
+    .process-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .process-timeline {
+        position: relative;
+        margin-top: 60px;
+    }
+
+    .process-timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(
+            to bottom,
+            transparent,
+            var(--lime),
+            var(--teal),
+            transparent
+        );
+        border-radius: 2px;
+    }
+
+    .process-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 80px;
+        position: relative;
+    }
+
+    .process-step:nth-child(odd) {
+        flex-direction: row;
+    }
+
+    .process-step:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+    .step-content {
+        flex: 1;
+        padding: 40px;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(162, 210, 66, 0.1);
+    }
+
+    .step-content::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: 200px;
+        opacity: 0.04;
+    }
+
+    .process-step:nth-child(odd) .step-content {
+        margin-right: 60px;
+    }
+
+    .process-step:nth-child(even) .step-content {
+        margin-left: 60px;
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        transition: var(--transition);
+        box-shadow: 0 5px 20px rgba(162, 210, 66, 0.3);
+    }
+
+    .process-step:hover .step-number {
+        background: var(--teal);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .step-content h4 {
+        font-size: 1.5rem;
+        color: var(--navy-dark);
         margin-bottom: 15px;
         font-weight: 700;
+        position: relative;
+        z-index: 1;
     }
 
-    .brand-tag {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #94a3b8;
-        margin-top: auto;
-        padding-top: 20px;
+    .step-content p {
+        color: var(--navy-light);
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
     }
 
-    /* Why Section */
-    .why-section {
+    /* CTA Section */
+    .cta-section {
         padding: 120px 0;
-        background: #f8fafc;
+        background: 
+            linear-gradient(rgba(26, 42, 64, 0.95), rgba(26, 42, 64, 0.92)),
+            url("{{ url_for('static', filename='images/board.png') }}");
+        background-size: cover, 300px;
+        background-position: center;
+        color: var(--white);
+        text-align: center;
+        position: relative;
     }
 
-    .reveal { opacity: 0; transform: translateY(30px); transition: var(--transition); }
-    .reveal.active { opacity: 1; transform: translateY(0); }
+    .cta-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-title {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        margin-bottom: 30px;
+        font-weight: 300;
+        line-height: 1.2;
+        color: var(--white);
+    }
+
+    .cta-title strong {
+        color: var(--lime);
+        font-weight: 700;
+    }
+
+    .cta-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 50px;
+        line-height: 1.6;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
     .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
         background: var(--lime);
-        color: var(--navy);
+        color: var(--navy-dark);
         padding: 18px 45px;
-        border-radius: 100px;
+        border-radius: 4px;
         text-decoration: none;
-        font-weight: 700;
         font-size: 1.1rem;
+        font-weight: 600;
         transition: var(--transition);
-        box-shadow: 0 10px 20px rgba(162, 210, 66, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: 0.8s;
     }
 
     .cta-button:hover {
-        background: white;
-        transform: scale(1.05);
+        background: var(--lime-light);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(162, 210, 66, 0.4);
+    }
+
+    .cta-button:hover::before {
+        left: 100%;
+    }
+
+    .cta-button i {
+        font-size: 1.3rem;
+        transition: var(--transition);
+    }
+
+    .cta-button:hover i {
+        transform: rotate(15deg);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .services-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .process-timeline::before {
+            left: 30px;
+        }
+        
+        .process-step {
+            flex-direction: row !important;
+        }
+        
+        .process-step:nth-child(odd) .step-content,
+        .process-step:nth-child(even) .step-content {
+            margin-left: 80px;
+            margin-right: 0;
+        }
+        
+        .step-number {
+            left: 30px;
+            transform: translateY(-50%);
+        }
+        
+        .process-step:hover .step-number {
+            transform: translateY(-50%) scale(1.1);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-container,
+        .services-grid,
+        .philosophy-content,
+        .portfolio-container,
+        .process-container,
+        .cta-container {
+            padding: 0 20px;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .brand-title {
+            font-size: 2.8rem;
+        }
+        
+        .brand-subtitle {
+            font-size: 1.5rem;
+        }
+        
+        .brand-description {
+            font-size: 1.1rem;
+            padding: 20px;
+        }
+        
+        .service-card,
+        .portfolio-item,
+        .philosophy-item {
+            padding: 40px 30px;
+        }
+        
+        .philosophy-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .portfolio-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .cta-button {
+            padding: 16px 35px;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .brand-title {
+            font-size: 2.2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .service-icon,
+        .portfolio-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Animation Classes */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
     }
 </style>
 
-<section class="hero">
-    <div class="hero-content" id="heroText">
-        <p style="text-transform: uppercase; letter-spacing: 4px; font-size: 0.9rem; color: var(--lime); font-weight: 700; margin-bottom: 15px;">
-            Partnering for Growth
+<!-- Brand Hero -->
+<section class="brand-hero">
+    <div class="hero-pattern"></div>
+    
+    <div class="hero-container">
+        <div class="creative-badge reveal">Tuka Brand Studio</div>
+        <h1 class="brand-title reveal">
+            <strong>Branding, Graphic Design</strong>
+            & Digital Marketing
+        </h1>
+        <p class="brand-subtitle reveal">by Tukakombe</p>
+        <p class="brand-description reveal">
+            Tuka Brand Studio helps businesses build strong, memorable, and market-ready brands that stand out. 
+            We combine creative strategy with modern marketing expertise to deliver solutions that drive engagement, 
+            awareness, and growth.
         </p>
-        <h1>Support designed to take your business to the <span>Next Level</span></h1>
-        <p>A multi-disciplinary business solutions firm built to help entrepreneurs and growing enterprises scale sustainably.</p>
-        <a href="#services" class="cta-button">Explore Solutions</a>
+        <div class="by-line reveal">A Tukakombe Service</div>
     </div>
 </section>
 
-<div class="services-container" id="services">
-    <div class="grid-layout">
+<!-- Services Section -->
+<section class="services-section">
+    <div class="section-header">
+        <h2 class="section-title reveal">Our Services</h2>
+        <p class="section-intro reveal">
+            Comprehensive creative solutions designed to elevate your brand and drive business growth through 
+            strategic design and marketing expertise.
+        </p>
+    </div>
+    
+    <div class="services-grid">
+        <!-- Brand Identity -->
         <div class="service-card reveal">
-            <div class="card-icon"><i class="fas fa-vault"></i></div>
-            <h3>Tuka Finance</h3>
-            <p>Tailored loans, working capital financing, and SME financial reporting systems.</p>
-            <div class="brand-tag">By Tukakombe</div>
+            <div class="service-number">01</div>
+            <div class="service-icon"><i class="fas fa-brush"></i></div>
+            <h3>Brand Identity Development</h3>
+            <p>Logo design, color palettes, typography, and complete brand guidelines that reflect your business's unique story.</p>
+            <ul class="service-features">
+                <li>Logo design & brand marks</li>
+                <li>Color palette development</li>
+                <li>Typography & visual systems</li>
+                <li>Complete brand guidelines</li>
+            </ul>
         </div>
-
+        
+        <!-- Graphic Design -->
         <div class="service-card reveal">
-            <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
-            <h3>Tuka Developers</h3>
-            <p>Custom software, scalable business systems, and modern web application development.</p>
-            <div class="brand-tag">By Tukakombe</div>
+            <div class="service-number">02</div>
+            <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
+            <h3>Graphic Design & Marketing Materials</h3>
+            <p>Professional posters, flyers, business cards, brochures, banners, and any visual content that strengthens your brand presence.</p>
+            <ul class="service-features">
+                <li>Print & digital collateral</li>
+                <li>Marketing materials</li>
+                <li>Presentation design</li>
+                <li>Packaging design</li>
+            </ul>
         </div>
-
+        
+        <!-- Content Creation -->
         <div class="service-card reveal">
-            <div class="card-icon"><i class="fas fa-briefcase"></i></div>
-            <h3>Tuka Advisory</h3>
-            <p>Strategy, feasibility studies, and professional project information memorandums.</p>
-            <div class="brand-tag">By Tukakombe</div>
+            <div class="service-number">03</div>
+            <div class="service-icon"><i class="fas fa-camera"></i></div>
+            <h3>Content Creation</h3>
+            <p>Eye-catching visuals, videos, and copywriting crafted to engage your audience and communicate your message effectively.</p>
+            <ul class="service-features">
+                <li>Visual & video content</li>
+                <li>Copywriting & messaging</li>
+                <li>Photography & art direction</li>
+                <li>Content strategy</li>
+            </ul>
         </div>
-
+        
+        <!-- Social Media -->
         <div class="service-card reveal">
-            <div class="card-icon"><i class="fas fa-pen-nib"></i></div>
-            <h3>Tuka Brand Studio</h3>
-            <p>Strategic identity development, creative content, and digital marketing excellence.</p>
-            <div class="brand-tag">By Tukakombe</div>
+            <div class="service-number">04</div>
+            <div class="service-icon"><i class="fas fa-hashtag"></i></div>
+            <h3>Social Media Management</h3>
+            <p>Full management of your social media pages, including content planning, posting schedules, and community engagement.</p>
+            <ul class="service-features">
+                <li>Content planning & scheduling</li>
+                <li>Community management</li>
+                <li>Social media strategy</li>
+                <li>Performance analytics</li>
+            </ul>
+        </div>
+        
+        <!-- Digital Marketing -->
+        <div class="service-card reveal">
+            <div class="service-number">05</div>
+            <div class="service-icon"><i class="fas fa-bullhorn"></i></div>
+            <h3>Digital Marketing Campaigns</h3>
+            <p>Creating and managing online ads across platforms like Facebook, Instagram, and Google to reach the right audience and drive results.</p>
+            <ul class="service-features">
+                <li>Social media advertising</li>
+                <li>Google Ads management</li>
+                <li>Email marketing campaigns</li>
+                <li>Conversion optimization</li>
+            </ul>
+        </div>
+        
+        <!-- Business Advertising -->
+        <div class="service-card reveal">
+            <div class="service-number">06</div>
+            <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Business Advertising</h3>
+            <p>Designing and executing marketing campaigns that increase visibility, attract clients, and convert leads into loyal customers.</p>
+            <ul class="service-features">
+                <li>Integrated campaigns</li>
+                <li>Brand awareness strategies</li>
+                <li>Lead generation</li>
+                <li>ROI tracking & analysis</li>
+            </ul>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Portfolio/Results -->
+<section class="portfolio-section">
+    <div class="portfolio-container">
+        <div class="section-header">
+            <h2 class="section-title reveal">What We Deliver</h2>
+            <p class="section-intro reveal">
+                Tangible results that transform businesses and elevate brands in meaningful, measurable ways.
+            </p>
+        </div>
+        
+        <div class="portfolio-grid">
+            <div class="portfolio-item reveal">
+                <div class="portfolio-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h4>Visual Recognition</h4>
+                <p>Memorable brand identities that stand out in competitive markets and resonate with target audiences.</p>
+            </div>
+            
+            <div class="portfolio-item reveal">
+                <div class="portfolio-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4>Audience Connection</h4>
+                <p>Content that creates emotional connections and drives meaningful engagement with your brand.</p>
+            </div>
+            
+            <div class="portfolio-item reveal">
+                <div class="portfolio-icon">
+                    <i class="fas fa-line-chart"></i>
+                </div>
+                <h4>Measurable Growth</h4>
+                <p>Data-driven campaigns with clear ROI, performance tracking, and continuous optimization.</p>
+            </div>
+            
+            <div class="portfolio-item reveal">
+                <div class="portfolio-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h4>Market Authority</h4>
+                <p>Brand positioning that establishes you as a trusted leader and go-to expert in your industry.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Philosophy Section -->
+<section class="philosophy-section">
+    <div class="philosophy-content">
+        <h2 class="philosophy-title reveal">Why Choose Tuka Brand Studio?</h2>
+        <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.9); max-width: 800px; margin: 0 auto 60px; line-height: 1.8;" class="reveal">
+            We understand that a brand is more than a logo—it's the heart of your business. Our team ensures 
+            that every design, campaign, and strategy aligns with your vision, creating a consistent and 
+            professional presence across all channels.
+        </p>
+        
+        <div class="philosophy-grid">
+            <div class="philosophy-item reveal">
+                <i class="fas fa-lightbulb"></i>
+                <h4>Creative Strategy</h4>
+                <p>Every design decision serves a clear business purpose and contributes to your overall brand goals.</p>
+            </div>
+            
+            <div class="philosophy-item reveal">
+                <i class="fas fa-star"></i>
+                <h4>Premium Execution</h4>
+                <p>Exceptional craftsmanship and attention to detail in every deliverable we produce.</p>
+            </div>
+            
+            <div class="philosophy-item reveal">
+                <i class="fas fa-sync-alt"></i>
+                <h4>End-to-End Service</h4>
+                <p>Comprehensive service from initial concept through execution and ongoing optimization.</p>
+            </div>
+            
+            <div class="philosophy-item reveal">
+                <i class="fas fa-handshake"></i>
+                <h4>True Partnership</h4>
+                <p>We work as an extension of your team, invested in your success as much as our own.</p>
+            </div>
+        </div>
+        
+        <p style="margin-top: 80px; font-style: italic; color: var(--lime); font-size: 1.1rem;" class="reveal">
+            Whether you are starting fresh or revitalizing your brand, we deliver solutions that help your business grow.
+        </p>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="process-container">
+        <div class="section-header">
+            <h2 class="section-title reveal">Our Creative Process</h2>
+            <p class="section-intro reveal">
+                A structured, collaborative approach that transforms business objectives into impactful brand experiences.
+            </p>
+        </div>
+        
+        <div class="process-timeline">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content reveal">
+                    <h4>Discover & Define</h4>
+                    <p>Deep dive into your business, audience, competitive landscape, and strategic objectives to establish a clear foundation for your brand.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content reveal">
+                    <h4>Design & Develop</h4>
+                    <p>Creative exploration and strategic brand development, translating insights into compelling visual and verbal identity systems.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content reveal">
+                    <h4>Implement & Execute</h4>
+                    <p>Strategic rollout across all brand touchpoints and channels, ensuring consistent and impactful implementation.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content reveal">
+                    <h4>Optimize & Evolve</h4>
+                    <p>Continuous monitoring, measurement, and refinement to ensure your brand remains relevant and effective over time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-container">
+        <h2 class="cta-title reveal">Ready to <strong>Build Your Brand?</strong></h2>
+        <p class="cta-subtitle reveal">
+            Let's collaborate to create a brand that not only looks exceptional but drives real business results. 
+            Your vision, our creative expertise—unlimited potential.
+        </p>
+        <a href="{{ url_for('core.contact') }}" class="cta-button reveal">
+            <i class="fas fa-palette"></i>
+            Start Your Brand Journey
+        </a>
+    </div>
+</section>
 
 <script>
-    // Reveal animations
-    window.addEventListener('load', () => {
-        document.getElementById('heroText').classList.add('visible');
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('active');
+    // Smooth reveal animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         });
-    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        revealElements.forEach(element => {
+            revealObserver.observe(element);
+        });
+
+        // Add subtle hover effects to service cards
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.zIndex = '10';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const target = document.querySelector(targetId);
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add subtle texture movement on scroll
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.brand-hero');
+            const services = document.querySelector('.services-section');
+            
+            if (hero) {
+                hero.style.backgroundPosition = `center ${scrolled * 0.3}px, center ${scrolled * 0.2}px`;
+            }
+            
+            if (services) {
+                services.style.backgroundPosition = `center ${scrolled * 0.2}px, center ${scrolled * 0.1}px`;
+            }
+        });
+
+        // Add click effect to CTA button
+        const ctaButton = document.querySelector('.cta-button');
+        if (ctaButton) {
+            ctaButton.addEventListener('click', function(e) {
+                // Add ripple effect
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    top: ${y}px;
+                    left: ${x}px;
+                `;
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    });
 </script>
+
 {% endblock %}
