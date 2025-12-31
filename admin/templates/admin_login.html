@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-sidebar">
+        <h3>Explore Tuka Services</h3>
+        <ul>
+            <li><a href="{{ url_for('developers.home') }}">Tuka Developers</a></li>
+            <li><a href="{{ url_for('finance.home') }}">Tuka Finance</a></li>
+            <li><a href="{{ url_for('advisory.home') }}">Tuka Advisory</a></li>
+            <li><a href="{{ url_for('market_place.home') }}">Marketplace</a></li>
+        </ul>
+    </div>
+
+    <div class="auth-form-container">
+        <h2>Admin Login</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flash-messages">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter admin email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Login as Admin</button>
+        </form>
+
+        <p class="register-link">
+            <a href="{{ url_for('auth.login') }}">Back to User Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

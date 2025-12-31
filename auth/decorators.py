@@ -1,12 +1,22 @@
+# auth/decorators.py
 from functools import wraps
-from flask import session, redirect, url_for, flash
+from flask import session, redirect, url_for, abort
 
 def login_required(f):
-    """Decorator to protect routes that require login"""
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('You must log in to access this page.', 'error')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated
+
+
+def role_required(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if 'role' not in session or session['role'] not in roles:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated
+    return wrapper

@@ -1,109 +1,69 @@
-# auth/routes.py
-
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    session,
-    flash
-)
-from utils.database import get_db_connection
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from auth.utils import hash_password, verify_password
 from auth.models import create_users_table
+from utils.database import get_db_connection
 
-auth_bp = Blueprint(
-    'auth',
-    __name__,
-    template_folder='templates'  # points to auth/templates/
-)
+auth_bp = Blueprint('auth', __name__, template_folder='templates')
 
-# Ensure users table exists
 create_users_table()
 
 
-# =========================
-# REGISTER ROUTE
-# =========================
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        db = get_db_connection()
+        user = db.execute(
+            "SELECT * FROM users WHERE email = ? AND is_active = 1",
+            (email,)
+        ).fetchone()
+        db.close()
+
+        if not user or not verify_password(password, user['password']):
+            flash("Invalid credentials", "error")
+            return redirect(request.url)
+
+        session['user_id'] = user['id']
+        session['role'] = user['role']
+
+        return redirect(url_for('core.home'))
+
+    return render_template('login.html')
+
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        role = request.form.get('role', 'client')  # default role is client
+        email = request.form['email']
+        password = request.form['password']
+        confirm = request.form['password_confirm']
 
-        if not email or not password:
-            flash('All fields are required', 'error')
+        if password != confirm:
+            flash("Passwords do not match", "error")
             return redirect(request.url)
 
-        # Ensure role is valid
-        valid_roles = ['client', 'blog_admin', 'finance_admin', 'super_admin']
-        if role not in valid_roles:
-            flash('Invalid role selected', 'error')
-            role = 'client'
-
-        conn = get_db_connection()
+        db = get_db_connection()
         try:
-            conn.execute(
-                "INSERT INTO users (email, password, role) VALUES (?, ?, ?)",
-                (email, hash_password(password), role)
+            db.execute(
+                "INSERT INTO users (email, password) VALUES (?, ?)",
+                (email, hash_password(password))
             )
-            conn.commit()
-        except Exception:
-            flash('Email already registered', 'error')
-            conn.close()
+            db.commit()
+        except:
+            flash("Email already exists", "error")
             return redirect(request.url)
+        finally:
+            db.close()
 
-        conn.close()
-        flash('Account created. Please log in.', 'success')
+        flash("Account created. Login now.", "success")
         return redirect(url_for('auth.login'))
 
     return render_template('register.html')
 
 
-# =========================
-# LOGIN ROUTE
-# =========================
-@auth_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-
-        conn = get_db_connection()
-        user = conn.execute(
-            "SELECT * FROM users WHERE email = ? AND is_active = 1",
-            (email,)
-        ).fetchone()
-        conn.close()
-
-        if not user or not verify_password(password, user['password']):
-            flash('Invalid credentials', 'error')
-            return redirect(request.url)
-
-        # Store user info in session
-        session['user_id'] = user['id']
-        session['role'] = user['role']
-
-        flash('Logged in successfully', 'success')
-
-        # Redirect based on role
-        if user['role'] == 'client':
-            return redirect(url_for('core.home'))
-        elif user['role'] in ['blog_admin', 'finance_admin', 'super_admin']:
-            return redirect(url_for('core.dashboard'))  # admin dashboard route
-        else:
-            return redirect(url_for('core.home'))
-
-    return render_template('login.html')
-
-
-# =========================
-# LOGOUT ROUTE
-# =========================
 @auth_bp.route('/logout')
 def logout():
     session.clear()
-    flash('Logged out successfully', 'success')
     return redirect(url_for('auth.login'))

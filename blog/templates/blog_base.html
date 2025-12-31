@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Tukakombe Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('core.home') }}">Home</a>
+            <a href="{{ url_for('blog.blog_home') }}">Blog</a>
+            {% if session.get('user_id') %}
+                <span>Welcome, {{ session.get('role') }}!</span>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {% if session.get('role') in ['blog_admin', 'super_admin'] %}
+                    <a href="{{ url_for('blog_admin.dashboard') }}">Admin Dashboard</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('admin.login') }}">Admin Login</a>
+                <a href="{{ url_for('auth.login') }}">Sign In</a>
+                <a href="{{ url_for('auth.register') }}">Sign Up</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tukakombe. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

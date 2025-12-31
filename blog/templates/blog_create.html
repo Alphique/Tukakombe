@@ -1,0 +1,25 @@
+<!--blog/templates/blog_create.html-->
+{% extends "base.html" %}
+
+{% block title %}Create Blog | Tukakombe{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <h1>Create New Blog Post</h1>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea name="content" rows="10"
+                      class="form-control" required></textarea>
+        </div>
+
+        <button class="btn btn-success">Publish Blog</button>
+    </form>
+</section>
+{% endblock %}

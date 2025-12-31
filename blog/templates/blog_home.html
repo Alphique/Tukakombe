@@ -1,0 +1,24 @@
+{% extends "blog_base.html" %}
+{% block title %}Blog Home{% endblock %}
+
+{% block content %}
+<h1>Latest Blog Posts</h1>
+<ul>
+    {% for blog in blogs %}
+    <li>
+        <h3>{{ blog['title'] }}</h3>
+        <p>{{ blog['summary'] }}</p>
+        <small>Posted on {{ blog['created_at'] }}</small><br>
+        <a href="{{ url_for('blog.blog_detail', blog_id=blog['id']) }}">
+            {% if session.get('user_id') %}
+                Read Full Post
+            {% else %}
+                Login to Read Full Post
+            {% endif %}
+        </a>
+    </li>
+    {% else %}
+    <li>No blogs available yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

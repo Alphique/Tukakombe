@@ -1,0 +1,34 @@
+{% extends "blog_base.html" %}
+{% block title %}{{ blog['title'] }}{% endblock %}
+
+{% block content %}
+<article>
+    <h1>{{ blog['title'] }}</h1>
+    <p>{{ blog['content'] }}</p>
+    <small>Posted on {{ blog['created_at'] }}</small>
+</article>
+
+<hr>
+<section>
+    <h2>Comments</h2>
+    <ul>
+        {% for c in comments %}
+        <li>
+            <strong>{{ c['user_email'] }}</strong>: {{ c['content'] }}
+            <small>{{ c['created_at'] }}</small>
+        </li>
+        {% else %}
+        <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+
+    {% if session.get('user_id') %}
+    <form method="POST">
+        <textarea name="content" rows="4" placeholder="Write your comment..." required></textarea><br>
+        <button type="submit">Submit Comment</button>
+    </form>
+    {% else %}
+    <p><a href="{{ url_for('auth.login') }}">Login</a> to comment.</p>
+    {% endif %}
+</section>
+{% endblock %}

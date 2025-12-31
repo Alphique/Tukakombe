@@ -1,26 +1,1419 @@
-<!-- services/advisory/templates/adv_home.html -->
-{% extends "adv_base.html" %}
+{% extends "base.html" %}
 
-{% block adv_content %}
-<h1>Welcome to Tuka Business Advisory</h1>
-<p>
-    Tuka Business Advisory supports SMEs with strategic guidance, financial planning, 
-    and growth-focused solutions.
-</p>
+{% block content %}
+<style>
+    :root {
+        --lime: #a2d242;
+        --lime-light: #c9ff66;
+        --lime-dark: #8ab82d;
+        --navy: #1a2a40;
+        --navy-dark: #0d1621;
+        --navy-light: #2a3a55;
+        --white: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.7);
+        --gray-light: #f8fafc;
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        --radius-md: 12px;
+        --radius-lg: 20px;
+        --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+        --shadow-lime: 0 10px 30px rgba(162, 210, 66, 0.2);
+    }
 
-<section>
-    <h2>Our Mission</h2>
-    <p>
-        To empower businesses with actionable insights, advisory support, and tailored strategies 
-        for sustainable growth.
-    </p>
+    /* Enhanced Hero Section from First Design */
+    .adv-hero {
+        min-height: 90vh;
+        background: 
+            radial-gradient(circle at 80% 20%, var(--navy-light), var(--navy-dark)),
+            linear-gradient(135deg, rgba(162, 210, 66, 0.1) 0%, transparent 50%);
+        color: var(--white);
+        padding: 100px 5%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 60px;
+        z-index: 2;
+        position: relative;
+    }
+
+    /* Animated Background Elements */
+    .hero-bg-pattern {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0.1;
+        background-image: 
+            radial-gradient(circle at 20% 80%, var(--lime) 1px, transparent 1px),
+            radial-gradient(circle at 80% 40%, var(--lime) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: patternShift 20s linear infinite;
+    }
+
+    @keyframes patternShift {
+        0% { background-position: 0 0; }
+        100% { background-position: 50px 50px; }
+    }
+
+    /* Enhanced Hero Content */
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(162, 210, 66, 0.3);
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        color: var(--lime);
+        margin-bottom: 30px;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        background: rgba(162, 210, 66, 0.1);
+    }
+
+    .badge-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--lime);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, var(--white) 0%, var(--lime-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+    }
+
+    .hero-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100px;
+        height: 4px;
+        background: var(--lime);
+        border-radius: 2px;
+    }
+
+    .hero-tagline {
+        font-size: 1.8rem;
+        color: var(--lime);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .hero-description {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 40px 0 50px;
+        padding-left: 20px;
+        border-left: 3px solid var(--lime);
+    }
+
+    .hero-btns {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn-lime {
+        background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+        color: var(--navy-dark);
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-lime);
+    }
+
+    .btn-lime:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(162, 210, 66, 0.4);
+    }
+
+    .btn-lime::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-lime:hover::after {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--white);
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition);
+        border: 2px solid var(--lime);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-outline:hover {
+        background: rgba(162, 210, 66, 0.1);
+        transform: translateY(-3px);
+    }
+
+    /* Enhanced Data Cards */
+    .hero-visual {
+        position: relative;
+        height: 500px;
+    }
+
+    .data-card {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(162, 210, 66, 0.2);
+        padding: 25px;
+        border-radius: var(--radius-lg);
+        width: 280px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: var(--transition);
+    }
+
+    .data-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        border-color: var(--lime);
+        box-shadow: 0 20px 40px rgba(162, 210, 66, 0.2);
+    }
+
+    .data-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--lime), transparent);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Hero Stats from Second Design */
+    .hero-stats {
+        display: flex;
+        gap: 40px;
+        margin-top: 60px;
+        padding-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--lime);
+        display: block;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    /* Value Proposition Section */
+    .value-section {
+        padding: 100px 5%;
+        background: var(--gray-light);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 2.8rem;
+        color: var(--navy-dark);
+        margin-bottom: 15px;
+        font-weight: 800;
+    }
+
+    .section-header .highlight {
+        color: var(--lime);
+    }
+
+    .section-header p {
+        color: #64748b;
+        max-width: 700px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    /* Services Grid with Tabs from Second Design */
+    .services-section {
+        padding: 100px 5%;
+        background: var(--white);
+    }
+
+    .services-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 50px;
+        justify-content: center;
+    }
+
+    .tab-btn {
+        padding: 14px 28px;
+        background: var(--gray-light);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        color: var(--navy);
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tab-btn:hover {
+        background: rgba(162, 210, 66, 0.1);
+        color: var(--lime-dark);
+    }
+
+    .tab-btn.active {
+        background: var(--lime);
+        color: var(--navy-dark);
+        box-shadow: var(--shadow-lime);
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .service-detail {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 50px;
+        background: var(--gray-light);
+        border-radius: var(--radius-lg);
+        border-left: 5px solid var(--lime);
+    }
+
+    .service-title {
+        font-size: 2.2rem;
+        color: var(--navy-dark);
+        margin-bottom: 20px;
+        font-weight: 800;
+    }
+
+    .service-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #4a5568;
+        margin-bottom: 40px;
+    }
+
+    .service-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: var(--radius-md);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        border: 1px solid #e2e8f0;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--lime);
+    }
+
+    .feature-card h4 {
+        font-size: 1.2rem;
+        color: var(--navy-dark);
+        margin-bottom: 15px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .feature-card h4 i {
+        color: var(--lime);
+    }
+
+    .feature-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .feature-card li {
+        padding: 8px 0;
+        color: #64748b;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .feature-card li:before {
+        content: "•";
+        color: var(--lime);
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+
+    /* Service Grid View */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .service-card {
+        background: white;
+        padding: 40px;
+        border-radius: var(--radius-lg);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--lime);
+    }
+
+    .service-number {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 3rem;
+        font-weight: 800;
+        color: rgba(162, 210, 66, 0.1);
+        line-height: 1;
+    }
+
+    .service-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--lime-light), var(--lime));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        color: var(--navy-dark);
+        font-size: 1.8rem;
+    }
+
+    .service-card h3 {
+        font-size: 1.5rem;
+        color: var(--navy-dark);
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .service-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 25px;
+    }
+
+    .service-key-points {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .service-key-points li {
+        padding: 8px 0;
+        color: var(--navy);
+        position: relative;
+        padding-left: 25px;
+    }
+
+    .service-key-points li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--lime);
+        font-weight: bold;
+    }
+
+    /* Process Section */
+    .process-section {
+        padding: 100px 5%;
+        background: var(--navy);
+        color: var(--white);
+    }
+
+    .process-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        margin-top: 60px;
+    }
+
+    .process-step {
+        flex: 1;
+        min-width: 250px;
+        text-align: center;
+        padding: 40px 30px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        position: relative;
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: var(--lime);
+        color: var(--navy-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 auto 25px;
+        position: relative;
+    }
+
+    .step-number:after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        height: 40px;
+        background: var(--lime);
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .process-step:last-child .step-number:after {
+        display: none;
+    }
+
+    .process-step h4 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        color: var(--white);
+    }
+
+    .process-step p {
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 100px 5%;
+        background: var(--navy);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        color: var(--white);
+    }
+
+    .cta-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-content h2 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        font-weight: 800;
+        color: var(--white);
+    }
+
+    .cta-content p {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-btns {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        
+        .hero-title::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .hero-description {
+            padding-left: 0;
+            border-left: none;
+            text-align: center;
+            margin: 30px auto;
+        }
+        
+        .hero-visual {
+            height: 300px;
+            margin-top: 50px;
+        }
+        
+        .hero-btns {
+            justify-content: center;
+        }
+        
+        .hero-stats {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .process-steps {
+            flex-direction: column;
+        }
+        
+        .step-number:after {
+            display: none;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.8rem;
+        }
+        
+        .hero-tagline {
+            font-size: 1.5rem;
+        }
+        
+        .section-header h2,
+        .cta-content h2 {
+            font-size: 2.2rem;
+        }
+        
+        .services-tabs {
+            overflow-x: auto;
+            justify-content: flex-start;
+        }
+        
+        .service-detail {
+            padding: 30px 20px;
+        }
+        
+        .btn-lime,
+        .btn-outline {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .cta-btns {
+            flex-direction: column;
+        }
+
+        .data-card {
+            width: 240px;
+            padding: 20px;
+        }
+    }
+</style>
+
+<!-- Enhanced Hero Section -->
+<section class="adv-hero">
+    <div class="hero-bg-pattern"></div>
+    
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Business Consulting & Financial Advisory
+            </div>
+            
+            <h1 class="hero-title">Tuka Business Advisory</h1>
+            <div class="hero-tagline">by Tukakombe</div>
+            
+            <p class="hero-description">
+                We provide structured business consulting and financial advisory services that help enterprises 
+                formalize operations, evaluate investments, secure financing, and strengthen governance. 
+                Our approach combines strategic insight, financial rigor, and practical execution support 
+                to make businesses investment and financing ready.
+            </p>
+            
+            <div class="hero-btns">
+                <a href="#" class="btn-lime">Start Your Transformation</a>
+                <a href="#" class="btn-outline">View Case Studies →</a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">8</span>
+                    <span class="stat-label">Core Services</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">150+</span>
+                    <span class="stat-label">Projects Delivered</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">94%</span>
+                    <span class="stat-label">Success Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Client Focus</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="data-card" style="top: 10%; right: 5%; animation-delay: 0s;">
+                <div style="color: var(--lime); font-weight: 600; margin-bottom: 10px;">// FINANCIAL_MODEL.AI</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Status:</span>
+                    <span style="color: var(--lime);">OPTIMIZED ✓</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Metrics:</span>
+                    <span style="color: var(--lime);">VERIFIED</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Confidence:</span>
+                    <span style="color: var(--lime);">98%</span>
+                </div>
+            </div>
+            
+            <div class="data-card" style="top: 40%; right: -10%; animation-delay: 2s;">
+                <div style="color: var(--lime); font-weight: 600; margin-bottom: 10px;">// GROWTH_METRICS.TS</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Avg. ROI:</span>
+                    <span style="color: var(--lime);">+28%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>NPV Rating:</span>
+                    <span style="color: var(--lime);">HIGH</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Risk Level:</span>
+                    <span style="color: var(--lime);">LOW</span>
+                </div>
+            </div>
+            
+            <div class="data-card" style="bottom: 10%; right: 15%; animation-delay: 4s;">
+                <div style="color: var(--lime); font-weight: 600; margin-bottom: 10px;">// COMPLIANCE_LOG</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Audit Status:</span>
+                    <span style="color: var(--lime);">PASS ✓</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Governance:</span>
+                    <span style="color: var(--lime);">ENABLED</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Readiness:</span>
+                    <span style="color: var(--lime);">INVESTMENT-GRADE</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Get Started</h2>
-    <p>
-        Explore our <a href="/advisory/services">services</a>, see our <a href="/advisory/case-studies">case studies</a>, 
-        or <a href="/advisory/contact">contact us</a> to discuss your business needs.
-    </p>
+<!-- Value Proposition -->
+<section class="value-section">
+    <div class="section-header">
+        <h2>Our <span class="highlight">Value Proposition</span></h2>
+        <p>
+            Through a structured, analytical, and execution-focused approach, Tuka Business Advisory 
+            supports businesses in moving from informal operations to well-governed, financially sound, 
+            and investment-ready enterprises.
+        </p>
+    </div>
 </section>
+
+<!-- Services Section with Tabs -->
+<section class="services-section">
+    <div class="section-header">
+        <h2>Our <span class="highlight">Services</span></h2>
+        <p>Comprehensive advisory solutions tailored to your business transformation needs</p>
+    </div>
+
+    <div class="services-tabs">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="service1">1. Investment Analysis</button>
+        <button class="tab-btn" data-tab="service2">2. Financial Analysis</button>
+        <button class="tab-btn" data-tab="service3">3. Financial Modelling</button>
+        <button class="tab-btn" data-tab="service4">4. Formalization</button>
+        <button class="tab-btn" data-tab="service5">5. Turnaround</button>
+        <button class="tab-btn" data-tab="service6">6. Pitch Decks</button>
+        <button class="tab-btn" data-tab="service7">7. Implementation</button>
+        <button class="tab-btn" data-tab="service8">8. Corporate Advisory</button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="overview">
+        <div class="services-grid">
+            <!-- Service 1 -->
+            <div class="service-card" data-service="1">
+                <div class="service-number">01</div>
+                <div class="service-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Investment Analysis & Project Appraisal</h3>
+                <p>Comprehensive investment analysis to determine commercial viability, funding suitability, and expected investor returns.</p>
+                <ul class="service-key-points">
+                    <li>Project feasibility assessment</li>
+                    <li>ROI and NPV analysis</li>
+                    <li>Risk assessment</li>
+                </ul>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="service-card" data-service="2">
+                <div class="service-number">02</div>
+                <div class="service-icon">
+                    <i class="fas fa-search-dollar"></i>
+                </div>
+                <h3>Financial Analysis & Performance Review</h3>
+                <p>Analyze financial performance to identify strengths, weaknesses, and improvement areas for strategic planning.</p>
+                <ul class="service-key-points">
+                    <li>Profitability analysis</li>
+                    <li>Liquidity assessment</li>
+                    <li>Cost structure review</li>
+                </ul>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="service-card" data-service="3">
+                <div class="service-number">03</div>
+                <div class="service-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>Financial Modelling & Projections</h3>
+                <p>Develop detailed, decision-ready financial models that translate business strategies into measurable outcomes.</p>
+                <ul class="service-key-points">
+                    <li>Integrated financial models</li>
+                    <li>Multi-year projections</li>
+                    <li>Scenario analysis</li>
+                </ul>
+            </div>
+
+            <!-- Service 4 -->
+            <div class="service-card" data-service="4">
+                <div class="service-number">04</div>
+                <div class="service-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <h3>Financial Structuring & Business Formalization</h3>
+                <p>Transition businesses from informal operations into structured, finance-ready entities with credible financial statements.</p>
+                <ul class="service-key-points">
+                    <li>Financial record reconstruction</li>
+                    <li>Formal statement preparation</li>
+                    <li>Transparency improvement</li>
+                </ul>
+            </div>
+
+            <!-- Service 5 -->
+            <div class="service-card" data-service="5">
+                <div class="service-number">05</div>
+                <div class="service-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>Turnaround & Restructuring Advisory</h3>
+                <p>Diagnose performance gaps and design practical turnaround strategies focused on restoring profitability.</p>
+                <ul class="service-key-points">
+                    <li>Diagnostic reviews</li>
+                    <li>Cash flow stabilization</li>
+                    <li>Recovery planning</li>
+                </ul>
+            </div>
+
+            <!-- Service 6 -->
+            <div class="service-card" data-service="6">
+                <div class="service-number">06</div>
+                <div class="service-icon">
+                    <i class="fas fa-presentation-screen"></i>
+                </div>
+                <h3>Project Information Memorandums & Pitch Decks</h3>
+                <p>Prepare professional, investor-ready documents that clearly present business opportunities and funding requirements.</p>
+                <ul class="service-key-points">
+                    <li>Investor presentations</li>
+                    <li>Business overviews</li>
+                    <li>Return analysis</li>
+                </ul>
+            </div>
+
+            <!-- Service 7 -->
+            <div class="service-card" data-service="7">
+                <div class="service-number">07</div>
+                <div class="service-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Project Implementation Planning</h3>
+                <p>Translate approved projects into clear execution roadmaps to ensure effective delivery and accountability.</p>
+                <ul class="service-key-points">
+                    <li>Execution roadmaps</li>
+                    <li>Resource allocation</li>
+                    <li>Performance monitoring</li>
+                </ul>
+            </div>
+
+            <!-- Service 8 -->
+            <div class="service-card" data-service="8">
+                <div class="service-number">08</div>
+                <div class="service-icon">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <h3>Corporate Advisory & Governance Support</h3>
+                <p>Long-term corporate advisory assessing systems and governance frameworks to recommend practical improvements.</p>
+                <ul class="service-key-points">
+                    <li>Governance reviews</li>
+                    <li>System assessments</li>
+                    <li>Compliance strengthening</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Service Tabs (same as before) -->
+    <!-- Service 1 Detail -->
+    <div class="tab-content" id="service1">
+        <div class="service-detail">
+            <h2 class="service-title">1. Investment Analysis & Project Appraisal</h2>
+            <p class="service-description">
+                We conduct comprehensive investment and project analysis to determine commercial viability, 
+                funding suitability, and expected investor returns. Our assessments are designed to support 
+                informed decision-making by entrepreneurs, lenders, and investors.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-check-circle"></i> Core Analysis Areas</h4>
+                    <ul>
+                        <li>Project feasibility and commercial viability</li>
+                        <li>Market and demand assumptions</li>
+                        <li>Capital expenditure and funding requirements</li>
+                        <li>Financing structure (equity, debt, blended finance)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-chart-bar"></i> Financial Metrics</h4>
+                    <ul>
+                        <li>Return on Investment (ROI) analysis</li>
+                        <li>Net Present Value (NPV) and IRR calculations</li>
+                        <li>Breakeven analysis and payback period</li>
+                        <li>Cash flow sustainability assessment</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-shield-alt"></i> Risk Assessment</h4>
+                    <ul>
+                        <li>Comprehensive risk identification</li>
+                        <li>Sensitivity and downside risk analysis</li>
+                        <li>Scenario planning and stress testing</li>
+                        <li>Risk mitigation strategies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 2 Detail -->
+    <div class="tab-content" id="service2">
+        <div class="service-detail">
+            <h2 class="service-title">2. Financial Analysis & Business Performance Review</h2>
+            <p class="service-description">
+                We analyze the financial performance and position of businesses to identify strengths, 
+                weaknesses, and areas requiring improvement. This service supports strategic planning, 
+                turnaround efforts, and financing applications.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-history"></i> Performance Analysis</h4>
+                    <ul>
+                        <li>Historical financial performance analysis</li>
+                        <li>Profitability and margin analysis</li>
+                        <li>Actuals vs projections analysis</li>
+                        <li>Operational efficiency assessment</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-tint"></i> Liquidity & Solvency</h4>
+                    <ul>
+                        <li>Liquidity assessment (working capital, cash cycles)</li>
+                        <li>Solvency and long-term sustainability analysis</li>
+                        <li>Cash flow performance and stress points</li>
+                        <li>Working capital management</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-cogs"></i> Structural Analysis</h4>
+                    <ul>
+                        <li>Gearing and capital structure analysis</li>
+                        <li>Cost structures evaluation</li>
+                        <li>Financial risk identification</li>
+                        <li>Capital adequacy assessment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 3 Detail -->
+    <div class="tab-content" id="service3">
+        <div class="service-detail">
+            <h2 class="service-title">3. Financial Modelling & Projections</h2>
+            <p class="service-description">
+                We develop detailed, decision-ready financial models that translate business strategies 
+                and projects into measurable financial outcomes. Our models are structured to meet the 
+                requirements of banks, investors, and development finance institutions.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-file-alt"></i> Model Components</h4>
+                    <ul>
+                        <li>Integrated financial models (P&L, Balance Sheet, Cash Flow)</li>
+                        <li>Multi-year financial projections</li>
+                        <li>Project-based financial models</li>
+                        <li>Funding and repayment modelling</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-chart-area"></i> Analysis Features</h4>
+                    <ul>
+                        <li>Scenario and sensitivity analysis</li>
+                        <li>Debt service coverage and affordability analysis</li>
+                        <li>Break-even and cash flow timing analysis</li>
+                        <li>Investor and lender return modelling</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-bullseye"></i> Application Focus</h4>
+                    <ul>
+                        <li>Bank financing applications</li>
+                        <li>Investor presentations</li>
+                        <li>Strategic planning support</li>
+                        <li>Performance monitoring frameworks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 4 Detail -->
+    <div class="tab-content" id="service4">
+        <div class="service-detail">
+            <h2 class="service-title">4. Financial Structuring & Business Formalization</h2>
+            <p class="service-description">
+                We help businesses transition from informal or partially recorded operations into structured, 
+                finance-ready entities. This includes reconstructing unrecorded financial activity into 
+                credible financial statements suitable for financing and investment purposes.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-history"></i> Historical Reconstruction</h4>
+                    <ul>
+                        <li>Reconstruction of historical financial records</li>
+                        <li>Conversion of unrecorded finances into formal statements</li>
+                        <li>Normalization of revenues and expenses</li>
+                        <li>Cash flow reconstruction and validation</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-file-invoice-dollar"></i> Documentation</h4>
+                    <ul>
+                        <li>Preparation of management accounts</li>
+                        <li>Formal financial statement compilation</li>
+                        <li>Supporting schedules and documentation</li>
+                        <li>Historical trend analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-handshake"></i> Financing Readiness</h4>
+                    <ul>
+                        <li>Structuring financial information for financing applications</li>
+                        <li>Improving financial transparency and credibility</li>
+                        <li>Compliance with reporting standards</li>
+                        <li>Investor communication materials</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 5 Detail -->
+    <div class="tab-content" id="service5">
+        <div class="service-detail">
+            <h2 class="service-title">5. Turnaround & Restructuring Advisory</h2>
+            <p class="service-description">
+                For businesses facing financial or operational distress, we diagnose performance gaps 
+                and design practical turnaround strategies focused on restoring profitability and sustainability.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-stethoscope"></i> Diagnostic Review</h4>
+                    <ul>
+                        <li>Comprehensive business and financial reviews</li>
+                        <li>Identification of underperforming areas</li>
+                        <li>Root cause analysis of distress</li>
+                        <li>Performance benchmarking</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-life-ring"></i> Stabilization Strategies</h4>
+                    <ul>
+                        <li>Cash flow stabilization strategies</li>
+                        <li>Cost restructuring and efficiency improvements</li>
+                        <li>Working capital optimization</li>
+                        <li>Immediate action plans</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-rocket"></i> Recovery & Growth</h4>
+                    <ul>
+                        <li>Revenue recovery and growth strategies</li>
+                        <li>Financial restructuring recommendations</li>
+                        <li>Short- to medium-term recovery plans</li>
+                        <li>Performance monitoring systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 6 Detail -->
+    <div class="tab-content" id="service6">
+        <div class="service-detail">
+            <h2 class="service-title">6. Project Information Memorandums & Pitch Decks</h2>
+            <p class="service-description">
+                We prepare professional, investor-ready documents that clearly present business opportunities, 
+                funding requirements, and expected returns.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-briefcase"></i> Business Presentation</h4>
+                    <ul>
+                        <li>Business and project overview</li>
+                        <li>Management team presentation</li>
+                        <li>Market opportunity analysis</li>
+                        <li>Competitive landscape assessment</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-chart-pie"></i> Financial Presentation</h4>
+                    <ul>
+                        <li>Financial performance highlights</li>
+                        <li>Projections and growth assumptions</li>
+                        <li>Funding requirements and use of funds</li>
+                        <li>Investment structure and returns</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-shield-alt"></i> Risk & Implementation</h4>
+                    <ul>
+                        <li>Risk analysis and mitigation strategies</li>
+                        <li>Implementation timelines and milestones</li>
+                        <li>Exit strategies (where applicable)</li>
+                        <li>Appendices and supporting data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 7 Detail -->
+    <div class="tab-content" id="service7">
+        <div class="service-detail">
+            <h2 class="service-title">7. Project Implementation Planning</h2>
+            <p class="service-description">
+                We translate approved projects and funded initiatives into clear execution roadmaps 
+                to ensure effective delivery and accountability.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-flag"></i> Planning Framework</h4>
+                    <ul>
+                        <li>Project scope and objectives definition</li>
+                        <li>Execution timelines and milestones</li>
+                        <li>Resource and budget allocation</li>
+                        <li>Stakeholder mapping and engagement</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-tasks"></i> Execution Management</h4>
+                    <ul>
+                        <li>Activity scheduling and sequencing</li>
+                        <li>Responsibility assignment matrix</li>
+                        <li>Progress tracking systems</li>
+                        <li>Budget monitoring and control</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-chart-line"></i> Monitoring & Control</h4>
+                    <ul>
+                        <li>Risk management frameworks</li>
+                        <li>Performance monitoring indicators</li>
+                        <li>Reporting and accountability structures</li>
+                        <li>Quality assurance protocols</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service 8 Detail -->
+    <div class="tab-content" id="service8">
+        <div class="service-detail">
+            <h2 class="service-title">8. Corporate Advisory & Governance Support</h2>
+            <p class="service-description">
+                We act as long-term corporate advisors, assessing existing systems and governance 
+                frameworks to identify gaps and recommend practical improvements.
+            </p>
+            
+            <div class="service-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-search"></i> System Assessment</h4>
+                    <ul>
+                        <li>Review of existing systems and internal controls</li>
+                        <li>Identification of governance and operational failures</li>
+                        <li>Financial management system assessments</li>
+                        <li>Process efficiency evaluation</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-chart-network"></i> Framework Improvement</h4>
+                    <ul>
+                        <li>Reporting and decision-making framework improvements</li>
+                        <li>Policy and procedure development</li>
+                        <li>Internal control strengthening</li>
+                        <li>Compliance framework enhancement</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-users-cog"></i> Advisory Support</h4>
+                    <ul>
+                        <li>Advisory support to directors and management</li>
+                        <li>Board effectiveness enhancement</li>
+                        <li>Strengthening accountability structures</li>
+                        <li>Succession planning support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="section-header">
+        <h2>Our <span class="highlight">Process</span></h2>
+        <p>A structured approach to business transformation and financial advisory</p>
+    </div>
+    
+    <div class="process-steps">
+        <div class="process-step">
+            <div class="step-number">1</div>
+            <h4>Diagnostic Assessment</h4>
+            <p>Comprehensive review of current operations, financial position, and governance structures.</p>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">2</div>
+            <h4>Strategic Planning</h4>
+            <p>Development of customized strategies addressing identified gaps and opportunities.</p>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">3</div>
+            <h4>Implementation Support</h4>
+            <p>Practical execution guidance with monitoring and adjustment mechanisms.</p>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">4</div>
+            <h4>Performance Review</h4>
+            <p>Regular assessment of progress against objectives with continuous improvement.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Transform Your Business?</h2>
+        <p>
+            Partner with Tuka Business Advisory to elevate your enterprise from informal operations 
+            to a well-governed, financially sound, and investment-ready organization.
+        </p>
+        <div class="cta-btns">
+            <a href="#" class="btn-lime">Schedule a Consultation</a>
+            <a href="#" class="btn-outline">Download Service Catalog</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Smooth scroll to services section
+                document.querySelector('.services-section').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+        
+        // Service card click functionality
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const serviceNum = card.getAttribute('data-service');
+                // Remove active class from all buttons
+                tabBtns.forEach(b => b.classList.remove('active'));
+                // Add active to corresponding service tab
+                const serviceBtn = document.querySelector(`[data-tab="service${serviceNum}"]`);
+                if (serviceBtn) {
+                    serviceBtn.classList.add('active');
+                    // Remove active from all contents
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    // Show service content
+                    document.getElementById(`service${serviceNum}`).classList.add('active');
+                }
+            });
+        });
+        
+        // Smooth scroll for navigation (if any)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}
