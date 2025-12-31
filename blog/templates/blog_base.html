@@ -1,30 +1,541 @@
+<!-- blog/templates/blog_base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Tukakombe Blog{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tuka Advisory Insights{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --lime: #a2d242;
+            --lime-light: #c9ff66;
+            --lime-dark: #8ab82d;
+            --navy: #1a2a40;
+            --navy-dark: #0d1621;
+            --navy-light: #2a3a55;
+            --white: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --gray-light: #f8fafc;
+            --gray-medium: #e2e8f0;
+            --gray-dark: #64748b;
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--white);
+            color: var(--navy);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .blog-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            color: var(--white);
+            padding: 20px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--lime);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-dark);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .logo-text h1 a {
+            color: var(--white);
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--white) 0%, var(--lime-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Main Navigation */
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--lime);
+            background: rgba(162, 210, 66, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--lime);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--lime);
+            border-radius: 50%;
+        }
+
+        /* User Actions */
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-welcome {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .user-welcome strong {
+            color: var(--lime);
+        }
+
+        .nav-btn {
+            background: rgba(162, 210, 66, 0.15);
+            color: var(--lime);
+            border: 1px solid rgba(162, 210, 66, 0.3);
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(162, 210, 66, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+            color: var(--navy-dark);
+            border: none;
+        }
+
+        .nav-btn.primary:hover {
+            box-shadow: 0 6px 20px rgba(162, 210, 66, 0.3);
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            background: var(--lime);
+            color: var(--navy-dark);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding-bottom: 60px;
+        }
+
+        /* Flash Messages */
+        .flashes {
+            list-style: none;
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 5%;
+        }
+
+        .flashes li {
+            padding: 16px 20px;
+            margin-bottom: 15px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flashes li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        .flashes .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-left: 5px solid #10b981;
+        }
+
+        .flashes .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-left: 5px solid #ef4444;
+        }
+
+        .flashes .warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border-left: 5px solid #f59e0b;
+        }
+
+        .flashes .info {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-left: 5px solid #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .blog-footer {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            color: var(--white);
+            padding: 40px 5%;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            color: var(--lime);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: var(--lime);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--lime);
+            color: var(--navy-dark);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: var(--lime);
+            text-decoration: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .main-nav {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--navy-dark);
+                flex-direction: column;
+                padding: 20px;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 999;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .main-nav.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-links a {
+                padding: 12px 20px;
+                width: 100%;
+                border-radius: var(--radius-md);
+                border-left: 3px solid transparent;
+            }
+
+            .nav-links a.active {
+                background: rgba(162, 210, 66, 0.15);
+                border-left-color: var(--lime);
+            }
+
+            .nav-links a.active::after {
+                display: none;
+            }
+
+            .user-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .user-welcome {
+                text-align: center;
+                padding: 10px 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .blog-header {
+                padding: 15px 5%;
+            }
+
+            .logo-text h1 {
+                font-size: 1.3rem;
+            }
+
+            .logo-text p {
+                font-size: 0.8rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="{{ url_for('core.home') }}">Home</a>
-            <a href="{{ url_for('blog.blog_home') }}">Blog</a>
-            {% if session.get('user_id') %}
-                <span>Welcome, {{ session.get('role') }}!</span>
-                <a href="{{ url_for('auth.logout') }}">Logout</a>
-                {% if session.get('role') in ['blog_admin', 'super_admin'] %}
-                    <a href="{{ url_for('blog_admin.dashboard') }}">Admin Dashboard</a>
-                {% endif %}
-            {% else %}
-                <a href="{{ url_for('admin.login') }}">Admin Login</a>
-                <a href="{{ url_for('auth.login') }}">Sign In</a>
-                <a href="{{ url_for('auth.register') }}">Sign Up</a>
-            {% endif %}
-        </nav>
+    <!-- Header -->
+    <header class="blog-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1><a href="{{ url_for('core.home') }}">Tuka Business Advisory</a></h1>
+                    <p>Strategic Insights & Financial Expertise</p>
+                </div>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Main Navigation -->
+            <nav class="main-nav" id="mainNav">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('core.home') }}" class="{% if request.endpoint == 'core.home' %}active{% endif %}">
+                        <i class="fas fa-home"></i> Home
+                    </a></li>
+                    <li><a href="{{ url_for('blog.blog_home') }}" class="{% if request.endpoint == 'blog.blog_home' %}active{% endif %}">
+                        <i class="fas fa-newspaper"></i> Blog
+                    </a></li>
+                    <li><a href="{{ url_for('core.services') if 'services' in url_for_map else '#' }}" class="{% if request.endpoint == 'core.services' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i> Services
+                    </a></li>
+                    <li><a href="{{ url_for('core.about') if 'about' in url_for_map else '#' }}" class="{% if request.endpoint == 'core.about' %}active{% endif %}">
+                        <i class="fas fa-info-circle"></i> About
+                    </a></li>
+                    <li><a href="{{ url_for('core.contact') if 'contact' in url_for_map else '#' }}" class="{% if request.endpoint == 'core.contact' %}active{% endif %}">
+                        <i class="fas fa-envelope"></i> Contact
+                    </a></li>
+                </ul>
+
+                <div class="user-actions">
+                    {% if session.get('user_id') %}
+                        <div class="user-welcome">
+                            Welcome, <strong>{{ session.get('username', 'User') }}</strong>
+                            <small style="display: block; font-size: 0.8rem;">{{ session.get('role', 'Member') }}</small>
+                        </div>
+                        
+                        {% if session.get('role') in ['admin', 'blog_admin', 'super_admin'] %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="nav-btn">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('auth.logout') }}" class="nav-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-btn">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="nav-btn primary">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </a>
+                        {% if 'admin.login' in url_for_map %}
+                        <a href="{{ url_for('admin.login') }}" class="nav-btn" style="background: rgba(255,255,255,0.1);">
+                            <i class="fas fa-lock"></i> Admin
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <main>
+    <!-- Flash Messages -->
+    <div class="flashes-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flashes">
@@ -34,12 +545,132 @@
                 </ul>
             {% endif %}
         {% endwith %}
+    </div>
 
+    <!-- Main Content -->
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <p>&copy; 2025 Tukakombe. All Rights Reserved.</p>
+    <!-- Footer -->
+    <footer class="blog-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Tuka Business Advisory</h3>
+                    <p>Providing strategic financial advisory and business consulting services to transform informal enterprises into investment-ready organizations.</p>
+                    <div class="social-links">
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('core.home') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('blog.blog_home') }}"><i class="fas fa-chevron-right"></i> Insights Blog</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Our Services</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Case Studies</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chart-line"></i> Investment Analysis</a></li>
+                        <li><a href="#"><i class="fas fa-search-dollar"></i> Financial Review</a></li>
+                        <li><a href="#"><i class="fas fa-calculator"></i> Financial Modelling</a></li>
+                        <li><a href="#"><i class="fas fa-file-contract"></i> Business Formalization</a></li>
+                        <li><a href="#"><i class="fas fa-project-diagram"></i> Implementation Planning</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><a href="mailto:info@tukakombe.com"><i class="fas fa-envelope"></i> info@tukakombe.com</a></li>
+                        <li><a href="tel:+1234567890"><i class="fas fa-phone"></i> +123 456 7890</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Business District, City</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i> Mon-Fri: 9:00-18:00</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Tuka Business Advisory. All Rights Reserved. | 
+                    <a href="#">Privacy Policy</a> | 
+                    <a href="#">Terms of Service</a>
+                </p>
+            </div>
+        </div>
     </footer>
+
+    <script>
+        // Mobile navigation toggle
+        document.getElementById('mobileToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+            this.innerHTML = document.getElementById('mainNav').classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const nav = document.getElementById('mainNav');
+            const toggle = document.getElementById('mobileToggle');
+            
+            if (!nav.contains(event.target) && !toggle.contains(event.target) && nav.classList.contains('active')) {
+                nav.classList.remove('active');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flashes li');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        if (message.parentElement) {
+                            message.remove();
+                        }
+                    }, 300);
+                }, 5000);
+            });
+
+            // Highlight current page in navigation
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#') && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

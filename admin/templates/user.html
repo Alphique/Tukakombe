@@ -1,0 +1,25 @@
+<!-- admin/templates/create_user.html -->
+<html>
+    <head>
+        <title>Create User</title>
+    </head>
+    <body>
+        <h1>Create New User</h1>
+        <form method="POST">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="admin">Admin</option>
+                <option value="blog_admin">Blog Admin</option>
+                <option value="super_admin">Super Admin</option>
+            </select><br><br>
+
+            <button type="submit">Create User</button>
+        </form>
+    </body>
+</html>

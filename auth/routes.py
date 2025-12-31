@@ -1,18 +1,35 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+# auth/routes.py
+from flask import (
+    Blueprint, render_template, request,
+    redirect, url_for, session, flash
+)
 from auth.utils import hash_password, verify_password
 from auth.models import create_users_table
 from utils.database import get_db_connection
 
-auth_bp = Blueprint('auth', __name__, template_folder='templates')
+# -------------------------------------------------------------------
+# Blueprint
+# -------------------------------------------------------------------
+auth_bp = Blueprint(
+    'auth',
+    __name__,
+    url_prefix='/auth',
+    template_folder='templates'
+)
 
+# -------------------------------------------------------------------
+# Init
+# -------------------------------------------------------------------
 create_users_table()
 
-
+# -------------------------------------------------------------------
+# LOGIN
+# -------------------------------------------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
 
         db = get_db_connection()
         user = db.execute(
@@ -22,9 +39,10 @@ def login():
         db.close()
 
         if not user or not verify_password(password, user['password']):
-            flash("Invalid credentials", "error")
-            return redirect(request.url)
+            flash("Invalid email or password", "error")
+            return redirect(url_for('auth.login'))
 
+        session.clear()
         session['user_id'] = user['id']
         session['role'] = user['role']
 
@@ -33,16 +51,19 @@ def login():
     return render_template('login.html')
 
 
+# -------------------------------------------------------------------
+# REGISTER
+# -------------------------------------------------------------------
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        confirm = request.form['password_confirm']
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm = request.form.get('password_confirm')
 
         if password != confirm:
             flash("Passwords do not match", "error")
-            return redirect(request.url)
+            return redirect(url_for('auth.register'))
 
         db = get_db_connection()
         try:
@@ -51,19 +72,34 @@ def register():
                 (email, hash_password(password))
             )
             db.commit()
-        except:
+        except Exception:
             flash("Email already exists", "error")
-            return redirect(request.url)
+            return redirect(url_for('auth.register'))
         finally:
             db.close()
 
-        flash("Account created. Login now.", "success")
+        flash("Account created successfully. Please login.", "success")
         return redirect(url_for('auth.login'))
 
     return render_template('register.html')
 
 
+# -------------------------------------------------------------------
+# LOGOUT
+# -------------------------------------------------------------------
 @auth_bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('auth.login'))
+
+
+# -------------------------------------------------------------------
+# FORGOT PASSWORD (STUB)
+# -------------------------------------------------------------------
+@auth_bp.route('/forgot-password')
+def forgot_password():
+    """
+    Placeholder route to prevent BuildError.
+    Full reset flow to be implemented later.
+    """
+    return render_template('forgot_password.html')

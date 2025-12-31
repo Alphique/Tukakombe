@@ -4,11 +4,18 @@
 {% block content %}
 <article>
     <h1>{{ blog['title'] }}</h1>
+
+    {% if blog.get('image') %}
+        <img src="{{ url_for('static', filename='uploads/blogs/' + blog['image']) }}"
+             alt="{{ blog['title'] }}" style="max-width:500px; margin-bottom: 15px;">
+    {% endif %}
+
     <p>{{ blog['content'] }}</p>
     <small>Posted on {{ blog['created_at'] }}</small>
 </article>
 
 <hr>
+
 <section>
     <h2>Comments</h2>
     <ul>
@@ -16,12 +23,20 @@
         <li>
             <strong>{{ c['user_email'] }}</strong>: {{ c['content'] }}
             <small>{{ c['created_at'] }}</small>
+
+            <!-- Admin can delete comments -->
+            {% if session.get('role') in ['admin', 'super_admin'] %}
+            <form method="POST" action="{{ url_for('admin.delete_comment', comment_id=c['id']) }}" style="display:inline;">
+                <button type="submit">Delete Comment</button>
+            </form>
+            {% endif %}
         </li>
         {% else %}
         <li>No comments yet.</li>
         {% endfor %}
     </ul>
 
+    <!-- Comment form for logged-in users -->
     {% if session.get('user_id') %}
     <form method="POST">
         <textarea name="content" rows="4" placeholder="Write your comment..." required></textarea><br>
