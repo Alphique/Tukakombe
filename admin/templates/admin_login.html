@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Register | Tuka Services{% endblock %}
+{% block title %}Admin Login | Tuka Services{% endblock %}
 
 {% block content %}
 <style>
@@ -17,6 +17,8 @@
         --off-white: #f8fafc;
         --gray-light: #e9ecef;
         --gray: #6c757d;
+        --red: #dc3545;
+        --red-light: #f8d7da;
         --radius-sm: 8px;
         --radius-md: 16px;
         --radius-lg: 24px;
@@ -64,12 +66,12 @@
         pointer-events: none;
     }
 
-    /* Sidebar */
+    /* Sidebar - Admin Focused */
     .auth-sidebar {
         flex: 0 0 40%;
         background: linear-gradient(135deg, 
-            rgba(162, 210, 66, 0.1) 0%, 
-            rgba(26, 42, 64, 0.95) 100%);
+            rgba(26, 42, 64, 0.95) 0%, 
+            rgba(13, 22, 33, 0.98) 100%);
         padding: 60px 40px;
         position: relative;
         overflow: hidden;
@@ -96,7 +98,7 @@
         background: linear-gradient(90deg, var(--lime), var(--lime-dark));
     }
 
-    .welcome-badge {
+    .admin-badge {
         display: inline-flex;
         align-items: center;
         gap: 10px;
@@ -134,34 +136,46 @@
         border-radius: 2px;
     }
 
-    .auth-sidebar hr {
-        border: none;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-        margin: 30px 0;
+    .admin-warning {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
     }
 
-    .sidebar-section {
-        color: var(--lime-light);
+    .admin-warning h4 {
+        color: var(--white);
         font-size: 1.1rem;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .sidebar-section i {
-        font-size: 1rem;
+    .admin-warning h4 i {
+        color: var(--red);
     }
 
-    .services-grid {
+    .admin-warning p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .admin-features {
+        margin-top: 40px;
+    }
+
+    .features-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 15px;
         margin-bottom: 30px;
     }
 
-    .service-card {
+    .feature-card {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -171,14 +185,14 @@
         cursor: pointer;
     }
 
-    .service-card:hover {
+    .feature-card:hover {
         background: rgba(162, 210, 66, 0.1);
         border-color: rgba(162, 210, 66, 0.3);
         transform: translateX(5px);
         box-shadow: var(--shadow-sm);
     }
 
-    .service-card a {
+    .feature-card a {
         color: var(--white);
         text-decoration: none;
         display: flex;
@@ -187,23 +201,23 @@
         font-weight: 600;
     }
 
-    .service-card i {
+    .feature-card i {
         color: var(--lime-light);
         font-size: 1.2rem;
         width: 24px;
         text-align: center;
     }
 
-    /* Benefits Section */
-    .registration-benefits {
-        background: rgba(255, 255, 255, 0.05);
+    /* Security Notice */
+    .security-notice {
+        background: rgba(162, 210, 66, 0.05);
         border-radius: var(--radius-md);
-        padding: 25px;
+        padding: 20px;
         margin-top: 30px;
         border: 1px solid rgba(162, 210, 66, 0.2);
     }
 
-    .registration-benefits h4 {
+    .security-notice h4 {
         color: var(--white);
         font-size: 1.1rem;
         margin-bottom: 15px;
@@ -212,12 +226,12 @@
         gap: 10px;
     }
 
-    .benefits-list {
+    .security-list {
         list-style: none;
         padding: 0;
     }
 
-    .benefits-list li {
+    .security-list li {
         color: var(--text-muted);
         padding: 8px 0;
         font-size: 0.9rem;
@@ -225,15 +239,14 @@
         padding-left: 20px;
     }
 
-    .benefits-list li::before {
-        content: '✓';
+    .security-list li::before {
+        content: '🔐';
         position: absolute;
         left: 0;
-        color: var(--lime-light);
-        font-weight: bold;
+        font-size: 0.8rem;
     }
 
-    /* Register Form */
+    /* Login Form */
     .auth-form-container {
         flex: 1;
         display: flex;
@@ -250,7 +263,7 @@
         }
     }
 
-    .register-card {
+    .login-card {
         width: 100%;
         max-width: 480px;
         background: var(--white);
@@ -263,12 +276,12 @@
     }
 
     @media (max-width: 768px) {
-        .register-card {
+        .login-card {
             padding: 30px;
         }
     }
 
-    .register-card::before {
+    .login-card::before {
         content: '';
         position: absolute;
         top: 0;
@@ -278,12 +291,12 @@
         background: linear-gradient(90deg, var(--lime), var(--lime-dark));
     }
 
-    .register-header {
+    .login-header {
         text-align: center;
         margin-bottom: 40px;
     }
 
-    .register-logo {
+    .login-logo {
         width: 80px;
         height: 80px;
         border-radius: var(--radius-md);
@@ -297,23 +310,35 @@
         border: 2px solid rgba(162, 210, 66, 0.2);
     }
 
-    .register-logo-img {
+    .login-logo-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: var(--radius-sm);
     }
 
-    .register-header h2 {
+    .login-header h2 {
         color: var(--navy-dark);
         font-size: 2rem;
         margin-bottom: 10px;
         font-weight: 800;
     }
 
-    .register-header p {
+    .login-header p {
         color: var(--gray);
         font-size: 1rem;
+    }
+
+    .admin-tag {
+        display: inline-block;
+        background: var(--lime);
+        color: var(--navy-dark);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-left: 10px;
+        vertical-align: middle;
     }
 
     /* Flash Messages */
@@ -405,8 +430,7 @@
     }
 
     .auth-form input[type="email"],
-    .auth-form input[type="password"],
-    .auth-form input[type="text"] {
+    .auth-form input[type="password"] {
         width: 100%;
         padding: 16px 50px 16px 50px;
         background: var(--off-white);
@@ -430,75 +454,46 @@
         opacity: 0.7;
     }
 
-    /* Password Strength Indicator */
-    .password-strength {
-        margin-top: 8px;
-        height: 4px;
-        background: var(--gray-light);
-        border-radius: 2px;
-        overflow: hidden;
-        position: relative;
+    /* Remember Me */
+    .remember-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
     }
 
-    .strength-bar {
-        height: 100%;
-        width: 0%;
-        background: #dc143c;
-        border-radius: 2px;
-        transition: width 0.3s ease, background-color 0.3s ease;
-    }
-
-    .strength-text {
-        font-size: 0.8rem;
-        color: var(--gray);
-        margin-top: 4px;
-        display: block;
-        text-align: right;
-    }
-
-    /* Password Requirements */
-    .password-requirements {
-        background: rgba(162, 210, 66, 0.05);
-        border-radius: var(--radius-sm);
-        padding: 15px;
-        margin-top: 10px;
-        border: 1px solid rgba(162, 210, 66, 0.1);
-    }
-
-    .password-requirements h5 {
-        color: var(--navy-dark);
-        font-size: 0.9rem;
-        margin-bottom: 10px;
+    .remember-checkbox {
         display: flex;
         align-items: center;
         gap: 8px;
+        cursor: pointer;
     }
 
-    .requirements-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    .remember-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--lime);
+        cursor: pointer;
     }
 
-    .requirements-list li {
-        font-size: 0.85rem;
+    .remember-checkbox label {
         color: var(--gray);
-        padding: 4px 0;
-        padding-left: 20px;
-        position: relative;
+        font-size: 0.9rem;
+        cursor: pointer;
+        user-select: none;
     }
 
-    .requirements-list li::before {
-        content: '○';
-        position: absolute;
-        left: 0;
-        color: var(--gray);
-        font-size: 0.8rem;
-    }
-
-    .requirements-list li.valid::before {
-        content: '✓';
+    .forgot-password {
         color: var(--lime);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .forgot-password:hover {
+        color: var(--lime-dark);
+        text-decoration: underline;
     }
 
     /* Password Toggle */
@@ -517,53 +512,15 @@
         align-items: center;
         justify-content: center;
         z-index: 10;
+        font-size: 1rem;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
     }
 
     .password-toggle:hover {
         color: var(--lime);
-    }
-
-    /* Terms and Conditions */
-    .terms-group {
-        margin-bottom: 30px;
-        padding: 20px;
-        background: rgba(162, 210, 66, 0.05);
-        border-radius: var(--radius-sm);
-        border: 1px solid rgba(162, 210, 66, 0.1);
-    }
-
-    .terms-checkbox {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        cursor: pointer;
-    }
-
-    .terms-checkbox input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--lime);
-        cursor: pointer;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .terms-checkbox label {
-        color: var(--gray);
-        font-size: 0.9rem;
-        cursor: pointer;
-        user-select: none;
-        line-height: 1.5;
-    }
-
-    .terms-checkbox a {
-        color: var(--lime);
-        text-decoration: none;
-        font-weight: 600;
-    }
-
-    .terms-checkbox a:hover {
-        text-decoration: underline;
+        background: rgba(162, 210, 66, 0.1);
     }
 
     /* Submit Button */
@@ -704,6 +661,12 @@
         .auth-footer-links a {
             justify-content: center;
         }
+
+        .remember-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
     }
 </style>
 
@@ -716,69 +679,79 @@
 
     <!-- Sidebar -->
     <div class="auth-sidebar">
-        <div class="welcome-badge">
-            <i class="fas fa-user-plus"></i>
-            <span>JOIN TUKA SERVICES</span>
+        <div class="admin-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>ADMIN PORTAL</span>
         </div>
 
-        <h3>Explore Tuka Services</h3>
+        <h3>Admin Dashboard Access</h3>
 
-        <div class="services-grid">
-            <div class="service-card">
-                <a href="{{ url_for('developers.home') }}">
-                    <i class="fas fa-code"></i>
-                    <span>Tuka Developers</span>
-                </a>
-            </div>
-
-            <div class="service-card">
-                <a href="{{ url_for('finance.home') }}">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Tuka Finance</span>
-                </a>
-            </div>
-
-            <div class="service-card">
-                <a href="{{ url_for('advisory.home') }}">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Tuka Advisory</span>
-                </a>
-            </div>
-
-            <div class="service-card">
-                <a href="{{ url_for('market_place.home') }}">
-                    <i class="fas fa-store"></i>
-                    <span>Marketplace</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="registration-benefits">
+        <div class="admin-warning">
             <h4>
-                <i class="fas fa-star"></i>
-                Registration Benefits
+                <i class="fas fa-exclamation-triangle"></i>
+                Restricted Access
             </h4>
-            <ul class="benefits-list">
-                <li>Access all Tuka services</li>
-                <li>Personalized dashboard</li>
-                <li>Priority support</li>
-                <li>Exclusive offers</li>
-                <li>Project tracking</li>
+            <p>This portal is for authorized administrators only. All activities are monitored and logged. Unauthorized access attempts will be reported.</p>
+        </div>
+
+        <div class="admin-features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <a href="#">
+                        <i class="fas fa-users-cog"></i>
+                        <span>User Management</span>
+                    </a>
+                </div>
+
+                <div class="feature-card">
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analytics Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="feature-card">
+                    <a href="#">
+                        <i class="fas fa-cogs"></i>
+                        <span>System Configuration</span>
+                    </a>
+                </div>
+
+                <div class="feature-card">
+                    <a href="#">
+                        <i class="fas fa-database"></i>
+                        <span>Database Management</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="security-notice">
+            <h4>
+                <i class="fas fa-shield-alt"></i>
+                Security Guidelines
+            </h4>
+            <ul class="security-list">
+                <li>Use strong, unique passwords</li>
+                <li>Enable 2FA for admin accounts</li>
+                <li>Log out after each session</li>
+                <li>Monitor access logs regularly</li>
+                <li>Report any suspicious activity</li>
             </ul>
         </div>
     </div>
 
-    <!-- Register Form -->
+    <!-- Login Form -->
     <div class="auth-form-container">
-        <div class="register-card">
-            <div class="register-header">
-                <div class="register-logo">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
                     <img src="{{ url_for('static', filename='images/logo.jpeg') }}" 
                          alt="Tuka Services Logo" 
-                         class="register-logo-img">
+                         class="login-logo-img">
                 </div>
-                <h2>Create Your Account</h2>
-                <p>Join Tuka Services today</p>
+                <h2>Admin Login<span class="admin-tag">SECURE</span></h2>
+                <p>Access the administration dashboard</p>
             </div>
 
             <!-- Flash Messages -->
@@ -803,107 +776,67 @@
                 {% endif %}
             {% endwith %}
 
-            <!-- Register Form -->
-            <form method="POST" class="auth-form" id="registerForm" novalidate>
+            <!-- Login Form -->
+            <form method="POST" class="auth-form" id="loginForm" novalidate>
                 <div class="form-group">
                     <label for="email">
                         <i class="fas fa-envelope"></i>
-                        Email Address
+                        Admin Email
                     </label>
                     <div class="input-with-icon">
                         <i class="fas fa-user"></i>
                         <input type="email" 
                                id="email" 
                                name="email" 
-                               placeholder="Enter your email" 
+                               placeholder="Enter admin email address" 
                                required
-                               autocomplete="email">
+                               autocomplete="email"
+                               autofocus>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">
                         <i class="fas fa-key"></i>
-                        Create Password
+                        Password
                     </label>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
                         <input type="password" 
                                id="password" 
                                name="password" 
-                               placeholder="Create a strong password" 
+                               placeholder="Enter your password" 
                                required
-                               autocomplete="new-password">
+                               autocomplete="current-password">
                         <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
-                    
-                    <!-- Password Strength Indicator -->
-                    <div class="password-strength">
-                        <div class="strength-bar" id="strengthBar"></div>
-                    </div>
-                    <span class="strength-text" id="strengthText">Password strength</span>
-                    
-                    <!-- Password Requirements -->
-                    <div class="password-requirements">
-                        <h5>
-                            <i class="fas fa-info-circle"></i>
-                            Password Requirements
-                        </h5>
-                        <ul class="requirements-list" id="requirementsList">
-                            <li id="req-length">At least 8 characters</li>
-                            <li id="req-uppercase">One uppercase letter</li>
-                            <li id="req-lowercase">One lowercase letter</li>
-                            <li id="req-number">One number</li>
-                            <li id="req-special">One special character</li>
-                        </ul>
-                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="password_confirm">
-                        <i class="fas fa-key"></i>
-                        Confirm Password
-                    </label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" 
-                               id="password_confirm" 
-                               name="password_confirm" 
-                               placeholder="Confirm your password" 
-                               required
-                               autocomplete="new-password">
-                        <button type="button" class="password-toggle" id="confirmPasswordToggle" aria-label="Toggle password visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                <div class="remember-group">
+                    <div class="remember-checkbox">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
                     </div>
-                </div>
-
-                <!-- Terms and Conditions -->
-                <div class="terms-group">
-                    <div class="terms-checkbox">
-                        <input type="checkbox" id="terms" name="terms" required>
-                        <label for="terms">
-                            I agree to the <a href="#">Terms of Service</a> 
-                            and <a href="#">Privacy Policy</a>. 
-                            I understand that my data will be processed in accordance with these policies.
-                        </label>
-                    </div>
+                    <a href="#" class="forgot-password">
+                        <i class="fas fa-question-circle"></i>
+                        Forgot Password?
+                    </a>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Create Account</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login as Admin</span>
                     <div class="loading-spinner" id="loadingSpinner"></div>
                 </button>
             </form>
 
             <div class="auth-footer-links">
-                <p>Already have an account?</p>
-                <a href="{{ url_for('auth.login') }}">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Login to your account
+                <p>Return to main site</p>
+                <a href="{{ url_for('core.home') }}">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Tuka Services
                 </a>
             </div>
         </div>
@@ -911,155 +844,68 @@
 </div>
 
 <script>
-    // Password toggle functionality - simplified and improved
+    // Password toggle functionality - FIXED VERSION
     function setupPasswordToggle() {
         const passwordToggle = document.getElementById('passwordToggle');
-        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
         const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('password_confirm');
         
-        // Function to toggle password visibility
-        function togglePasswordVisibility(input, toggleBtn) {
-            const icon = toggleBtn.querySelector('i');
-            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-            input.setAttribute('type', type);
+        if (!passwordToggle || !passwordInput) return;
+        
+        // Add event listener with proper event handling
+        passwordToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             
-            // Toggle eye icon
+            const type = passwordInput.getAttribute('type');
+            const icon = passwordToggle.querySelector('i');
+            
             if (type === 'password') {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
+                passwordInput.setAttribute('type', 'text');
                 icon.classList.remove('fa-eye');
                 icon.classList.add('fa-eye-slash');
+                passwordToggle.setAttribute('aria-label', 'Hide password');
+            } else {
+                passwordInput.setAttribute('type', 'password');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                passwordToggle.setAttribute('aria-label', 'Show password');
             }
-        }
-        
-        // Add event listeners if elements exist
-        if (passwordToggle && passwordInput) {
-            passwordToggle.addEventListener('click', function() {
-                togglePasswordVisibility(passwordInput, passwordToggle);
-            });
-        }
-        
-        if (confirmPasswordToggle && confirmPasswordInput) {
-            confirmPasswordToggle.addEventListener('click', function() {
-                togglePasswordVisibility(confirmPasswordInput, confirmPasswordToggle);
-            });
-        }
-    }
-
-    // Password strength checker
-    function checkPasswordStrength(password) {
-        // Reset all checks
-        const requirements = {
-            length: password.length >= 8,
-            uppercase: /[A-Z]/.test(password),
-            lowercase: /[a-z]/.test(password),
-            number: /[0-9]/.test(password),
-            special: /[^A-Za-z0-9]/.test(password)
-        };
-        
-        // Update requirement indicators
-        Object.keys(requirements).forEach(key => {
-            const element = document.getElementById(`req-${key}`);
-            if (element) {
-                if (requirements[key]) {
-                    element.classList.add('valid');
-                } else {
-                    element.classList.remove('valid');
-                }
-            }
+            
+            // Keep focus on password field
+            passwordInput.focus();
         });
         
-        // Calculate strength score
-        const validChecks = Object.values(requirements).filter(Boolean).length;
-        const strength = (validChecks / 5) * 100;
-        
-        // Update strength bar
-        const strengthBar = document.getElementById('strengthBar');
-        const strengthText = document.getElementById('strengthText');
-        
-        if (strengthBar) {
-            strengthBar.style.width = strength + '%';
-            
-            // Update color and text based on strength
-            if (strength < 20) {
-                strengthBar.style.backgroundColor = '#dc143c';
-                strengthText.textContent = 'Very Weak';
-                strengthText.style.color = '#dc143c';
-            } else if (strength < 40) {
-                strengthBar.style.backgroundColor = '#ff6b6b';
-                strengthText.textContent = 'Weak';
-                strengthText.style.color = '#ff6b6b';
-            } else if (strength < 60) {
-                strengthBar.style.backgroundColor = '#ffa500';
-                strengthText.textContent = 'Fair';
-                strengthText.style.color = '#ffa500';
-            } else if (strength < 80) {
-                strengthBar.style.backgroundColor = '#ffd700';
-                strengthText.textContent = 'Good';
-                strengthText.style.color = '#ffd700';
-            } else {
-                strengthBar.style.backgroundColor = '#28a745';
-                strengthText.textContent = 'Strong';
-                strengthText.style.color = '#28a745';
-            }
-        }
-        
-        return validChecks >= 3; // At least 3 requirements met
+        // Prevent form submission when clicking the toggle button
+        passwordToggle.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
     }
 
     // Form validation
     function setupFormValidation() {
-        const registerForm = document.getElementById('registerForm');
+        const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         
-        if (!registerForm) return;
-        
-        // Real-time password validation
-        const passwordInput = document.getElementById('password');
-        if (passwordInput) {
-            passwordInput.addEventListener('input', function() {
-                checkPasswordStrength(this.value);
-            });
-        }
+        if (!loginForm) return;
         
         // Form submission
-        registerForm.addEventListener('submit', function(e) {
-            // Basic validation
+        loginForm.addEventListener('submit', function(e) {
             const email = document.getElementById('email')?.value;
             const password = document.getElementById('password')?.value;
-            const passwordConfirm = document.getElementById('password_confirm')?.value;
-            const terms = document.getElementById('terms')?.checked;
             
             let isValid = true;
             
             // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!email || !emailRegex.test(email)) {
-                showError('Please enter a valid email address');
+                showError('Please enter a valid admin email address');
                 isValid = false;
             }
             
-            // Password strength validation
-            if (!password || password.length < 8) {
-                showError('Password must be at least 8 characters long');
-                isValid = false;
-            } else if (!checkPasswordStrength(password)) {
-                showError('Please ensure your password meets all requirements');
-                isValid = false;
-            }
-            
-            // Password confirmation
-            if (password !== passwordConfirm) {
-                showError('Passwords do not match');
-                isValid = false;
-            }
-            
-            // Terms agreement
-            if (!terms) {
-                showError('You must agree to the Terms of Service and Privacy Policy');
+            // Password validation
+            if (!password || password.length < 6) {
+                showError('Password must be at least 6 characters long');
                 isValid = false;
             }
             
@@ -1134,11 +980,11 @@
             
             // Save preference to localStorage
             const isDark = document.body.classList.contains('dark-theme');
-            localStorage.setItem('userTheme', isDark ? 'dark' : 'light');
+            localStorage.setItem('adminTheme', isDark ? 'dark' : 'light');
         });
 
         // Load saved theme preference
-        const savedTheme = localStorage.getItem('userTheme') || localStorage.getItem('adminTheme');
+        const savedTheme = localStorage.getItem('adminTheme');
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-theme');
             if (themeIcon) {
@@ -1155,17 +1001,17 @@
                 background: var(--navy-dark);
             }
             
-            body.dark-theme .register-card {
+            body.dark-theme .login-card {
                 background: var(--navy);
                 color: var(--white);
                 border-color: rgba(162, 210, 66, 0.2);
             }
             
-            body.dark-theme .register-header h2 {
+            body.dark-theme .login-header h2 {
                 color: var(--white);
             }
             
-            body.dark-theme .register-header p {
+            body.dark-theme .login-header p {
                 color: var(--text-muted);
             }
             
@@ -1174,8 +1020,7 @@
             }
             
             body.dark-theme .auth-form input[type="email"],
-            body.dark-theme .auth-form input[type="password"],
-            body.dark-theme .auth-form input[type="text"] {
+            body.dark-theme .auth-form input[type="password"] {
                 background: rgba(255, 255, 255, 0.05);
                 border-color: rgba(255, 255, 255, 0.1);
                 color: var(--white);
@@ -1186,16 +1031,12 @@
                 border-color: var(--lime);
             }
             
-            body.dark-theme .terms-checkbox label {
+            body.dark-theme .remember-checkbox label {
                 color: var(--text-muted);
             }
             
-            body.dark-theme .password-requirements h5 {
-                color: var(--white);
-            }
-            
-            body.dark-theme .requirements-list li {
-                color: var(--text-muted);
+            body.dark-theme .forgot-password {
+                color: var(--lime-light);
             }
             
             body.dark-theme .auth-footer-links {
@@ -1210,6 +1051,10 @@
                 background: rgba(162, 210, 66, 0.1);
                 color: var(--lime-light);
             }
+            
+            body.dark-theme .password-toggle:hover {
+                background: rgba(162, 210, 66, 0.2);
+            }
         `;
         
         const darkThemeStyle = document.createElement('style');
@@ -1217,50 +1062,42 @@
         document.head.appendChild(darkThemeStyle);
     }
 
+    // Auto-submit on enter key
+    function setupEnterKeySubmit() {
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeElement = document.activeElement;
+                const loginForm = document.getElementById('loginForm');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                if (loginForm && loginForm.contains(activeElement) && submitBtn && !submitBtn.disabled) {
+                    loginForm.requestSubmit();
+                }
+            }
+        });
+    }
+
     // Initialize everything when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set up password toggle functionality
+    function init() {
         setupPasswordToggle();
-        
-        // Set up form validation
         setupFormValidation();
-        
-        // Set up theme toggle
         setupThemeToggle();
-        
-        // Add dark theme styles
         addDarkThemeStyles();
+        setupEnterKeySubmit();
         
-        // Auto-focus email field on page load
+        // Auto-focus email field
         const emailField = document.getElementById('email');
         if (emailField) {
             emailField.focus();
         }
-        
-        // Add enter key to submit form
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const activeElement = document.activeElement;
-                const registerForm = document.getElementById('registerForm');
-                const submitBtn = document.getElementById('submitBtn');
-                
-                if (registerForm && registerForm.contains(activeElement) && submitBtn && !submitBtn.disabled) {
-                    registerForm.requestSubmit();
-                }
-            }
-        });
-    });
+    }
 
-    // Also initialize if DOM is already loaded
+    // Run initialization when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setupPasswordToggle();
-            setupFormValidation();
-        });
+        document.addEventListener('DOMContentLoaded', init);
     } else {
         // DOM already loaded
-        setupPasswordToggle();
-        setupFormValidation();
+        init();
     }
 </script>
 {% endblock %}

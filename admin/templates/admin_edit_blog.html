@@ -1,0 +1,238 @@
+{% extends "blog_base.html" %}
+{% block title %}Edit Story | Tukakombe{% endblock %}
+
+{% block content %}
+<div class="studio-wrapper">
+    <form id="editBlogForm" method="POST" enctype="multipart/form-data">
+        
+        <nav class="studio-nav">
+            <div class="nav-left">
+                <a href="{{ url_for('admin.dashboard') }}" class="back-btn"><i class="fas fa-chevron-left"></i></a>
+                <span class="nav-label">Editing Post</span>
+            </div>
+            <div class="nav-right">
+                <select name="status" class="status-pill">
+                    <option value="published" {% if blog['status'] == 'published' %}selected{% endif %}>Live</option>
+                    <option value="draft" {% if blog['status'] == 'draft' %}selected{% endif %}>Draft</option>
+                </select>
+                <button type="submit" class="btn-save">Update</button>
+            </div>
+        </nav>
+
+        <div class="studio-main">
+            <div class="editor-view">
+                <div class="content-header">
+                    <input type="text" name="title" class="title-autosize" 
+                           value="{{ blog['title'] }}" placeholder="Enter title..." required>
+                    
+                    <div class="image-manager">
+                        <div class="image-preview-zone" id="img-preview-zone">
+                            {% if blog['image'] %}
+                                <img src="{{ url_for('static', filename='uploads/blogs/' + blog['image']) }}" id="main-preview">
+                            {% else %}
+                                <div class="placeholder-icon"><i class="fas fa-image"></i></div>
+                            {% endif %}
+                        </div>
+                        <label for="featuredImgInput" class="change-img-btn">
+                            <i class="fas fa-camera"></i> Change Cover
+                            <input type="file" name="image" id="featuredImgInput" hidden accept="image/*">
+                        </label>
+                    </div>
+                </div>
+
+                <div id="toolbar-container" class="sticky-toolbar"></div>
+
+                <div class="writing-surface">
+                    <div id="editor-canvas" class="article-content">
+                        {{ blog['content'] | safe }}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="side-preview desktop-only">
+                <div class="preview-inner">
+                    <div class="preview-label">LIVE PREVIEW</div>
+                    <div id="previewContent" class="article-content">
+                        {{ blog['content'] | safe }}
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <input type="hidden" name="content" id="hiddenContent">
+    </form>
+</div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/decoupled-document/ckeditor.js"></script>
+
+<style>
+/* --- Design System --- */
+:root {
+    --studio-bg: #f8fafc;
+    --navy: #1a2a40;
+    --accent: #a2d242;
+    --border: #e2e8f0;
+    --white: #ffffff;
+}
+
+.studio-wrapper { background: var(--studio-bg); min-height: 100vh; font-family: 'Inter', sans-serif; }
+
+/* --- Fixed Mobile-Friendly Nav --- */
+.studio-nav {
+    height: 60px;
+    background: var(--navy);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
+.back-btn { color: white; font-size: 1.2rem; }
+.nav-label { color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 500; }
+
+.status-pill {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+.btn-save {
+    background: var(--accent);
+    color: var(--navy);
+    border: none;
+    padding: 6px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* --- Layout Structure --- */
+.studio-main { display: grid; grid-template-columns: 1fr 450px; }
+
+@media (max-width: 1024px) {
+    .studio-main { grid-template-columns: 1fr; }
+    .desktop-only { display: none; }
+}
+
+/* --- Editor Elements --- */
+.editor-view { background: var(--white); min-height: 100vh; }
+.content-header { padding: 30px 20px; max-width: 800px; margin: 0 auto; }
+
+.title-autosize {
+    width: 100%;
+    border: none;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--navy);
+    outline: none;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+/* --- Image Manager --- */
+.image-manager { position: relative; border-radius: 12px; overflow: hidden; background: #f1f5f9; }
+.image-preview-zone { width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; }
+.image-preview-zone img { width: 100%; height: 100%; object-fit: cover; }
+.placeholder-icon { font-size: 3rem; color: #cbd5e1; }
+.change-img-btn {
+    position: absolute; bottom: 15px; right: 15px;
+    background: rgba(0,0,0,0.6); color: white; padding: 8px 15px;
+    border-radius: 6px; font-size: 0.8rem; cursor: pointer; backdrop-filter: blur(4px);
+}
+
+/* --- CKEditor Adjustments --- */
+.sticky-toolbar {
+    position: sticky;
+    top: 60px;
+    z-index: 999;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Horizontal scroll for mobile toolbar */
+.ck-toolbar { 
+    border: none !important; 
+    background: transparent !important; 
+    flex-wrap: nowrap !important; 
+    overflow-x: auto !important; 
+}
+
+.writing-surface { padding: 20px; }
+#editor-canvas { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    min-height: 500px; 
+    outline: none; 
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* --- Side Preview --- */
+.side-preview {
+    background: #f1f5f9;
+    padding: 40px;
+    border-left: 1px solid var(--border);
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    position: sticky;
+    top: 60px;
+}
+.preview-inner { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.preview-label { font-size: 0.65rem; font-weight: 900; color: #94a3b8; margin-bottom: 20px; letter-spacing: 1px; }
+
+</style>
+
+<script>
+let editorInstance;
+
+// Initialize CKEditor
+DecoupledEditor
+    .create(document.querySelector('#editor-canvas'), {
+        toolbar: {
+            items: [
+                'heading', '|', 'bold', 'italic', 'underline', '|',
+                'bulletedList', 'numberedList', '|', 'alignment', '|',
+                'link', 'uploadImage', 'insertTable', '|', 'undo', 'redo'
+            ]
+        }
+    })
+    .then(editor => {
+        editorInstance = editor;
+        document.querySelector('#toolbar-container').appendChild(editor.ui.view.toolbar.element);
+
+        // Initial sync
+        document.getElementById('hiddenContent').value = editor.getData();
+
+        // Sync on change
+        editor.model.document.on('change:data', () => {
+            const data = editor.getData();
+            document.getElementById('hiddenContent').value = data;
+            if (document.getElementById('previewContent')) {
+                document.getElementById('previewContent').innerHTML = data;
+            }
+        });
+    })
+    .catch(error => console.error(error));
+
+// Image Preview Handling
+document.getElementById('featuredImgInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const zone = document.getElementById('img-preview-zone');
+            zone.innerHTML = `<img src="${event.target.result}" id="main-preview">`;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

@@ -96,8 +96,8 @@ def view_document(doc_id):
 # ------------------------------
 @finance_admin_bp.route('/documents/download/<int:doc_id>')
 def download_document(doc_id):
-    if not session.get('finance_admin_logged_in'):
-        return redirect(url_for('finance_admin.login'))
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin.login'))
 
     doc = DOCUMENTS.get(doc_id)
     if doc:
@@ -107,4 +107,4 @@ def download_document(doc_id):
         flash('File not found on server.', 'danger')
     else:
         flash('Document not found.', 'danger')
-    return redirect(url_for('finance_admin.documents'))
+    return redirect(url_for('admin.documents'))

@@ -1,57 +1,66 @@
-<!--admin/templates/dashboard.html-->
-{% extends "base.html" %}
+{% extends "blog_base.html" %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Admin Dashboard | Tuka Advisory{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <header class="dashboard-header">
         <div class="header-content">
             <h1 class="dashboard-title">Admin Dashboard</h1>
-            <p class="welcome-message">Welcome back, <span class="user-role">{{ session.get('role')|capitalize }}</span>!</p>
+            <p class="welcome-message">
+                Welcome back, 
+                <span class="user-role">
+                    {% if session.get('role') in ['admin', 'super_admin', 'blog_admin'] %}
+                        {{ session.get('role')|replace('_', ' ')|title }}
+                    {% else %}
+                        {{ session.get('username') }}
+                    {% endif %}
+                </span>
+            </p>
         </div>
         <div class="header-stats">
             <div class="stat-card">
                 <span class="stat-number">{{ blogs|length if blogs else 0 }}</span>
-                <span class="stat-label">Blogs</span>
+                <span class="stat-label">Total Blogs</span>
             </div>
-            <!-- Add more stats as needed -->
+            <div class="stat-card">
+                <span class="stat-number"><i class="fas fa-users" style="font-size: 1.2rem;"></i></span>
+                <span class="stat-label">Active Users</span>
+            </div>
         </div>
     </header>
 
     <div class="dashboard-grid">
-        <!-- Blog Management -->
         <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
-                    <i class="card-icon">📝</i>
+                    <i class="fas fa-edit card-icon"></i>
                     Blog Management
                 </h2>
             </div>
             <div class="card-body">
                 <div class="action-buttons">
                     <a href="{{ url_for('admin.create_blog') }}" class="action-btn primary">
-                        <span>+ Create New Blog</span>
-                        <i>→</i>
+                        <span><i class="fas fa-plus-circle"></i> Create New Blog</span>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                     <a href="{{ url_for('blog.blog_home') }}" class="action-btn secondary">
-                        <span>View All Blogs</span>
-                        <i>→</i>
+                        <span><i class="fas fa-eye"></i> View All Blogs</span>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                     <a href="#manage-blogs" class="action-btn secondary">
-                        <span>Manage Content</span>
-                        <i>↓</i>
+                        <span><i class="fas fa-tasks"></i> Manage Content</span>
+                        <i class="fas fa-chevron-down"></i>
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- User Management (Super Admin Only) -->
         {% if session.get('role') == 'super_admin' %}
         <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
-                    <i class="card-icon">👥</i>
+                    <i class="fas fa-users-cog card-icon"></i>
                     User Management
                 </h2>
             </div>
@@ -59,22 +68,21 @@
                 <div class="action-buttons">
                     <a href="{{ url_for('admin.users') }}" class="action-btn primary">
                         <span>View All Users</span>
-                        <i>→</i>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
-                    <a href="{{ url_for('admin.create_blog') }}" class="action-btn secondary">
+                    <a href="#" class="action-btn secondary">
                         <span>Create Admin/Staff</span>
-                        <i>→</i>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
         </section>
         {% endif %}
 
-        <!-- Finance / Loan Management -->
         <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
-                    <i class="card-icon">💰</i>
+                    <i class="fas fa-hand-holding-usd card-icon"></i>
                     Finance / Loans
                 </h2>
             </div>
@@ -82,17 +90,16 @@
                 <div class="action-buttons">
                     <a href="{{ url_for('admin.dashboard') }}" class="action-btn primary">
                         <span>View & Approve Loans</span>
-                        <i>→</i>
+                        <i class="fas fa-check-circle"></i>
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- Logs Management -->
         <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
-                    <i class="card-icon">📊</i>
+                    <i class="fas fa-terminal card-icon"></i>
                     System Logs
                 </h2>
             </div>
@@ -100,64 +107,63 @@
                 <div class="action-buttons">
                     <a href="{{ url_for('admin.login') }}" class="action-btn primary">
                         <span>View & Delete Logs</span>
-                        <i>→</i>
+                        <i class="fas fa-history"></i>
                     </a>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Blog Management Section -->
     <section id="manage-blogs" class="content-section">
         <div class="section-header">
             <h2 class="section-title">
-                <i class="section-icon">📋</i>
+                <i class="fas fa-list-ul section-icon"></i>
                 Manage Blogs & Comments
             </h2>
-            <p class="section-subtitle">Quick access to delete or edit blogs and their comments directly.</p>
+            <p class="section-subtitle">Perform quick edits or moderate community discussions.</p>
         </div>
 
         <div class="blogs-list">
             {% for blog in blogs %}
-            <div class="blog-card">
-                <div class="blog-header">
+            <div class="blog-card-admin">
+                <div class="blog-admin-header">
                     <div class="blog-info">
                         <h3 class="blog-title">{{ blog['title'] }}</h3>
                         <p class="blog-meta">
-                            <span class="meta-item">Posted on {{ blog['created_at'] }}</span>
+                            <span class="meta-item"><i class="far fa-calendar-alt"></i> {{ blog['created_at'] }}</span>
                             {% if blog['comments'] %}
-                            <span class="meta-item">{{ blog['comments']|length }} comments</span>
+                            <span class="meta-item"><i class="far fa-comment"></i> {{ blog['comments']|length }} comments</span>
                             {% endif %}
                         </p>
                     </div>
                     <div class="blog-actions">
                         <a href="{{ url_for('admin.edit_blog', blog_id=blog['id']) }}" class="btn-edit">
-                            <i>✏️</i> Edit
+                            <i class="fas fa-pen"></i> Edit
                         </a>
                         <form method="POST" action="{{ url_for('admin.delete_blog', blog_id=blog['id']) }}" class="delete-form">
                             <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this blog?');">
-                                <i>🗑️</i> Delete
+                                <i class="fas fa-trash"></i> Delete
                             </button>
                         </form>
                     </div>
                 </div>
 
                 {% if blog['comments'] %}
-                <div class="comments-section">
-                    <h4 class="comments-title">Comments</h4>
+                <div class="comments-accordion">
+                    <h4 class="comments-title">User Comments</h4>
                     <div class="comments-list">
                         {% for comment in blog['comments'] %}
-                        <div class="comment-item">
+                        <div class="comment-item-admin">
                             <div class="comment-content">
-                                <div class="comment-header">
+                                <div class="comment-header-admin">
                                     <span class="comment-author">{{ comment['user_email'] }}</span>
-                                    <span class="comment-time">• Just now</span>
+                                    <span class="comment-time">Recently</span>
                                 </div>
                                 <p class="comment-text">{{ comment['content'] }}</p>
                             </div>
-                            <form method="POST" action="{{ url_for('blog.delete_comment', comment_id=comment['id']) }}" class="comment-action">
-                                <button type="submit" class="btn-delete-sm" onclick="return confirm('Delete this comment?');">
-                                    <i>🗑️</i>
+                            <form method="POST" action="{{ url_for('blog.delete_comment', comment_id=comment['id']) }}">
+                                <button type="submit" class="btn-delete-sm" title="Remove Comment" onclick="return confirm('Delete this comment?');">
+                                    <i class="fas fa-times-circle"></i>
                                 </button>
                             </form>
                         </div>
@@ -168,10 +174,10 @@
             </div>
             {% else %}
             <div class="empty-state">
-                <i class="empty-icon">📝</i>
+                <div class="empty-icon"><i class="fas fa-feather-alt"></i></div>
                 <h3>No blogs available</h3>
-                <p>Create your first blog post to get started</p>
-                <a href="{{ url_for('admin.create_blog') }}" class="action-btn primary">Create Blog</a>
+                <p>Your insight library is currently empty.</p>
+                <a href="{{ url_for('admin.create_blog') }}" class="nav-btn primary">Create First Blog</a>
             </div>
             {% endfor %}
         </div>
@@ -179,402 +185,170 @@
 </div>
 
 <style>
-    /* Dashboard Layout */
+    /* Admin Specific Styles using Base Variables */
     .dashboard-container {
-        padding: 2rem;
-        max-width: var(--container-lg);
+        padding: 40px 5%;
+        max-width: 1400px;
         margin: 0 auto;
     }
 
-    /* Header */
     .dashboard-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 3rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--navy-light);
-    }
-
-    .header-content {
-        flex: 1;
+        align-items: flex-end;
+        margin-bottom: 40px;
+        border-bottom: 1px solid rgba(162, 210, 66, 0.2);
+        padding-bottom: 20px;
     }
 
     .dashboard-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--lime-light);
-        margin: 0 0 0.5rem 0;
-        background: linear-gradient(135deg, var(--lime), var(--lime-light));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .welcome-message {
-        font-size: 1.1rem;
-        color: var(--text-muted);
-        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--navy);
+        margin-bottom: 5px;
     }
 
     .user-role {
-        color: var(--lime);
-        font-weight: 600;
-        text-transform: capitalize;
+        color: var(--lime-dark);
+        font-weight: 700;
     }
 
-    /* Stats */
-    .header-stats {
-        display: flex;
-        gap: 1rem;
-    }
-
+    /* Stats Cards */
+    .header-stats { display: flex; gap: 15px; }
     .stat-card {
-        background: var(--navy-light);
-        padding: 1rem 1.5rem;
+        background: var(--navy);
+        padding: 15px 25px;
         border-radius: var(--radius-md);
         text-align: center;
-        min-width: 100px;
-        border: 1px solid rgba(162, 210, 66, 0.1);
-        transition: var(--transition);
+        min-width: 120px;
+        color: var(--white);
+        box-shadow: var(--shadow-sm);
     }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-        border-color: var(--lime);
-    }
-
-    .stat-number {
-        display: block;
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--lime);
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+    .stat-number { display: block; font-size: 1.8rem; font-weight: 800; color: var(--lime); }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
 
     /* Dashboard Grid */
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 25px;
+        margin-bottom: 50px;
     }
 
-    /* Cards */
     .dashboard-card {
-        background: var(--navy);
+        background: var(--white);
         border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        border: 1px solid var(--navy-light);
+        padding: 25px;
+        border: 1px solid var(--gray-medium);
         transition: var(--transition);
         box-shadow: var(--shadow-sm);
     }
 
     .dashboard-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-5px);
         box-shadow: var(--shadow-md);
         border-color: var(--lime);
     }
 
-    .card-header {
-        margin-bottom: 1.5rem;
-    }
-
     .card-title {
+        font-size: 1.2rem;
+        color: var(--navy);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        font-size: 1.25rem;
-        color: var(--lime-light);
-        margin: 0;
+        gap: 12px;
     }
 
-    .card-icon {
-        font-size: 1.5rem;
-    }
+    .card-icon { color: var(--lime-dark); }
 
     /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
+    .action-buttons { display: flex; flex-direction: column; gap: 10px; }
     .action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 1.25rem;
+        padding: 12px 18px;
         border-radius: var(--radius-md);
         text-decoration: none;
-        transition: var(--transition);
-        font-weight: 500;
-        border: 1px solid transparent;
-    }
-
-    .action-btn.primary {
-        background: var(--lime);
-        color: var(--navy-dark);
-    }
-
-    .action-btn.primary:hover {
-        background: var(--lime-light);
-        transform: translateX(4px);
-    }
-
-    .action-btn.secondary {
-        background: var(--navy-light);
-        color: var(--text-light);
-        border-color: var(--navy-light);
-    }
-
-    .action-btn.secondary:hover {
-        background: var(--navy);
-        border-color: var(--lime);
-        transform: translateX(4px);
-    }
-
-    /* Content Section */
-    .content-section {
-        background: var(--navy);
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        margin-top: 2rem;
-        border: 1px solid var(--navy-light);
-    }
-
-    .section-header {
-        margin-bottom: 2rem;
-    }
-
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1.5rem;
-        color: var(--lime-light);
-        margin: 0 0 0.5rem 0;
-    }
-
-    .section-subtitle {
-        color: var(--text-muted);
-        margin: 0;
-    }
-
-    /* Blog Cards */
-    .blogs-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .blog-card {
-        background: var(--navy-dark);
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
-        border: 1px solid var(--navy-light);
-        transition: var(--transition);
-    }
-
-    .blog-card:hover {
-        border-color: var(--lime);
-    }
-
-    .blog-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-
-    .blog-title {
-        color: var(--text-light);
-        margin: 0 0 0.5rem 0;
-        font-size: 1.25rem;
-    }
-
-    .blog-meta {
-        display: flex;
-        gap: 1rem;
-        color: var(--text-muted);
+        align-items: center;
+        font-weight: 600;
         font-size: 0.9rem;
-        margin: 0;
-    }
-
-    .blog-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    /* Buttons */
-    .btn-edit, .btn-delete, .btn-delete-sm {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        border: none;
-        font-weight: 500;
-        cursor: pointer;
         transition: var(--transition);
-        text-decoration: none;
     }
 
-    .btn-edit {
-        background: var(--navy-light);
-        color: var(--lime);
+    .action-btn.primary { background: var(--lime); color: var(--navy-dark); }
+    .action-btn.secondary { background: var(--gray-light); color: var(--navy); border: 1px solid var(--gray-medium); }
+    .action-btn:hover { padding-left: 22px; filter: brightness(1.05); }
+
+    /* Blog Management List */
+    .content-section {
+        background: var(--gray-light);
+        padding: 40px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-medium);
     }
 
-    .btn-edit:hover {
-        background: var(--lime);
-        color: var(--navy-dark);
+    .section-title { color: var(--navy); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .section-subtitle { color: var(--gray-dark); margin-bottom: 30px; font-size: 0.95rem; }
+
+    .blog-card-admin {
+        background: var(--white);
+        margin-bottom: 20px;
+        padding: 20px;
+        border-radius: var(--radius-md);
+        border-left: 5px solid var(--navy);
+        box-shadow: var(--shadow-sm);
     }
 
-    .btn-delete {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-    }
-
-    .btn-delete:hover {
-        background: #dc3545;
-        color: white;
-    }
-
-    .btn-delete-sm {
-        padding: 0.375rem 0.75rem;
-        background: transparent;
-        color: #dc3545;
-    }
-
-    .btn-delete-sm:hover {
-        background: rgba(220, 53, 69, 0.1);
-    }
-
-    /* Comments */
-    .comments-section {
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--navy-light);
-    }
-
-    .comments-title {
-        color: var(--lime);
-        font-size: 1rem;
-        margin: 0 0 1rem 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .comments-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .comment-item {
+    .blog-admin-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: var(--radius-sm);
-    }
-
-    .comment-header {
-        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.25rem;
     }
 
-    .comment-author {
-        color: var(--lime-light);
-        font-weight: 500;
+    .blog-title { font-size: 1.1rem; color: var(--navy); margin-bottom: 5px; }
+    .blog-meta { font-size: 0.8rem; color: var(--gray-dark); display: flex; gap: 15px; }
+
+    .blog-actions { display: flex; gap: 10px; }
+    .btn-edit, .btn-delete {
+        padding: 8px 15px;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
     }
 
-    .comment-time {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-    }
+    .btn-edit { background: #eef2ff; color: #4f46e5; }
+    .btn-delete { background: #fef2f2; color: #dc2626; }
+    .btn-edit:hover { background: #4f46e5; color: white; }
+    .btn-delete:hover { background: #dc2626; color: white; }
 
-    .comment-text {
-        color: var(--text-light);
-        margin: 0;
-        line-height: 1.5;
+    /* Comments Section */
+    .comments-accordion { margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--gray-medium); }
+    .comments-title { font-size: 0.8rem; text-transform: uppercase; color: var(--gray-dark); margin-bottom: 15px; }
+    .comment-item-admin {
+        display: flex;
+        justify-content: space-between;
+        background: var(--gray-light);
+        padding: 10px 15px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
     }
-
-    .comment-action {
-        margin-left: 1rem;
-    }
+    .comment-author { font-weight: 700; font-size: 0.85rem; color: var(--navy); }
+    .comment-text { font-size: 0.85rem; color: var(--navy-light); }
+    .btn-delete-sm { background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
+    .btn-delete-sm:hover { opacity: 1; }
 
     /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        background: var(--navy-dark);
-        border-radius: var(--radius-lg);
-        border: 2px dashed var(--navy-light);
-    }
+    .empty-state { text-align: center; padding: 60px; }
+    .empty-icon { font-size: 3rem; color: var(--gray-medium); margin-bottom: 20px; }
 
-    .empty-icon {
-        font-size: 3rem;
-        color: var(--navy-light);
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    .empty-state h3 {
-        color: var(--text-light);
-        margin: 0 0 0.5rem 0;
-    }
-
-    .empty-state p {
-        color: var(--text-muted);
-        margin: 0 0 1.5rem 0;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        .dashboard-container {
-            padding: 1rem;
-        }
-
-        .dashboard-header {
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .header-stats {
-            width: 100%;
-        }
-
-        .stat-card {
-            flex: 1;
-        }
-
-        .blog-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .blog-actions {
-            width: 100%;
-        }
-
-        .btn-edit, .btn-delete {
-            flex: 1;
-            justify-content: center;
-        }
-
-        .dashboard-grid {
-            grid-template-columns: 1fr;
-        }
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+        .blog-admin-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .blog-actions { width: 100%; }
+        .btn-edit, .btn-delete { flex: 1; text-align: center; }
     }
 </style>
 {% endblock %}
