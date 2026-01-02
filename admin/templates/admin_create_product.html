@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}Add Product | Inventory Studio{% endblock %}
+
+{% block content %}
+<div class="studio-page-wrapper">
+    <div class="product-studio-container">
+        <header class="studio-header">
+            <div class="header-text">
+                <h1>📦 New Product</h1>
+                <p>List a new item in your storefront with high-quality details.</p>
+            </div>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">Cancel</a>
+        </header>
+
+        <form method="POST" enctype="multipart/form-data" class="product-form-layout">
+            <div class="form-main-card">
+                <div class="input-group">
+                    <label for="name">Product Name</label>
+                    <input type="text" name="name" id="name" placeholder="e.g. Premium Leather Tote" required>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="price">Price (ZMW)</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-tag">K</span>
+                            <input type="number" name="price" id="price" step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="category">Category</label>
+                        <select name="category" id="category">
+                            <option value="electronics">Electronics</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="home">Home & Living</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="description">Full Description</label>
+                    <textarea name="description" id="description" rows="6" placeholder="Tell customers about the materials, features, and dimensions..." required></textarea>
+                </div>
+            </div>
+
+            <div class="form-side-column">
+                <div class="side-card upload-section">
+                    <label class="side-label">Product Image</label>
+                    <div class="image-drop-zone" id="drop-zone">
+                        <div id="preview-container">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p>Drag & drop or <span>browse</span></p>
+                        </div>
+                        <input type="file" name="image" id="product-img" hidden accept="image/*">
+                    </div>
+                    <p class="upload-tip">Use a square 800x800px image for best results.</p>
+                </div>
+
+                <div class="action-card">
+                    <button type="submit" class="btn-primary-large">
+                        <i class="fas fa-plus"></i> Create Product
+                    </button>
+                    <p class="status-info"><i class="fas fa-info-circle"></i> Product will be visible immediately after creation.</p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* --- Dashboard Variables --- */
+:root {
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --navy: #0f172a;
+    --text-muted: #64748b;
+    --bg-light: #f8fafc;
+    --border: #e2e8f0;
+}
+
+/* FIX: This wrapper ensures the content starts BELOW your fixed navbar */
+.studio-page-wrapper {
+    background: var(--bg-light);
+    min-height: 100vh;
+    padding-top: 100px; /* Adjust this value if your navbar is taller */
+    padding-bottom: 60px;
+}
+
+.product-studio-container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 0 20px; 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* --- Header Refinement --- */
+.studio-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; /* Changed from flex-end to better align with Cancel btn */
+    margin-bottom: 30px; 
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.studio-header h1 { font-size: 1.8rem; font-weight: 800; color: var(--navy); margin: 0; }
+.studio-header p { color: var(--text-muted); margin: 5px 0 0 0; }
+
+/* --- Form Layout --- */
+.product-form-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
+
+@media (max-width: 900px) {
+    .product-form-layout { grid-template-columns: 1fr; }
+    .studio-page-wrapper { padding-top: 80px; }
+}
+
+.form-main-card, .side-card, .action-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+/* --- Input Styling --- */
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; color: var(--navy); }
+
+input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    outline: none;
+    background: #ffffff; /* Brighter background for better contrast */
+}
+
+input:focus, textarea:focus, select:focus { 
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
+}
+
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* --- Price Wrapper --- */
+.price-input-wrapper { 
+    display: flex; 
+    align-items: center; 
+    border: 1px solid var(--border); 
+    border-radius: 8px; 
+    overflow: hidden; 
+}
+.currency-tag { 
+    padding: 0 15px; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    background: #f1f5f9; 
+    height: 45px; /* Fixed height for alignment */
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border); 
+}
+.price-input-wrapper input { border: none !important; box-shadow: none !important; flex: 1; }
+
+/* --- Image Upload Zone --- */
+.image-drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.image-drop-zone:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.02); }
+.upload-icon { font-size: 2rem; color: var(--text-muted); margin-bottom: 10px; }
+.image-drop-zone p { font-size: 0.85rem; color: var(--text-muted); }
+.image-drop-zone p span { color: var(--primary); font-weight: 600; }
+
+#preview-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* --- Buttons --- */
+.btn-primary-large {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.btn-primary-large:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-secondary { 
+    text-decoration: none; 
+    color: var(--text-muted); 
+    font-size: 0.9rem; 
+    font-weight: 600;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+}
+.btn-secondary:hover { background: #f1f5f9; }
+</style>
+
+<script>
+// (Keep your existing script, it works great!)
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('product-img');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            dropZone.innerHTML = `<img src="${e.target.result}" id="preview-img">`;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
+dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--border)'; });
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileInput.files = e.dataTransfer.files;
+    fileInput.dispatchEvent(new Event('change'));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ product['name'] }}{% endblock %}
+
+{% block content %}
+<h1>{{ product['name'] }}</h1>
+
+{% if product['image'] %}
+<img src="{{ url_for('static', filename='uploads/products/' + product['image']) }}"
+     style="max-width:400px;">
+{% endif %}
+
+<p>{{ product['description'] }}</p>
+<p><strong>Price:</strong> ZMW {{ product['price'] }}</p>
+
+<hr>
+
+<h3>Contact Admin About This Product</h3>
+<form method="POST">
+    <textarea name="message" rows="4" required
+              placeholder="Your message..."></textarea><br>
+    <button type="submit">Send Inquiry</button>
+</form>
+{% endblock %}

@@ -27,9 +27,19 @@ create_users_table()
 # -------------------------------------------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # Prevent logged-in users from re-accessing login
+    if session.get('user_id'):
+        return redirect(url_for('core.home'))
+
+    next_page = request.args.get('next')
+
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not email or not password:
+            flash("Email and password are required.", "error")
+            return redirect(url_for('auth.login'))
 
         db = get_db_connection()
         user = db.execute(
@@ -39,12 +49,19 @@ def login():
         db.close()
 
         if not user or not verify_password(password, user['password']):
-            flash("Invalid email or password", "error")
+            flash("Invalid email or password.", "error")
             return redirect(url_for('auth.login'))
 
+        # Reset session securely
         session.clear()
         session['user_id'] = user['id']
         session['role'] = user['role']
+
+        flash("Login successful.", "success")
+
+        # Redirect to originally requested page if available
+        if next_page:
+            return redirect(next_page)
 
         return redirect(url_for('core.home'))
 
@@ -56,13 +73,20 @@ def login():
 # -------------------------------------------------------------------
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    if session.get('user_id'):
+        return redirect(url_for('core.home'))
+
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm = request.form.get('password_confirm')
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        confirm = request.form.get('password_confirm', '')
+
+        if not email or not password:
+            flash("All fields are required.", "error")
+            return redirect(url_for('auth.register'))
 
         if password != confirm:
-            flash("Passwords do not match", "error")
+            flash("Passwords do not match.", "error")
             return redirect(url_for('auth.register'))
 
         db = get_db_connection()
@@ -73,7 +97,7 @@ def register():
             )
             db.commit()
         except Exception:
-            flash("Email already exists", "error")
+            flash("Email already exists.", "error")
             return redirect(url_for('auth.register'))
         finally:
             db.close()
@@ -90,6 +114,7 @@ def register():
 @auth_bp.route('/logout')
 def logout():
     session.clear()
+    flash("You have been logged out.", "success")
     return redirect(url_for('auth.login'))
 
 

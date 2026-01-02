@@ -66,7 +66,7 @@
             </div>
             <div class="card-body">
                 <div class="action-buttons">
-                    <a href="{{ url_for('admin.users') }}" class="action-btn primary">
+                    <a href="{{ url_for('admin.login') }}" class="action-btn primary">
                         <span>View All Users</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -96,6 +96,28 @@
             </div>
         </section>
 
+<section class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-hand-holding-usd card-icon"></i>
+                    Market Place Products
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="action-buttons">
+                    <a href="{{ url_for('admin.create_product') }}" class="action-btn primary">
+                        <span>Add Marketplace Product</span>
+                        <i class="fas fa-check-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+<a href="{{ url_for('admin.product_inquiries') }}">
+    📩 View Product Inquiries
+</a>
+
+
         <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
@@ -113,6 +135,15 @@
             </div>
         </section>
     </div>
+
+    <section id="manage-blogs" class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-list-ul section-icon"></i>
+                Manage Blogs & Comments
+            </h2>
+            <p class="section-subtitle">Perform quick edits or moderate community discussions.</p>
+        </div>
 
     <section id="manage-blogs" class="content-section">
         <div class="section-header">

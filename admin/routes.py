@@ -19,11 +19,18 @@ admin_bp = Blueprint(
 # ------------------------------
 # Config
 # ------------------------------
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads', 'blogs')
+BLOG_UPLOAD_FOLDER = os.path.join(
+    os.path.dirname(__file__), '..', 'static', 'uploads', 'blogs'
+)
+PRODUCT_UPLOAD_FOLDER = os.path.join(
+    os.path.dirname(__file__), '..', 'static', 'uploads', 'products'
+)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # ------------------------------
 # Admin Login
@@ -52,6 +59,7 @@ def login():
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin_login.html')
+
 
 # ------------------------------
 # Admin Dashboard
@@ -88,17 +96,6 @@ def dashboard():
         comments=comments
     )
 
-# ------------------------------
-# User Management (Super Admin Only)
-# ------------------------------
-@admin_bp.route('/users')
-@login_required
-@role_required('super_admin')
-def users():
-    db = get_db_connection()
-    users = db.execute("SELECT id, email, role FROM users").fetchall()
-    db.close()
-    return render_template('users.html', users=users)
 
 # ------------------------------
 # Blog Creation
@@ -114,10 +111,9 @@ def create_blog():
 
         image_filename = None
         if file and allowed_file(file.filename):
+            os.makedirs(BLOG_UPLOAD_FOLDER, exist_ok=True)
             filename = secure_filename(file.filename)
-            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            file.save(os.path.join(BLOG_UPLOAD_FOLDER, filename))
             image_filename = filename
 
         db = get_db_connection()
@@ -129,9 +125,10 @@ def create_blog():
         db.close()
 
         flash("Blog created successfully!", "success")
-        return redirect(url_for('admin.create_blog'))
+        return redirect(url_for('admin.dashboard'))
 
     return render_template('admin_create.html')
+
 
 # ------------------------------
 # Edit Blog
@@ -141,9 +138,7 @@ def create_blog():
 @role_required('admin', 'super_admin')
 def edit_blog(blog_id):
     db = get_db_connection()
-    blog = db.execute(
-        "SELECT * FROM blogs WHERE id = ?", (blog_id,)
-    ).fetchone()
+    blog = db.execute("SELECT * FROM blogs WHERE id = ?", (blog_id,)).fetchone()
 
     if not blog:
         db.close()
@@ -167,6 +162,7 @@ def edit_blog(blog_id):
     db.close()
     return render_template('admin_edit_blog.html', blog=blog)
 
+
 # ------------------------------
 # Delete Blog
 # ------------------------------
@@ -175,8 +171,6 @@ def edit_blog(blog_id):
 @role_required('admin', 'super_admin')
 def delete_blog(blog_id):
     db = get_db_connection()
-
-    # delete comments first (important!)
     db.execute("DELETE FROM comments WHERE blog_id = ?", (blog_id,))
     db.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
     db.commit()
@@ -197,5 +191,100 @@ def delete_comment(comment_id):
     db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
     db.commit()
     db.close()
-    flash("Comment deleted successfully.", "success")
+
+    flash("Comment deleted.", "success")
     return redirect(request.referrer or url_for('admin.dashboard'))
+
+
+# ------------------------------
+# Product Creation
+# ------------------------------
+@admin_bp.route('/products/create', methods=['GET', 'POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def create_product():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        price = request.form.get('price')
+        description = request.form.get('description')
+        image = request.files.get('image')
+
+        filename = None
+        if image and allowed_file(image.filename):
+            os.makedirs(PRODUCT_UPLOAD_FOLDER, exist_ok=True)
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(PRODUCT_UPLOAD_FOLDER, filename))
+
+        db = get_db_connection()
+        db.execute("""
+            INSERT INTO products (name, description, price, image)
+            VALUES (?, ?, ?, ?)
+        """, (name, description, price, filename))
+        db.commit()
+        db.close()
+
+        flash("Product added successfully.", "success")
+        return redirect(url_for('market_place.home'))
+
+    return render_template('admin_create_product.html')
+
+
+# ------------------------------
+# Delete Product
+# ------------------------------
+@admin_bp.route('/products/delete/<int:product_id>', methods=['POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def delete_product(product_id):
+    db = get_db_connection()
+    db.execute("DELETE FROM products WHERE id = ?", (product_id,))
+    db.commit()
+    db.close()
+
+    flash("Product deleted.", "success")
+    return redirect(url_for('market_place.home'))
+
+# ------------------------------
+# Delete Product Inquiry
+# ------------------------------
+@admin_bp.route('/product-inquiries/delete/<int:inquiry_id>', methods=['POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def delete_product_inquiry(inquiry_id):
+    db = get_db_connection()
+    db.execute(
+        "DELETE FROM product_inquiries WHERE id = ?",
+        (inquiry_id,)
+    )
+    db.commit()
+    db.close()
+
+    flash("Inquiry deleted.", "success")
+    return redirect(url_for('admin.product_inquiries'))
+
+# ------------------------------
+# View Product Inquiries
+# ------------------------------
+@admin_bp.route('/product-inquiries')
+@login_required
+@role_required('admin', 'super_admin')
+def product_inquiries():
+    db = get_db_connection()
+
+    inquiries = db.execute("""
+        SELECT
+            product_inquiries.id,
+            product_inquiries.message,
+            product_inquiries.created_at,
+            products.name AS product_name
+        FROM product_inquiries
+        JOIN products ON products.id = product_inquiries.product_id
+        ORDER BY product_inquiries.created_at DESC
+    """).fetchall()
+
+    db.close()
+
+    return render_template(
+        'admin_product_inquiries.html',
+        inquiries=inquiries
+    )

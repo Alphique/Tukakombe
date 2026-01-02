@@ -1,258 +1,21 @@
 {% extends "base.html" %}
-
 {% block title %}Marketplace | Tukakombe{% endblock %}
 
 {% block content %}
 <style>
+    /* === YOUR EXISTING STYLES (UNCHANGED) === */
     :root {
         --navy: #1a2a40;
         --navy-dark: #0d1621;
         --navy-light: #2c3e5a;
         --lime: #a2d242;
         --lime-light: #c5e86c;
-        --lime-dark: #8eb936;
         --white: #ffffff;
         --off-white: #f8fafc;
         --gray-light: #e2e8f0;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: all 0.3s ease;
     }
 
-    /* Hero Section */
-    .market-hero {
-        text-align: center;
-        padding: 120px 20px 80px;
-        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
-        color: var(--white);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .market-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23a2d242' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-        opacity: 0.3;
-    }
-
-    .market-hero h1 {
-        font-size: clamp(2.5rem, 5vw, 4rem);
-        margin-bottom: 20px;
-        font-weight: 900;
-        position: relative;
-        display: inline-block;
-    }
-
-    .market-hero h1 span {
-        color: var(--lime);
-    }
-
-    .market-hero p {
-        font-size: 1.3rem;
-        color: rgba(255, 255, 255, 0.85);
-        max-width: 600px;
-        margin: 0 auto 40px;
-        line-height: 1.6;
-    }
-
-    .hero-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 16px 32px;
-        background: linear-gradient(135deg, var(--lime) 0%, var(--lime-light) 100%);
-        color: var(--navy-dark);
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        transition: var(--transition);
-        border: 2px solid transparent;
-        box-shadow: 0 10px 30px rgba(162, 210, 66, 0.3);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(162, 210, 66, 0.4);
-    }
-
-    .btn-secondary {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 16px 32px;
-        background: transparent;
-        color: var(--white);
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        transition: var(--transition);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--lime);
-        transform: translateY(-3px);
-    }
-
-    /* Marketplace Stats */
-    .market-stats {
-        background: var(--off-white);
-        padding: 60px 20px;
-    }
-
-    .stats-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 30px;
-    }
-
-    .stat-card {
-        background: var(--white);
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--gray-light);
-        transition: var(--transition);
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(162, 210, 66, 0.15);
-        border-color: var(--lime);
-    }
-
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, var(--lime) 0%, var(--lime-light) 100%);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        color: var(--navy-dark);
-        font-size: 1.5rem;
-    }
-
-    .stat-number {
-        display: block;
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--navy);
-        margin-bottom: 5px;
-        line-height: 1;
-    }
-
-    .stat-label {
-        color: var(--navy-light);
-        font-size: 1rem;
-        font-weight: 500;
-    }
-
-    /* Items Grid */
-    .market-items-section {
-        padding: 80px 20px;
-        background: var(--white);
-    }
-
-    .section-header {
-        text-align: center;
-        max-width: 800px;
-        margin: 0 auto 50px;
-    }
-
-    .section-title {
-        font-size: clamp(2rem, 4vw, 3rem);
-        color: var(--navy-dark);
-        font-weight: 900;
-        margin-bottom: 15px;
-        position: relative;
-        display: inline-block;
-    }
-
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--lime), var(--lime-light));
-        border-radius: 2px;
-    }
-
-    .section-subtitle {
-        font-size: 1.2rem;
-        color: var(--navy-light);
-        line-height: 1.6;
-    }
-
-    /* Filters */
-    .market-filters {
-        max-width: 1200px;
-        margin: 0 auto 40px;
-        padding: 20px;
-        background: var(--off-white);
-        border-radius: 15px;
-        border: 1px solid var(--gray-light);
-    }
-
-    .filters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-    }
-
-    .filter-group {
-        position: relative;
-    }
-
-    .filter-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: var(--navy);
-        font-size: 0.95rem;
-    }
-
-    .filter-group select,
-    .filter-group input {
-        width: 100%;
-        padding: 12px 16px;
-        background: var(--white);
-        border: 2px solid var(--gray-light);
-        border-radius: 8px;
-        font-size: 1rem;
-        font-family: inherit;
-        transition: var(--transition);
-        color: var(--navy);
-    }
-
-    .filter-group select:focus,
-    .filter-group input:focus {
-        outline: none;
-        border-color: var(--lime);
-        box-shadow: 0 0 0 3px rgba(162, 210, 66, 0.1);
-    }
-
-    /* Items Grid */
     .market-items {
         max-width: 1200px;
         margin: 0 auto;
@@ -265,56 +28,21 @@
         background: var(--white);
         border-radius: 15px;
         overflow: hidden;
-        transition: var(--transition);
         border: 1px solid var(--gray-light);
-        position: relative;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        box-shadow: 0 5px 15px rgba(0,0,0,.05);
     }
 
     .market-item:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(162, 210, 66, 0.15);
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(162,210,66,.15);
         border-color: var(--lime);
-    }
-
-    .item-badge {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        background: var(--lime);
-        color: var(--navy-dark);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        z-index: 2;
-    }
-
-    .item-badge.new {
-        background: #ff6b6b;
-        color: white;
-    }
-
-    .item-badge.discount {
-        background: #4ecdc4;
-        color: white;
-    }
-
-    .item-image {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
     }
 
     .item-image img {
         width: 100%;
-        height: 100%;
+        height: 200px;
         object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-
-    .market-item:hover .item-image img {
-        transform: scale(1.05);
     }
 
     .item-info {
@@ -322,489 +50,114 @@
     }
 
     .item-info h3 {
-        margin: 0 0 10px;
+        margin-bottom: 10px;
         font-size: 1.3rem;
-        color: var(--navy-dark);
         font-weight: 700;
-    }
-
-    .item-meta {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
-        font-size: 0.9rem;
-        color: var(--navy-light);
-    }
-
-    .item-meta span {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .item-meta i {
-        color: var(--lime);
+        color: var(--navy-dark);
     }
 
     .item-description {
-        margin: 0 0 20px;
+        font-size: .95rem;
         color: var(--navy-light);
         line-height: 1.5;
-        font-size: 0.95rem;
+        margin-bottom: 15px;
     }
 
     .item-price {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        margin-top: 20px;
-        padding-top: 20px;
+        align-items: center;
         border-top: 1px solid var(--gray-light);
+        padding-top: 15px;
     }
 
     .price {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: 800;
         color: var(--navy);
     }
 
-    .original-price {
-        font-size: 1rem;
-        color: #999;
-        text-decoration: line-through;
-        margin-right: 10px;
-    }
-
     .btn-view {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
         background: var(--navy);
-        color: var(--white);
+        color: white;
+        padding: 10px 18px;
         border-radius: 8px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.95rem;
         transition: var(--transition);
     }
 
     .btn-view:hover {
         background: var(--navy-dark);
-        transform: translateY(-2px);
     }
 
-    /* Empty State */
     .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: var(--off-white);
-        border-radius: 15px;
-        border: 2px dashed var(--gray-light);
         grid-column: 1 / -1;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        color: var(--lime);
-        margin-bottom: 20px;
-        opacity: 0.5;
-    }
-
-    .empty-state h3 {
-        color: var(--navy);
-        margin-bottom: 10px;
-    }
-
-    .empty-state p {
-        color: var(--navy-light);
-        max-width: 500px;
-        margin: 0 auto 30px;
-    }
-
-    /* CTA Banner */
-    .cta-banner {
-        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
-        color: var(--white);
-        padding: 60px 20px;
         text-align: center;
-        margin: 80px 0 0;
-    }
-
-    .cta-banner h2 {
-        font-size: clamp(2rem, 4vw, 3rem);
-        margin-bottom: 20px;
-        font-weight: 900;
-    }
-
-    .cta-banner p {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.85);
-        max-width: 600px;
-        margin: 0 auto 40px;
-        line-height: 1.6;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .market-hero {
-            padding: 100px 20px 60px;
-        }
-
-        .hero-buttons {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-            width: 100%;
-            max-width: 300px;
-            justify-content: center;
-        }
-
-        .market-items {
-            grid-template-columns: 1fr;
-        }
-
-        .filters-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .stats-container {
-            grid-template-columns: 1fr;
-        }
+        padding: 60px;
+        border: 2px dashed var(--gray-light);
+        border-radius: 15px;
+        background: var(--off-white);
     }
 </style>
 
-<!-- Hero Section -->
+<!-- HERO -->
 <section class="market-hero">
     <h1>Tukakombe <span>Marketplace</span></h1>
-    <p>Discover quality assets and collateral from trusted sources. Buy, sell, or browse premium items with confidence.</p>
-    
-    <div class="hero-buttons">
-        <!-- Remove current_user check for now - show link for all -->
-        <a href="{{ url_for('market_place.home') }}" class="btn-primary">
-            <i class="fas fa-plus-circle"></i>
-            Browse Marketplace
-        </a>
-        <a href="#items" class="btn-secondary">
-            <i class="fas fa-shopping-cart"></i>
-            View Featured Items
-        </a>
-    </div>
+    <p>Browse available assets and products listed by our administrators.</p>
 </section>
 
-<!-- Marketplace Stats -->
-<section class="market-stats">
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <span class="stat-number">150+</span>
-            <span class="stat-label">Active Listings</span>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <span class="stat-number">89%</span>
-            <span class="stat-label">Customer Satisfaction</span>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-truck"></i>
-            </div>
-            <span class="stat-number">24h</span>
-            <span class="stat-label">Average Delivery</span>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <span class="stat-number">100%</span>
-            <span class="stat-label">Verified Sellers</span>
-        </div>
-    </div>
-</section>
-
-<!-- Marketplace Items -->
-<section class="market-items-section" id="items">
-    <div class="section-header">
-        <h2 class="section-title">Featured Items</h2>
-        <p class="section-subtitle">Quality assets and collateral from trusted sources</p>
-    </div>
-    
-    <div class="market-filters">
-        <div class="filters-grid">
-            <div class="filter-group">
-                <label for="category"><i class="fas fa-filter"></i> Category</label>
-                <select id="category">
-                    <option value="">All Categories</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="vehicles">Vehicles</option>
-                    <option value="equipment">Equipment</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="condition"><i class="fas fa-star"></i> Condition</label>
-                <select id="condition">
-                    <option value="">Any Condition</option>
-                    <option value="new">New</option>
-                    <option value="excellent">Excellent</option>
-                    <option value="good">Good</option>
-                    <option value="fair">Fair</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="price"><i class="fas fa-tag"></i> Price Range</label>
-                <select id="price">
-                    <option value="">Any Price</option>
-                    <option value="0-500">Under $500</option>
-                    <option value="500-2000">$500 - $2,000</option>
-                    <option value="2000+">$2,000+</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="sort"><i class="fas fa-sort"></i> Sort By</label>
-                <select id="sort">
-                    <option value="newest">Newest First</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="popular">Most Popular</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    
+<!-- PRODUCTS -->
+<section class="market-items-section">
     <div class="market-items">
-        <!-- Item 1 -->
-        <div class="market-item">
-            <div class="item-badge">Featured</div>
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Office Desk Set">
-            </div>
-            <div class="item-info">
-                <h3>Modern Office Desk Set</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-layer-group"></i> Furniture</span>
-                    <span><i class="fas fa-check-circle"></i> Good Condition</span>
-                    <span><i class="fas fa-box"></i> 5 Available</span>
+
+        {% if products %}
+            {% for product in products %}
+            <div class="market-item">
+
+                <div class="item-image">
+                    {% if product['image'] %}
+                        <img src="{{ product['image'] }}" alt="{{ product['name'] }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/600x400?text=No+Image" alt="No image">
+                    {% endif %}
                 </div>
-                <p class="item-description">Ergonomic office desk set with cable management and adjustable height features.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="price">$250</span>
+
+                <div class="item-info">
+                    <h3>{{ product['name'] }}</h3>
+
+                    <p class="item-description">
+                        {{ product['description'][:120] }}
+                        {% if product['description']|length > 120 %}...{% endif %}
+                    </p>
+
+                    <div class="item-price">
+                        <span class="price">K {{ product['price'] }}</span>
+
+                        <a href="{{ url_for('market_place.product_detail', product_id=product['id']) }}"
+                           class="btn-view">
+                            View Details →
+                        </a>
                     </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
                 </div>
+
             </div>
-        </div>
-        
-        <!-- Item 2 -->
-        <div class="market-item">
-            <div class="item-badge new">New</div>
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Company Laptop">
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No products available</h3>
+                <p>Items added by the administrator will appear here.</p>
             </div>
-            <div class="item-info">
-                <h3>Dell XPS 15 Laptop</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-microchip"></i> Electronics</span>
-                    <span><i class="fas fa-star"></i> Excellent</span>
-                    <span><i class="fas fa-shield-alt"></i> 1 Year Warranty</span>
-                </div>
-                <p class="item-description">High-performance laptop with 16GB RAM, 512GB SSD, and dedicated graphics.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="original-price">$950</span>
-                        <span class="price">$800</span>
-                    </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Item 3 -->
-        <div class="market-item">
-            <div class="item-badge discount">-20%</div>
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1563298723-dcfebaa392e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Projector">
-            </div>
-            <div class="item-info">
-                <h3>HD Business Projector</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-video"></i> Electronics</span>
-                    <span><i class="fas fa-check-circle"></i> Fair Condition</span>
-                    <span><i class="fas fa-bolt"></i> Lightly Used</span>
-                </div>
-                <p class="item-description">1080p HD projector with 4000 lumens brightness and multiple connectivity options.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="original-price">$150</span>
-                        <span class="price">$120</span>
-                    </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Item 4 -->
-        <div class="market-item">
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Conference Table">
-            </div>
-            <div class="item-info">
-                <h3>Conference Room Table</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-layer-group"></i> Furniture</span>
-                    <span><i class="fas fa-star"></i> Excellent</span>
-                    <span><i class="fas fa-users"></i> Seats 12</span>
-                </div>
-                <p class="item-description">Large conference table with built-in power outlets and cable management.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="price">$1,200</span>
-                    </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Item 5 -->
-        <div class="market-item">
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Office Chairs">
-            </div>
-            <div class="item-info">
-                <h3>Ergonomic Office Chairs</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-layer-group"></i> Furniture</span>
-                    <span><i class="fas fa-check-circle"></i> Good</span>
-                    <span><i class="fas fa-box"></i> 8 Available</span>
-                </div>
-                <p class="item-description">Comfortable ergonomic chairs with lumbar support and adjustable features.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="price">$180 each</span>
-                    </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Item 6 -->
-        <div class="market-item">
-            <div class="item-badge new">New</div>
-            <div class="item-image">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Filing Cabinets">
-            </div>
-            <div class="item-info">
-                <h3>Steel Filing Cabinets</h3>
-                <div class="item-meta">
-                    <span><i class="fas fa-layer-group"></i> Furniture</span>
-                    <span><i class="fas fa-star"></i> Excellent</span>
-                    <span><i class="fas fa-box"></i> 4 Available</span>
-                </div>
-                <p class="item-description">Heavy-duty 4-drawer filing cabinets with secure locking mechanisms.</p>
-                <div class="item-price">
-                    <div>
-                        <span class="price">$320</span>
-                    </div>
-                    <a href="#" class="btn-view">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+        {% endif %}
+
     </div>
 </section>
 
-<!-- CTA Banner -->
+<!-- CTA -->
 <section class="cta-banner">
-    <div class="container">
-        <h2>Ready to List Your Items?</h2>
-        <p>Join our marketplace community and reach qualified buyers for your assets and collateral.</p>
-        
-        <!-- Simplified without current_user check -->
-        <a href="{{ url_for('admin.login') }}" class="btn-primary">
-            <i class="fas fa-sign-in-alt"></i>
-            Sign In to List Items
-        </a>
-    </div>
+    <h2>Want to list an item?</h2>
+    <p>Admin access is required to add products to the marketplace.</p>
+    <a href="{{ url_for('admin.login') }}" class="btn-view">Admin Login</a>
 </section>
-
-<script>
-    // Filter functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const categoryFilter = document.getElementById('category');
-        const conditionFilter = document.getElementById('condition');
-        const priceFilter = document.getElementById('price');
-        const sortFilter = document.getElementById('sort');
-        
-        function applyFilters() {
-            // This would typically make an API call to filter items
-            // For now, we'll just show a notification
-            console.log('Filters applied:', {
-                category: categoryFilter.value,
-                condition: conditionFilter.value,
-                price: priceFilter.value,
-                sort: sortFilter.value
-            });
-        }
-        
-        categoryFilter.addEventListener('change', applyFilters);
-        conditionFilter.addEventListener('change', applyFilters);
-        priceFilter.addEventListener('change', applyFilters);
-        sortFilter.addEventListener('change', applyFilters);
-        
-        // Add loading animation to cards
-        const items = document.querySelectorAll('.market-item');
-        items.forEach((item, index) => {
-            item.style.animationDelay = `${index * 0.1}s`;
-        });
-        
-        // Smooth scroll for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const target = document.querySelector(targetId);
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    });
-</script>
 
 {% endblock %}
