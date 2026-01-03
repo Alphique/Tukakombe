@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tuka Advisory Insights{% endblock %}</title>
+    <title>{% block title %}Tukakula Insights{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -312,7 +312,7 @@
             <div class="logo-container">
                 <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="logo-text">
-                    <h1><a href="{{ url_for('core.home') }}">Tuka Advisory</a></h1>
+                    <h1><a href="{{ url_for('core.home') }}">Tukakula</a></h1>
                     <p>Strategic Financial Expertise</p>
                 </div>
             </div>
@@ -406,6 +406,7 @@
                     <li><a href="/finance">Tuka Finance</a></li>
                     <li><a href="/advisory">Tuka Advisory</a></li>
                     <li><a href="/developers">Tuka Developers</a></li>
+                    <li></li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -417,7 +418,7 @@
             </div>
         </div>
         <div style="text-align: center; margin-top: 50px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 25px;">
-            &copy; 2026 Tuka Business Advisory. All rights reserved. | <a href="#" style="color: var(--lime); text-decoration: none;">Privacy Policy</a>
+            &copy; 2026 Tukakula. All rights reserved. | <a href="#" style="color: var(--lime); text-decoration: none;">Privacy Policy</a>
         </div>
     </footer>
 

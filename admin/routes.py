@@ -5,6 +5,7 @@ from auth.utils import verify_password
 from auth.decorators import login_required, role_required
 import os
 from werkzeug.utils import secure_filename
+import time  # add at top
 
 # ------------------------------
 # Blueprint
@@ -30,7 +31,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 # ------------------------------
 # Admin Login
@@ -59,7 +59,6 @@ def login():
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin_login.html')
-
 
 # ------------------------------
 # Admin Dashboard
@@ -96,10 +95,6 @@ def dashboard():
         comments=comments
     )
 
-
-# ------------------------------
-# Blog Creation
-# ------------------------------
 @admin_bp.route('/create-blog', methods=['GET', 'POST'])
 @login_required
 @role_required('admin', 'super_admin')
@@ -107,19 +102,38 @@ def create_blog():
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
+        status = request.form.get('status', 'published')
         file = request.files.get('image')
 
         image_filename = None
-        if file and allowed_file(file.filename):
-            os.makedirs(BLOG_UPLOAD_FOLDER, exist_ok=True)
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(BLOG_UPLOAD_FOLDER, filename))
-            image_filename = filename
+        
+        # DEBUG: Check if file actually reached the server
+        if file:
+            print(f"DEBUG: Filename received: {file.filename}")
+        
+        if file and file.filename != '':
+            # Ensure the extension is allowed (check your ALLOWED_EXTENSIONS list)
+            if allowed_file(file.filename):
+                filename = f"{int(time.time())}_{secure_filename(file.filename)}"
+                
+                # Use current_app.root_path to be 100% sure of the location
+                from flask import current_app
+                upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'blogs')
+                
+                if not os.path.exists(upload_path):
+                    os.makedirs(upload_path)
+                
+                save_path = os.path.join(upload_path, filename)
+                file.save(save_path)
+                image_filename = filename
+                print(f"DEBUG: File saved to: {save_path}") # Check your console for this!
+            else:
+                print("DEBUG: File extension not allowed")
 
         db = get_db_connection()
         db.execute(
-            "INSERT INTO blogs (title, content, image, created_by) VALUES (?, ?, ?, ?)",
-            (title, content, image_filename, session['user_id'])
+            "INSERT INTO blogs (title, content, image, created_by, status) VALUES (?, ?, ?, ?, ?)",
+            (title, content, image_filename, session['user_id'], status)
         )
         db.commit()
         db.close()
@@ -127,8 +141,7 @@ def create_blog():
         flash("Blog created successfully!", "success")
         return redirect(url_for('admin.dashboard'))
 
-    return render_template('admin_create.html')
-
+    return render_template('admin_create.html', blog={})
 
 # ------------------------------
 # Edit Blog
@@ -148,10 +161,43 @@ def edit_blog(blog_id):
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
+        status = request.form.get('status') # Get the new status (draft/published)
+        file = request.files.get('image')
 
+        image_filename = blog['image']  # Keep the old image by default
+
+        # Logic to handle a NEW image upload
+        if file and file.filename != '':
+            if allowed_file(file.filename):
+                # Create a unique filename
+                filename = f"{int(time.time())}_{secure_filename(file.filename)}"
+                
+                # Ensure the directory exists
+                from flask import current_app
+                upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'blogs')
+                os.makedirs(upload_path, exist_ok=True)
+                
+                # Save the new file
+                file.save(os.path.join(upload_path, filename))
+                image_filename = filename 
+                
+                # Optional: Delete the old physical file from the folder to save space
+                if blog['image']:
+                    old_path = os.path.join(upload_path, blog['image'])
+                    if os.path.exists(old_path):
+                        try:
+                            os.remove(old_path)
+                        except:
+                            pass
+
+        # UPDATE EVERYTHING: title, content, image, AND status
         db.execute(
-            "UPDATE blogs SET title = ?, content = ? WHERE id = ?",
-            (title, content, blog_id)
+            """
+            UPDATE blogs 
+            SET title = ?, content = ?, image = ?, status = ? 
+            WHERE id = ?
+            """,
+            (title, content, image_filename, status, blog_id)
         )
         db.commit()
         db.close()
@@ -160,8 +206,8 @@ def edit_blog(blog_id):
         return redirect(url_for('admin.dashboard'))
 
     db.close()
+    # Make sure your edit template is using the fixed version I gave you earlier
     return render_template('admin_edit_blog.html', blog=blog)
-
 
 # ------------------------------
 # Delete Blog
@@ -179,7 +225,6 @@ def delete_blog(blog_id):
     flash("Blog deleted successfully.", "success")
     return redirect(url_for('admin.dashboard'))
 
-
 # ------------------------------
 # Delete Comment
 # ------------------------------
@@ -194,7 +239,6 @@ def delete_comment(comment_id):
 
     flash("Comment deleted.", "success")
     return redirect(request.referrer or url_for('admin.dashboard'))
-
 
 # ------------------------------
 # Product Creation
@@ -227,7 +271,6 @@ def create_product():
         return redirect(url_for('market_place.home'))
 
     return render_template('admin_create_product.html')
-
 
 # ------------------------------
 # Delete Product
@@ -268,7 +311,7 @@ def delete_product_inquiry(inquiry_id):
 @admin_bp.route('/product-inquiries')
 @login_required
 @role_required('admin', 'super_admin')
-def product_inquiries():
+def product_inquiries_view():
     db = get_db_connection()
 
     inquiries = db.execute("""
@@ -287,4 +330,71 @@ def product_inquiries():
     return render_template(
         'admin_product_inquiries.html',
         inquiries=inquiries
+    )
+
+#---------------------------------------
+# Loan Management Routes
+#--------------------------------------
+@admin_bp.route('/loans-manage', endpoint='loans')
+@login_required
+@role_required('admin', 'super_admin')
+def manage_loans():
+    db = get_db_connection()
+    loans = db.execute("""
+        SELECT
+            loan_applications.id,
+            loan_applications.business_name,
+            loan_applications.loan_amount,
+            loan_applications.status,
+            loan_applications.created_at,
+            users.email AS applicant_email
+        FROM loan_applications
+        JOIN users ON users.id = loan_applications.user_id
+        ORDER BY loan_applications.created_at DESC
+    """).fetchall()
+    db.close()
+
+    return render_template(
+        'admin_loan_management.html',
+        loans=loans
+    )
+
+
+@admin_bp.route('/loans/<int:loan_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def view_loan(loan_id):
+    db = get_db_connection()
+
+    loan = db.execute("""
+        SELECT loan_applications.*, users.email
+        FROM loan_applications
+        JOIN users ON users.id = loan_applications.user_id
+        WHERE loan_applications.id = ?
+    """, (loan_id,)).fetchone()
+
+    attachments = db.execute("""
+        SELECT * FROM loan_attachments
+        WHERE loan_id = ?
+    """, (loan_id,)).fetchall()
+
+    if request.method == 'POST':
+        status = request.form.get('status')
+        admin_notes = request.form.get('admin_notes')
+
+        db.execute("""
+            UPDATE loan_applications
+            SET status = ?, admin_notes = ?
+            WHERE id = ?
+        """, (status, admin_notes, loan_id))
+        db.commit()
+
+        flash("Loan status updated.", "success")
+        return redirect(url_for('admin.manage_loans'))
+
+    db.close()
+    return render_template(
+        'admin_view_loan.html',
+        loan=loan,
+        attachments=attachments
     )

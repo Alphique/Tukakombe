@@ -4,7 +4,7 @@ from flask import (
     redirect, url_for, session, flash
 )
 from auth.utils import hash_password, verify_password
-from auth.models import create_users_table
+from auth.decorators import login_required
 from utils.database import get_db_connection
 
 # -------------------------------------------------------------------
@@ -18,20 +18,20 @@ auth_bp = Blueprint(
 )
 
 # -------------------------------------------------------------------
-# Init
-# -------------------------------------------------------------------
-create_users_table()
-
-# -------------------------------------------------------------------
 # LOGIN
 # -------------------------------------------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # Prevent logged-in users from re-accessing login
+    # Prevent logged-in users from accessing login again
     if session.get('user_id'):
+        if session.get('role') in ('admin', 'super_admin'):
+            return redirect(url_for('admin.dashboard'))
         return redirect(url_for('core.home'))
 
+    # Secure "next" redirect
     next_page = request.args.get('next')
+    if next_page and not next_page.startswith('/'):
+        next_page = None
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
@@ -52,16 +52,19 @@ def login():
             flash("Invalid email or password.", "error")
             return redirect(url_for('auth.login'))
 
-        # Reset session securely
+        # Secure session reset
         session.clear()
         session['user_id'] = user['id']
         session['role'] = user['role']
 
         flash("Login successful.", "success")
 
-        # Redirect to originally requested page if available
+        # Priority redirect
         if next_page:
             return redirect(next_page)
+
+        if user['role'] in ('admin', 'super_admin'):
+            return redirect(url_for('admin.dashboard'))
 
         return redirect(url_for('core.home'))
 
@@ -81,7 +84,7 @@ def register():
         password = request.form.get('password', '')
         confirm = request.form.get('password_confirm', '')
 
-        if not email or not password:
+        if not email or not password or not confirm:
             flash("All fields are required.", "error")
             return redirect(url_for('auth.register'))
 
@@ -92,7 +95,10 @@ def register():
         db = get_db_connection()
         try:
             db.execute(
-                "INSERT INTO users (email, password) VALUES (?, ?)",
+                """
+                INSERT INTO users (email, password, role)
+                VALUES (?, ?, 'client')
+                """,
                 (email, hash_password(password))
             )
             db.commit()
@@ -112,6 +118,7 @@ def register():
 # LOGOUT
 # -------------------------------------------------------------------
 @auth_bp.route('/logout')
+@login_required
 def logout():
     session.clear()
     flash("You have been logged out.", "success")
@@ -119,12 +126,12 @@ def logout():
 
 
 # -------------------------------------------------------------------
-# FORGOT PASSWORD (STUB)
+# FORGOT PASSWORD (SAFE STUB)
 # -------------------------------------------------------------------
 @auth_bp.route('/forgot-password')
 def forgot_password():
     """
     Placeholder route to prevent BuildError.
-    Full reset flow to be implemented later.
+    Password reset flow to be implemented later.
     """
     return render_template('forgot_password.html')

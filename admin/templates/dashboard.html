@@ -88,7 +88,7 @@
             </div>
             <div class="card-body">
                 <div class="action-buttons">
-                    <a href="{{ url_for('admin.dashboard') }}" class="action-btn primary">
+                    <a href="{{ url_for('admin.loans') }}" class="action-btn primary">
                         <span>View & Approve Loans</span>
                         <i class="fas fa-check-circle"></i>
                     </a>
@@ -96,10 +96,11 @@
             </div>
         </section>
 
-<section class="dashboard-card">
+
+        <section class="dashboard-card">
             <div class="card-header">
                 <h2 class="card-title">
-                    <i class="fas fa-hand-holding-usd card-icon"></i>
+                    <i class="fas fa-users-cog card-icon"></i>
                     Market Place Products
                 </h2>
             </div>
@@ -107,15 +108,15 @@
                 <div class="action-buttons">
                     <a href="{{ url_for('admin.create_product') }}" class="action-btn primary">
                         <span>Add Marketplace Product</span>
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.product_inquiries_view') }}" class="action-btn secondary">
+                        <span>View Product Inquiries</span>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
         </section>
-
-<a href="{{ url_for('admin.product_inquiries') }}">
-    📩 View Product Inquiries
-</a>
 
 
         <section class="dashboard-card">
