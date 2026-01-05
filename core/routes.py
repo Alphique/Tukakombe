@@ -58,7 +58,7 @@ def developer_tools_home():
 @core_bp.route('/advisory')
 def advisory_services_home():
     """Render Advisory Services home page."""
-    return render_template('ad_home.html')
+    return render_template('adv_home.html')
 
 @core_bp.route('/finance')
 def finance_services_home():
