@@ -1,127 +1,190 @@
-<!--admin/templates/admin_loa_managements-->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin | Loan Applications</title>
+{% extends "admin_base.html" %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            padding: 30px;
-        }
+{% block title %}Loan Management - {{ loan.application_number }}{% endblock %}
 
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background: #222;
-            color: #fff;
-        }
-
-        tr:hover {
-            background: #f1f1f1;
-        }
-
-        .status {
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-
-        .status.pending {
-            color: orange;
-        }
-
-        .status.approved {
-            color: green;
-        }
-
-        .status.rejected {
-            color: red;
-        }
-
-        .status.disbursed {
-            color: blue;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .btn-view {
-            background: #007bff;
-            color: #fff;
-        }
-
-        .btn-view:hover {
-            background: #0056b3;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 20px;
-            color: #777;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Loan Applications Management</h1>
-
-    {% if loans %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Applicant</th>
-                    <th>Business Name</th>
-                    <th>Loan Amount</th>
-                    <th>Status</th>
-                    <th>Date Applied</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for loan in loans %}
-                <tr>
-                    <td>{{ loan.id }}</td>
-                    <td>{{ loan.applicant_email }}</td>
-                    <td>{{ loan.business_name }}</td>
-                    <td>ZMW {{ "%.2f"|format(loan.loan_amount) }}</td>
-                    <td class="status {{ loan.status }}">{{ loan.status }}</td>
-                    <td>{{ loan.created_at }}</td>
-                    <td>
-                        <a href="{{ url_for('admin.view_loan', loan_id=loan.id) }}"
-                           class="btn btn-view">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="empty">
-            No loan applications found.
+{% block content %}
+<div style="max-width:1200px; margin:2rem auto; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#333">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
+        <div>
+            <h2 style="color: var(--navy);">Loan Application: {{ loan.application_number }}</h2>
+            <p style="color: #666; font-size: 0.9rem;">Reviewing submission from <strong>{{ loan.applicant_email }}</strong></p>
         </div>
-    {% endif %}
+        <a href="{{ url_for('admin.list_loans') }}" style="text-decoration:none; color:#3498db; font-weight: 600;">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
 
-</body>
-</html>
+    <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:1.5rem; margin-bottom:2rem; border-left:6px solid var(--navy)">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1.5rem">
+            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Loan Type</small><br><strong>{{ loan.loan_type|title }}</strong></div>
+            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Status</small><br>
+                <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight: 800;
+                    {% if loan.status=='approved' %}background:#d1fae5; color:#065f46;
+                    {% elif loan.status=='rejected' %}background:#fee2e2; color:#991b1b;
+                    {% elif loan.status=='missing_info' %}background:#fef3c7; color:#92400e;
+                    {% else %}background:#e0f2fe; color:#075985;{% endif %}">
+                    <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 4px;"></i>
+                    {{ loan.status|upper }}
+                </span>
+            </div>
+            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Submission Date</small><br><strong>{{ loan.applied_date if loan.applied_date else 'N/A' }}</strong></div>
+            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Interest Rate</small><br><strong>{{ (loan.interest_rate * 100)|round(1) if loan.interest_rate else 30 }}%</strong></div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2rem;">
+        
+        <div>
+            {% if loan.loan_type=='personal' and personal_details %}
+            <section style="background:white; padding:2rem; border-radius:12px; margin-bottom:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
+                    <i class="fas fa-user-circle"></i> Applicant Information
+                </h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
+                        <small style="color:#64748b;">Requested Amount</small><br>
+                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(personal_details.loan_amount) }}</strong>
+                    </div>
+                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
+                        <small style="color:#64748b;">Repayment Term</small><br>
+                        <strong style="font-size:1.5rem; color:#0f172a">{{ personal_details.repayment_period_days }} Days</strong>
+                    </div>
+                </div>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b; width:35%">Full Legal Name</td><td><strong>{{ personal_details.full_name }}</strong></td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">NRC Number</td><td>{{ personal_details.nrc_number }}</td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Phone Number</td><td>{{ personal_details.phone_number }}</td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Address</td><td>{{ personal_details.residential_address }}</td></tr>
+                    <tr><td style="padding:1rem 0; color:#64748b;">Purpose of Loan</td><td><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px;">{{ personal_details.purpose|replace('_', ' ')|title }}</span></td></tr>
+                </table>
+            </section>
+            
+            {% elif loan.loan_type=='business' and business_details %}
+            <section style="background:white; padding:2rem; border-radius:12px; margin-bottom:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
+                    <i class="fas fa-building"></i> Business Information
+                </h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
+                        <small style="color:#64748b;">Requested Amount</small><br>
+                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(business_details.loan_amount) }}</strong>
+                    </div>
+                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
+                        <small style="color:#64748b;">Monthly Revenue</small><br>
+                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(business_details.monthly_revenue) if business_details.monthly_revenue else '0.00' }}</strong>
+                    </div>
+                </div>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b; width:35%">Business Name</td><td><strong>{{ business_details.business_name }}</strong></td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Registration No.</td><td>{{ business_details.business_registration_number }}</td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Contact Person</td><td>{{ business_details.contact_person_name }}</td></tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Industry</td><td>{{ business_details.industry_type }}</td></tr>
+                    <tr><td style="padding:1rem 0; color:#64748b;">Years in Operation</td><td>{{ business_details.years_in_operation }} Years</td></tr>
+                </table>
+            </section>
+            {% endif %}
+
+            <section style="background:white; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
+                    <i class="fas fa-shield-alt"></i> Collateral Items ({{ collateral_items|length }})
+                </h3>
+                {% if collateral_items %}
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem">
+                    {% for item in collateral_items %}
+                    <div style="border:1px solid #e2e8f0; border-radius:10px; padding:1.2rem; background:#f8fafc">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem">
+                            <strong style="color:var(--navy)">{{ item.item_name|title }}</strong>
+                            <span style="font-size:0.7rem; background:#cbd5e1; padding:2px 8px; border-radius:10px;">{{ item.item_type|upper }}</span>
+                        </div>
+                        <div style="margin-bottom:0.5rem">
+                            <small style="color:#64748b">Market Value:</small><br>
+                            <strong style="color:#10b981">K{{ "{:,.2f}".format(item.estimated_value) }}</strong>
+                        </div>
+                        <p style="font-size:0.85rem; color:#475569; border-top:1px solid #e2e8f0; padding-top:0.5rem">
+                            {{ item.condition_description or 'No condition report provided.' }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align:center; padding:2rem; color:#94a3b8; background:#f8fafc; border-radius:12px; border:2px dashed #e2e8f0">
+                    <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>No collateral listed for this application.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <div style="background:white; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); border:1px solid #e2e8f0">
+                <h3 style="margin-top:0; font-size: 1.1rem; display:flex; justify-content:space-between;">
+                    <span><i class="fas fa-file-download"></i> Documents</span>
+                    <span style="background:var(--navy); color:white; padding:2px 10px; border-radius:20px; font-size:0.7rem">{{ attachments|length }}</span>
+                </h3>
+                <div style="margin-top:1.5rem">
+                    {% for file in attachments %}
+                    <div style="padding:12px; margin-bottom:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;">
+                            <strong style="font-size:0.85rem; display:block;">{{ file.document_category|replace('_',' ')|title }}</strong>
+                            <small style="color:#94a3b8; font-size: 0.75rem;">{{ file.file_name }}</small>
+                        </div>
+                        <a href="{{ url_for('admin.download_attachment', filename=file.file_path) }}" 
+                           style="background:var(--lime); color:var(--navy); padding:6px 10px; border-radius:6px; text-decoration:none; font-size:0.75rem; font-weight:700;">
+                           <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% else %}
+                    <p style="color:#94a3b8; font-style:italic; font-size:0.9rem; text-align:center;">No files uploaded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:1.5rem; border-radius:12px;">
+                <h4 style="margin-top:0; color:var(--lime);"><i class="fas fa-calculator"></i> Repayment Estimate</h4>
+                {% set amt = (personal_details.loan_amount if personal_details else business_details.loan_amount if business_details else 0) %}
+                <table style="width:100%; margin-top:1rem; font-size:0.9rem;">
+                    <tr><td style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)">Principal</td><td style="text-align:right">K{{ "{:,.2f}".format(amt) }}</td></tr>
+                    <tr><td style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)">Interest Rate</td><td style="text-align:right">{{ (loan.interest_rate*100)|round(0) if loan.interest_rate else 30 }}%</td></tr>
+                    <tr><td style="padding:12px 0; font-size:1.1rem; color:var(--lime);"><strong>Total Due</strong></td><td style="text-align:right; font-size:1.1rem;"><strong>K{{ "{:,.2f}".format(loan.total_repayment if loan.total_repayment else amt * 1.30) }}</strong></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:3rem; background:#1e293b; color:white; padding:2.5rem; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2)">
+        <h3 style="margin-top:0; color:var(--white);"><i class="fas fa-gavel"></i> Administrative Decision</h3>
+        <p style="color:#94a3b8; margin-bottom:2rem;">Set the final status for this loan. This action will be logged and the client will be updated.</p>
+        
+        <form action="{{ url_for('admin.view_loan', loan_id=loan.id) }}" method="POST">
+            <div style="margin-bottom:1.5rem">
+                <label style="display:block; margin-bottom:0.8rem; font-weight:600;">Internal Decision Notes / Feedback to Client:</label>
+                <textarea name="admin_notes" rows="5" style="width:100%; border-radius:8px; padding:15px; border:none; background:rgba(255,255,255,0.1); color:white; font-family: inherit;" placeholder="State the reason for approval, rejection, or specify missing documents...">{{ loan.admin_notes or '' }}</textarea>
+            </div>
+            
+            <div style="display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap">
+                <div style="flex:1; min-width:250px">
+                    <label style="display:block; margin-bottom:0.8rem; font-weight:600;">Change Application Status:</label>
+                    <select name="status" style="width:100%; padding:12px; border-radius:8px; background:white; color:var(--navy); border:none; font-weight:bold; cursor:pointer;">
+                        <option value="pending" {% if loan.status=='pending' %}selected{% endif %}>🕒 Pending Review</option>
+                        <option value="approved" {% if loan.status=='approved' %}selected{% endif %}>✅ Approve Loan</option>
+                        <option value="rejected" {% if loan.status=='rejected' %}selected{% endif %}>❌ Reject Loan</option>
+                        <option value="missing_info" {% if loan.status=='missing_info' %}selected{% endif %}>⚠️ Request More Info</option>
+                    </select>
+                </div>
+                <button type="submit" style="background:var(--lime); color:var(--navy); border:none; padding:12px 40px; border-radius:8px; font-weight:800; cursor:pointer; font-size:1rem; transition: transform 0.2s;">
+                    UPDATE APPLICATION
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 992px) {
+        div[style*="grid-template-columns: 2fr 1fr"] { grid-template-columns: 1fr !important; }
+    }
+    button:hover { transform: scale(1.02); opacity: 0.9; }
+</style>
+{% endblock %}

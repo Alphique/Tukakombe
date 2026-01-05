@@ -1,11 +1,12 @@
 # admin/routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app, send_from_directory
 from utils.database import get_db_connection
 from auth.utils import verify_password
 from auth.decorators import login_required, role_required
 import os
 from werkzeug.utils import secure_filename
-import time  # add at top
+import time 
+from datetime import datetime
 
 # ------------------------------
 # Blueprint
@@ -20,14 +21,12 @@ admin_bp = Blueprint(
 # ------------------------------
 # Config
 # ------------------------------
-BLOG_UPLOAD_FOLDER = os.path.join(
-    os.path.dirname(__file__), '..', 'static', 'uploads', 'blogs'
-)
-PRODUCT_UPLOAD_FOLDER = os.path.join(
-    os.path.dirname(__file__), '..', 'static', 'uploads', 'products'
-)
+UPLOAD_BASE = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+BLOG_UPLOAD_FOLDER = os.path.join(UPLOAD_BASE, 'blogs')
+PRODUCT_UPLOAD_FOLDER = os.path.join(UPLOAD_BASE, 'products')
+LOAN_UPLOAD_FOLDER = os.path.join(UPLOAD_BASE, 'loans')
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'tiff', 'jfif', 'bmp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -69,32 +68,27 @@ def login():
 def dashboard():
     db = get_db_connection()
 
-    blogs = db.execute("""
-        SELECT id, title, created_at
-        FROM blogs
-        ORDER BY created_at DESC
-    """).fetchall()
-
+    blogs = db.execute("SELECT id, title, created_at, status FROM blogs ORDER BY created_at DESC").fetchall()
     comments = db.execute("""
-        SELECT
-            comments.id,
-            comments.blog_id,
-            comments.content,
-            comments.created_at,
-            users.email AS user_email
+        SELECT comments.id, comments.blog_id, comments.content, comments.created_at, users.email AS user_email
         FROM comments
         JOIN users ON users.id = comments.user_id
         ORDER BY comments.created_at DESC
     """).fetchall()
-
+    loans = db.execute("""
+        SELECT la.id, la.application_number, la.loan_type, la.status, la.applied_date, u.email
+        FROM loan_applications la
+        JOIN users u ON u.id = la.user_id
+        ORDER BY la.applied_date DESC
+        LIMIT 5
+    """).fetchall()
     db.close()
 
-    return render_template(
-        'dashboard.html',
-        blogs=blogs,
-        comments=comments
-    )
+    return render_template('dashboard.html', blogs=blogs, comments=comments, loans=loans)
 
+# ------------------------------
+# Blog Routes
+# ------------------------------
 @admin_bp.route('/create-blog', methods=['GET', 'POST'])
 @login_required
 @role_required('admin', 'super_admin')
@@ -104,31 +98,16 @@ def create_blog():
         content = request.form.get('content')
         status = request.form.get('status', 'published')
         file = request.files.get('image')
-
         image_filename = None
-        
-        # DEBUG: Check if file actually reached the server
-        if file:
-            print(f"DEBUG: Filename received: {file.filename}")
-        
+
         if file and file.filename != '':
-            # Ensure the extension is allowed (check your ALLOWED_EXTENSIONS list)
             if allowed_file(file.filename):
                 filename = f"{int(time.time())}_{secure_filename(file.filename)}"
-                
-                # Use current_app.root_path to be 100% sure of the location
-                from flask import current_app
-                upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'blogs')
-                
-                if not os.path.exists(upload_path):
-                    os.makedirs(upload_path)
-                
-                save_path = os.path.join(upload_path, filename)
-                file.save(save_path)
+                os.makedirs(BLOG_UPLOAD_FOLDER, exist_ok=True)
+                file.save(os.path.join(BLOG_UPLOAD_FOLDER, filename))
                 image_filename = filename
-                print(f"DEBUG: File saved to: {save_path}") # Check your console for this!
             else:
-                print("DEBUG: File extension not allowed")
+                flash("File type not allowed. Please use JPG, PNG, WEBP or GIF.", "error")
 
         db = get_db_connection()
         db.execute(
@@ -143,9 +122,6 @@ def create_blog():
 
     return render_template('admin_create.html', blog={})
 
-# ------------------------------
-# Edit Blog
-# ------------------------------
 @admin_bp.route('/edit-blog/<int:blog_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin', 'super_admin')
@@ -161,62 +137,45 @@ def edit_blog(blog_id):
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
-        status = request.form.get('status') # Get the new status (draft/published)
+        status = request.form.get('status')
         file = request.files.get('image')
+        image_filename = blog['image']
 
-        image_filename = blog['image']  # Keep the old image by default
-
-        # Logic to handle a NEW image upload
         if file and file.filename != '':
             if allowed_file(file.filename):
-                # Create a unique filename
                 filename = f"{int(time.time())}_{secure_filename(file.filename)}"
-                
-                # Ensure the directory exists
-                from flask import current_app
-                upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'blogs')
-                os.makedirs(upload_path, exist_ok=True)
-                
-                # Save the new file
-                file.save(os.path.join(upload_path, filename))
-                image_filename = filename 
-                
-                # Optional: Delete the old physical file from the folder to save space
+                os.makedirs(BLOG_UPLOAD_FOLDER, exist_ok=True)
+                file.save(os.path.join(BLOG_UPLOAD_FOLDER, filename))
+                image_filename = filename
+                # remove old image
                 if blog['image']:
-                    old_path = os.path.join(upload_path, blog['image'])
-                    if os.path.exists(old_path):
-                        try:
-                            os.remove(old_path)
-                        except:
-                            pass
+                    old_path = os.path.join(BLOG_UPLOAD_FOLDER, blog['image'])
+                    if os.path.exists(old_path): os.remove(old_path)
+            else:
+                flash("Unsupported image format.", "error")
 
-        # UPDATE EVERYTHING: title, content, image, AND status
         db.execute(
-            """
-            UPDATE blogs 
-            SET title = ?, content = ?, image = ?, status = ? 
-            WHERE id = ?
-            """,
+            "UPDATE blogs SET title = ?, content = ?, image = ?, status = ? WHERE id = ?",
             (title, content, image_filename, status, blog_id)
         )
         db.commit()
         db.close()
-
         flash("Blog updated successfully.", "success")
         return redirect(url_for('admin.dashboard'))
 
     db.close()
-    # Make sure your edit template is using the fixed version I gave you earlier
     return render_template('admin_edit_blog.html', blog=blog)
 
-# ------------------------------
-# Delete Blog
-# ------------------------------
 @admin_bp.route('/delete-blog/<int:blog_id>', methods=['POST'])
 @login_required
 @role_required('admin', 'super_admin')
 def delete_blog(blog_id):
     db = get_db_connection()
+    blog = db.execute("SELECT image FROM blogs WHERE id = ?", (blog_id,)).fetchone()
+    if blog and blog['image']:
+        try: os.remove(os.path.join(BLOG_UPLOAD_FOLDER, blog['image']))
+        except: pass
+
     db.execute("DELETE FROM comments WHERE blog_id = ?", (blog_id,))
     db.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
     db.commit()
@@ -225,9 +184,6 @@ def delete_blog(blog_id):
     flash("Blog deleted successfully.", "success")
     return redirect(url_for('admin.dashboard'))
 
-# ------------------------------
-# Delete Comment
-# ------------------------------
 @admin_bp.route('/delete-comment/<int:comment_id>', methods=['POST'])
 @login_required
 @role_required('admin', 'super_admin')
@@ -236,12 +192,11 @@ def delete_comment(comment_id):
     db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
     db.commit()
     db.close()
-
     flash("Comment deleted.", "success")
     return redirect(request.referrer or url_for('admin.dashboard'))
 
 # ------------------------------
-# Product Creation
+# Product Routes
 # ------------------------------
 @admin_bp.route('/products/create', methods=['GET', 'POST'])
 @login_required
@@ -252,18 +207,21 @@ def create_product():
         price = request.form.get('price')
         description = request.form.get('description')
         image = request.files.get('image')
-
         filename = None
-        if image and allowed_file(image.filename):
-            os.makedirs(PRODUCT_UPLOAD_FOLDER, exist_ok=True)
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(PRODUCT_UPLOAD_FOLDER, filename))
+
+        if image and image.filename != '':
+            if allowed_file(image.filename):
+                os.makedirs(PRODUCT_UPLOAD_FOLDER, exist_ok=True)
+                filename = f"{int(time.time())}_{secure_filename(image.filename)}"
+                image.save(os.path.join(PRODUCT_UPLOAD_FOLDER, filename))
+            else:
+                flash("Invalid image format for product.", "error")
 
         db = get_db_connection()
-        db.execute("""
-            INSERT INTO products (name, description, price, image)
-            VALUES (?, ?, ?, ?)
-        """, (name, description, price, filename))
+        db.execute(
+            "INSERT INTO products (name, description, price, image) VALUES (?, ?, ?, ?)",
+            (name, description, price, filename)
+        )
         db.commit()
         db.close()
 
@@ -272,14 +230,16 @@ def create_product():
 
     return render_template('admin_create_product.html')
 
-# ------------------------------
-# Delete Product
-# ------------------------------
 @admin_bp.route('/products/delete/<int:product_id>', methods=['POST'])
 @login_required
 @role_required('admin', 'super_admin')
 def delete_product(product_id):
     db = get_db_connection()
+    product = db.execute("SELECT image FROM products WHERE id = ?", (product_id,)).fetchone()
+    if product and product['image']:
+        try: os.remove(os.path.join(PRODUCT_UPLOAD_FOLDER, product['image']))
+        except: pass
+
     db.execute("DELETE FROM products WHERE id = ?", (product_id,))
     db.commit()
     db.close()
@@ -288,113 +248,164 @@ def delete_product(product_id):
     return redirect(url_for('market_place.home'))
 
 # ------------------------------
-# Delete Product Inquiry
-# ------------------------------
-@admin_bp.route('/product-inquiries/delete/<int:inquiry_id>', methods=['POST'])
-@login_required
-@role_required('admin', 'super_admin')
-def delete_product_inquiry(inquiry_id):
-    db = get_db_connection()
-    db.execute(
-        "DELETE FROM product_inquiries WHERE id = ?",
-        (inquiry_id,)
-    )
-    db.commit()
-    db.close()
-
-    flash("Inquiry deleted.", "success")
-    return redirect(url_for('admin.product_inquiries'))
-
-# ------------------------------
-# View Product Inquiries
+# Product Inquiries
 # ------------------------------
 @admin_bp.route('/product-inquiries')
 @login_required
 @role_required('admin', 'super_admin')
 def product_inquiries_view():
     db = get_db_connection()
-
     inquiries = db.execute("""
-        SELECT
-            product_inquiries.id,
-            product_inquiries.message,
-            product_inquiries.created_at,
-            products.name AS product_name
-        FROM product_inquiries
-        JOIN products ON products.id = product_inquiries.product_id
-        ORDER BY product_inquiries.created_at DESC
+        SELECT pi.id, pi.message, pi.created_at, p.name AS product_name
+        FROM product_inquiries pi
+        JOIN products p ON p.id = pi.product_id
+        ORDER BY pi.created_at DESC
     """).fetchall()
-
     db.close()
+    return render_template('admin_product_inquiries.html', inquiries=inquiries)
 
-    return render_template(
-        'admin_product_inquiries.html',
-        inquiries=inquiries
-    )
-
-#---------------------------------------
-# Loan Management Routes
-#--------------------------------------
-@admin_bp.route('/loans-manage', endpoint='loans')
+@admin_bp.route('/product-inquiries/delete/<int:inquiry_id>', methods=['POST'])
 @login_required
 @role_required('admin', 'super_admin')
-def manage_loans():
+def delete_product_inquiry(inquiry_id):
     db = get_db_connection()
-    loans = db.execute("""
-        SELECT
-            loan_applications.id,
-            loan_applications.business_name,
-            loan_applications.loan_amount,
-            loan_applications.status,
-            loan_applications.created_at,
-            users.email AS applicant_email
-        FROM loan_applications
-        JOIN users ON users.id = loan_applications.user_id
-        ORDER BY loan_applications.created_at DESC
-    """).fetchall()
+    db.execute("DELETE FROM product_inquiries WHERE id = ?", (inquiry_id,))
+    db.commit()
     db.close()
+    flash("Inquiry deleted.", "success")
+    return redirect(url_for('admin.product_inquiries_view'))
 
-    return render_template(
-        'admin_loan_management.html',
-        loans=loans
-    )
-
-
+# ------------------------------
+# Loan Routes
+# ------------------------------
+@admin_bp.route('/loans')
+@login_required
+@role_required('admin', 'super_admin')
+def list_loans():
+    db = get_db_connection()
+    # We join personal and business details to get the names
+    query = """
+        SELECT 
+            la.id, 
+            la.application_number, 
+            la.loan_type, 
+            la.status, 
+            la.applied_date, 
+            u.email,
+            COALESCE(p.full_name, b.business_name, 'Unknown') AS display_name
+        FROM loan_applications la
+        JOIN users u ON u.id = la.user_id
+        LEFT JOIN personal_loan_details p ON la.id = p.application_id
+        LEFT JOIN business_loan_details b ON la.id = b.application_id
+        ORDER BY la.applied_date DESC
+    """
+    loans = db.execute(query).fetchall()
+    db.close()
+    return render_template('admin_loans_list.html', loans=loans)
+# ------------------------------
+# View & Manage Loan
+# ------------------------------
+# View & Manage Loan
+# ------------------------------
 @admin_bp.route('/loans/<int:loan_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin', 'super_admin')
 def view_loan(loan_id):
     db = get_db_connection()
 
-    loan = db.execute("""
-        SELECT loan_applications.*, users.email
-        FROM loan_applications
-        JOIN users ON users.id = loan_applications.user_id
-        WHERE loan_applications.id = ?
-    """, (loan_id,)).fetchone()
-
-    attachments = db.execute("""
-        SELECT * FROM loan_attachments
-        WHERE loan_id = ?
-    """, (loan_id,)).fetchall()
-
     if request.method == 'POST':
         status = request.form.get('status')
         admin_notes = request.form.get('admin_notes')
-
+        
+        # Update status and set decision_date/updated_date
         db.execute("""
-            UPDATE loan_applications
-            SET status = ?, admin_notes = ?
+            UPDATE loan_applications 
+            SET status = ?, admin_notes = ?, updated_date = CURRENT_TIMESTAMP, decision_date = CURRENT_TIMESTAMP
             WHERE id = ?
         """, (status, admin_notes, loan_id))
         db.commit()
+        
+        flash(f"Loan status updated successfully.", "success")
+        return redirect(url_for('admin.view_loan', loan_id=loan_id))
 
-        flash("Loan status updated.", "success")
-        return redirect(url_for('admin.manage_loans'))
+    # Fetch main loan data
+    loan = db.execute("""
+        SELECT la.*, u.email AS applicant_email 
+        FROM loan_applications la
+        JOIN users u ON u.id = la.user_id
+        WHERE la.id = ?
+    """, (loan_id,)).fetchone()
 
+    if not loan:
+        db.close()
+        flash("Loan not found.", "error")
+        return redirect(url_for('admin.list_loans'))
+
+    # Fetch all sub-details for the actual data display
+    attachments = db.execute("SELECT * FROM application_attachments WHERE application_id = ?", (loan_id,)).fetchall()
+    collateral_items = db.execute("SELECT * FROM collateral_items WHERE application_id = ?", (loan_id,)).fetchall()
+    personal_details = db.execute("SELECT * FROM personal_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
+    business_details = db.execute("SELECT * FROM business_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
+    
     db.close()
+
+    # CRITICAL: Template name must match your file name exactly
     return render_template(
-        'admin_view_loan.html',
+        'admin_loan_management.html', 
         loan=loan,
-        attachments=attachments
+        attachments=attachments,
+        collateral_items=collateral_items,
+        personal_details=personal_details,
+        business_details=business_details
     )
+
+# ------------------------------
+# Filter Loans
+# ------------------------------
+@admin_bp.route('/loans/filter')
+@login_required
+@role_required('admin', 'super_admin')
+def filter_loans():
+    """Filter loans by status and/or type"""
+    status = request.args.get('status')
+    loan_type = request.args.get('loan_type')
+    db = get_db_connection()
+    query = "SELECT la.id, la.application_number, la.loan_type, la.status, la.applied_date, u.email FROM loan_applications la JOIN users u ON u.id = la.user_id WHERE 1=1"
+    params = []
+    if status:
+        query += " AND la.status = ?"
+        params.append(status)
+    if loan_type:
+        query += " AND la.loan_type = ?"
+        params.append(loan_type)
+    query += " ORDER BY la.applied_date DESC"
+    loans = db.execute(query, params).fetchall()
+    db.close()
+    return render_template('admin_loans_list.html', loans=loans, filter_status=status, loan_type=loan_type)
+
+# ------------------------------
+# Download Loan Attachments
+# ------------------------------
+@admin_bp.route('/loans/attachments/<filename>')
+@login_required
+@role_required('admin', 'super_admin')
+def download_attachment(filename):
+    try:
+        return send_from_directory(LOAN_UPLOAD_FOLDER, filename, as_attachment=True)
+    except Exception:
+        flash(f"File not found: {filename}", "error")
+        return redirect(request.referrer or url_for('admin.list_loans'))
+
+# ------------------------------
+# Delete Loan
+# ------------------------------
+@admin_bp.route('/loans/delete/<int:loan_id>', methods=['POST'])
+@login_required
+@role_required('admin', 'super_admin')
+def delete_loan(loan_id):
+    db = get_db_connection()
+    db.execute("DELETE FROM loan_applications WHERE id = ?", (loan_id,))
+    db.commit()
+    db.close()
+    flash("Loan deleted successfully.", "success")
+    return redirect(url_for('admin.list_loans'))

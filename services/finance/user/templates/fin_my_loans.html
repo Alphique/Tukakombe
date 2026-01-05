@@ -1,0 +1,59 @@
+<!--services/finance/user/templates/fin_my_loans.html-->
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 1000px; margin: 2rem auto; padding: 0 1rem; font-family: 'Inter', sans-serif;">
+    <h2 style="color: #2c3e50; margin-bottom: 1.5rem;">My Loan Applications</h2>
+
+    {% if loans %}
+        <div style="display: grid; gap: 1.5rem;">
+            {% for loan in loans %}
+            <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #edf2f7; overflow: hidden;">
+                <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    
+                    <div>
+                        <span style="font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 0.05em;">App #{{ loan.application_number }}</span>
+                        <h3 style="margin: 0.2rem 0; color: #2d3748;">{{ loan.loan_type | title }} Loan</h3>
+                        <small style="color: #a0aec0;">Applied on: {{ loan.applied_date }}</small>
+                    </div>
+
+                    <div style="text-align: right;">
+                        {% if loan.status == 'pending' %}
+                            <span style="background: #fffaf0; color: #975a16; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">⏳ Pending Review</span>
+                        {% elif loan.status == 'approved' %}
+                            <span style="background: #f0fff4; color: #22543d; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">✅ Approved</span>
+                        {% elif loan.status == 'rejected' %}
+                            <span style="background: #fff5f5; color: #822727; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">❌ Declined</span>
+                        {% elif loan.status == 'action_required' %}
+                            <span style="background: #ebf8ff; color: #2b6cb0; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">⚠️ Action Required</span>
+                        {% else %}
+                            <span style="background: #edf2f7; color: #2d3748; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">{{ loan.status | replace('_', ' ') | title }}</span>
+                        {% endif %}
+
+                        {% if loan.status == 'pending' or loan.status == 'action_required' %}
+                            <div style="margin-top: 10px;">
+                                <a href="{{ url_for('finance.edit_loan', loan_id=loan.id) }}" 
+                                   style="font-size: 0.85rem; color: #3182ce; text-decoration: none; border: 1px solid #3182ce; padding: 4px 12px; border-radius: 6px; transition: all 0.2s;">
+                                   Edit Details
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if loan.admin_notes %}
+                <div style="background: #f8fafc; padding: 1rem 1.5rem; border-top: 1px solid #edf2f7;">
+                    <strong style="display: block; font-size: 0.8rem; color: #4a5568; margin-bottom: 0.25rem;">MESSAGE FROM ADVISOR:</strong>
+                    <p style="margin: 0; color: #4a5568; font-size: 0.95rem; line-height: 1.5;">{{ loan.admin_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: #f9fafb; border-radius: 12px; border: 2px dashed #e2e8f0;">
+            <p style="color: #718096; font-size: 1.1rem;">You haven't applied for any loans yet.</p>
+            <a href="{{ url_for('finance.loans') }}" class="btn primary" style="display: inline-block; margin-top: 1rem; text-decoration: none;">Start Application</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

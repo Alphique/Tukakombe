@@ -2,65 +2,82 @@
 {% block title %}Add Product | Inventory Studio{% endblock %}
 
 {% block content %}
-<div class="studio-page-wrapper">
+<div class="studio-master-wrapper">
     <div class="product-studio-container">
-        <header class="studio-header">
-            <div class="header-text">
+        
+        <header class="studio-header-card">
+            <div class="header-content">
+                <span class="studio-badge">Inventory Studio</span>
                 <h1>📦 New Product</h1>
                 <p>List a new item in your storefront with high-quality details.</p>
             </div>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">Cancel</a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-cancel">Cancel</a>
         </header>
 
-        <form method="POST" enctype="multipart/form-data" class="product-form-layout">
-            <div class="form-main-card">
-                <div class="input-group">
-                    <label for="name">Product Name</label>
-                    <input type="text" name="name" id="name" placeholder="e.g. Premium Leather Tote" required>
-                </div>
-
-                <div class="input-grid">
+        <form method="POST" enctype="multipart/form-data" class="product-form-layout" id="product-form">
+            <div class="form-main-column">
+                <div class="form-card">
+                    <h3 class="card-title"><i class="fas fa-info-circle"></i> General Information</h3>
                     <div class="input-group">
-                        <label for="price">Price (ZMW)</label>
-                        <div class="price-input-wrapper">
-                            <span class="currency-tag">K</span>
-                            <input type="number" name="price" id="price" step="0.01" placeholder="0.00" required>
+                        <label for="name">Product Name</label>
+                        <input type="text" name="name" id="name" class="studio-input" placeholder="e.g. Premium Leather Tote" required>
+                    </div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="price">Price (ZMW)</label>
+                            <div class="price-input-wrapper">
+                                <span class="currency-tag">K</span>
+                                <input type="number" name="price" id="price" step="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="category">Category</label>
+                            <select name="category" id="category" class="studio-input">
+                                <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="home">Home & Living</option>
+                            </select>
                         </div>
                     </div>
+
                     <div class="input-group">
-                        <label for="category">Category</label>
-                        <select name="category" id="category">
-                            <option value="electronics">Electronics</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="home">Home & Living</option>
-                        </select>
+                        <label for="description">Full Description</label>
+                        <textarea name="description" id="description" class="studio-input" rows="5" placeholder="Details about materials and features..." required></textarea>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label for="description">Full Description</label>
-                    <textarea name="description" id="description" rows="6" placeholder="Tell customers about the materials, features, and dimensions..." required></textarea>
+                <div class="form-card">
+                    <h3 class="card-title"><i class="fas fa-boxes"></i> Inventory & Tracking</h3>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="sku">SKU Code</label>
+                            <input type="text" name="sku" id="sku" class="studio-input" placeholder="INV-001">
+                        </div>
+                        <div class="input-group">
+                            <label for="stock">Stock Quantity</label>
+                            <input type="number" name="stock" id="stock" class="studio-input" placeholder="0">
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="form-side-column">
-                <div class="side-card upload-section">
-                    <label class="side-label">Product Image</label>
+                <div class="side-card">
+                    <h3 class="card-title">Product Media</h3>
                     <div class="image-drop-zone" id="drop-zone">
-                        <div id="preview-container">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <p>Drag & drop or <span>browse</span></p>
-                        </div>
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p>Drag & drop or <span>browse</span></p>
                         <input type="file" name="image" id="product-img" hidden accept="image/*">
                     </div>
-                    <p class="upload-tip">Use a square 800x800px image for best results.</p>
                 </div>
 
-                <div class="action-card">
-                    <button type="submit" class="btn-primary-large">
-                        <i class="fas fa-plus"></i> Create Product
+                <div class="action-card-fixed">
+                    <button type="submit" class="btn-publish">
+                        <span>Create Product</span>
+                        <i class="fas fa-plus-circle"></i>
                     </button>
-                    <p class="status-info"><i class="fas fa-info-circle"></i> Product will be visible immediately after creation.</p>
+                    <button type="button" class="btn-draft">Save Draft</button>
                 </div>
             </div>
         </form>
@@ -68,181 +85,317 @@
 </div>
 
 <style>
-/* --- Dashboard Variables --- */
+/* --- THE LAYOUT FIX --- */
 :root {
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
-    --navy: #0f172a;
-    --text-muted: #64748b;
-    --bg-light: #f8fafc;
-    --border: #e2e8f0;
+    --navy: #1a2a40;
+    --lime: #a2d242;
+    --white: #ffffff;
+    --off-white: #f1f5f9;
 }
 
-/* FIX: This wrapper ensures the content starts BELOW your fixed navbar */
-.studio-page-wrapper {
-    background: var(--bg-light);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.studio-master-wrapper {
+    background: var(--off-white);
+    /* FIX: Start content below the fixed header automatically */
     min-height: 100vh;
-    padding-top: 100px; /* Adjust this value if your navbar is taller */
-    padding-bottom: 60px;
-}
-
-.product-studio-container { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    padding: 0 20px; 
-    font-family: 'Inter', sans-serif; 
-}
-
-/* --- Header Refinement --- */
-.studio-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-start; /* Changed from flex-end to better align with Cancel btn */
-    margin-bottom: 30px; 
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-}
-
-.studio-header h1 { font-size: 1.8rem; font-weight: 800; color: var(--navy); margin: 0; }
-.studio-header p { color: var(--text-muted); margin: 5px 0 0 0; }
-
-/* --- Form Layout --- */
-.product-form-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
-
-@media (max-width: 900px) {
-    .product-form-layout { grid-template-columns: 1fr; }
-    .studio-page-wrapper { padding-top: 80px; }
-}
-
-.form-main-card, .side-card, .action-card {
-    background: white;
-    padding: 25px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-}
-
-/* --- Input Styling --- */
-.input-group { margin-bottom: 20px; }
-.input-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; color: var(--navy); }
-
-input[type="text"], input[type="number"], textarea, select {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.2s;
-    outline: none;
-    background: #ffffff; /* Brighter background for better contrast */
-}
-
-input:focus, textarea:focus, select:focus { 
-    border-color: var(--primary); 
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
-}
-
-.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-/* --- Price Wrapper --- */
-.price-input-wrapper { 
-    display: flex; 
-    align-items: center; 
-    border: 1px solid var(--border); 
-    border-radius: 8px; 
-    overflow: hidden; 
-}
-.currency-tag { 
-    padding: 0 15px; 
-    font-weight: 700; 
-    color: var(--text-muted); 
-    background: #f1f5f9; 
-    height: 45px; /* Fixed height for alignment */
-    display: flex;
-    align-items: center;
-    border-right: 1px solid var(--border); 
-}
-.price-input-wrapper input { border: none !important; box-shadow: none !important; flex: 1; }
-
-/* --- Image Upload Zone --- */
-.image-drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    height: 220px;
+    
+    /* Adjust these values based on your actual header height */
+    /* If your fixed header is 64px tall, use: */
+    padding-top: 80px; /* Slightly more than header height for breathing room */
+    
+    /* If you have a fixed footer, adjust this too */
+    padding-bottom: 40px;
+    
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.3s;
-    position: relative;
-    overflow: hidden;
-    background: #fafafa;
 }
 
-.image-drop-zone:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.02); }
-.upload-icon { font-size: 2rem; color: var(--text-muted); margin-bottom: 10px; }
-.image-drop-zone p { font-size: 0.85rem; color: var(--text-muted); }
-.image-drop-zone p span { color: var(--primary); font-weight: 600; }
+.product-studio-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 95%;
+    flex: 1;
+}
 
-#preview-img { width: 100%; height: 100%; object-fit: cover; }
+/* If you have a fixed navbar, ensure proper z-index */
+nav.fixed-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    /* Your navbar styles here */
+}
 
-/* --- Buttons --- */
-.btn-primary-large {
-    width: 100%;
-    padding: 16px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
+/* --- Refined Header Card --- */
+.studio-header-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-left: 8px solid var(--lime);
+    position: relative;
+    z-index: 1;
 }
 
-.btn-primary-large:hover { background: var(--primary-hover); transform: translateY(-1px); }
-.btn-secondary { 
-    text-decoration: none; 
-    color: var(--text-muted); 
-    font-size: 0.9rem; 
+.studio-badge {
+    background: var(--navy);
+    color: var(--lime);
+    padding: 5px 15px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.header-content h1 { 
+    color: var(--navy); 
+    margin: 0; 
+    font-size: 1.8rem; 
+    font-weight: 800; 
+}
+
+.header-content p { 
+    color: #64748b; 
+    margin: 5px 0 0; 
+}
+
+.btn-cancel {
+    text-decoration: none;
+    color: #ef4444;
     font-weight: 600;
-    padding: 8px 16px;
-    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border: 1px solid #fee2e2;
     border-radius: 8px;
+    transition: 0.3s;
     background: white;
 }
-.btn-secondary:hover { background: #f1f5f9; }
-</style>
 
-<script>
-// (Keep your existing script, it works great!)
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('product-img');
+.btn-cancel:hover { 
+    background: #fef2f2; 
+}
 
-dropZone.addEventListener('click', () => fileInput.click());
+/* --- Forms & Grid --- */
+.product-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+}
 
-fileInput.addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            dropZone.innerHTML = `<img src="${e.target.result}" id="preview-img">`;
-        }
-        reader.readAsDataURL(file);
+.form-card, .side-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.card-title {
+    font-size: 1rem;
+    color: var(--navy);
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.8rem;
+}
+
+.card-title i {
+    margin-right: 8px;
+    color: var(--lime);
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+}
+
+.studio-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: 0.9rem;
+    transition: border 0.3s;
+}
+
+.studio-input:focus {
+    outline: none;
+    border-color: var(--lime);
+    background: white;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.price-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-tag {
+    position: absolute;
+    left: 12px;
+    font-weight: bold;
+    color: var(--navy);
+    z-index: 2;
+}
+
+.price-input-wrapper input {
+    padding-left: 30px;
+}
+
+/* --- Image Drop Zone --- */
+.image-drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f8fafc;
+}
+
+.image-drop-zone:hover {
+    border-color: var(--lime);
+    background: #f1f8e9;
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.image-drop-zone p {
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.image-drop-zone span {
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* --- Action Section --- */
+.action-card-fixed {
+    background: var(--navy);
+    padding: 2rem;
+    border-radius: 16px;
+    color: white;
+}
+
+.btn-publish {
+    width: 100%;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-publish:hover {
+    background: #b8e252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(162, 210, 66, 0.3);
+}
+
+.btn-draft {
+    width: 100%;
+    margin-top: 1rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-draft:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .product-form-layout { 
+        grid-template-columns: 1fr; 
     }
-});
+    
+    .studio-master-wrapper { 
+        padding-top: 100px; 
+    }
+    
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--border)'; });
-dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    fileInput.files = e.dataTransfer.files;
-    fileInput.dispatchEvent(new Event('change'));
-});
-</script>
+@media (max-width: 768px) {
+    .studio-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .btn-cancel {
+        align-self: flex-end;
+    }
+    
+    .studio-master-wrapper { 
+        padding-top: 90px; 
+        padding-bottom: 30px;
+    }
+    
+    .form-card, .side-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Optional: If you need to see exactly where content starts */
+/* Uncomment this for debugging:
+.studio-master-wrapper::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: rgba(255,0,0,0.2);
+    z-index: 9999;
+    pointer-events: none;
+}
+*/
+</style>
 {% endblock %}
