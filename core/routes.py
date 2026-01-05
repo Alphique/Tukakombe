@@ -1,3 +1,4 @@
+# core/routes.py
 from flask import Blueprint, render_template
 
 # Blueprint for core pages
@@ -39,3 +40,27 @@ def not_found(error):
 def server_error(error):
     """Render 500 error page."""
     return render_template('500.html'), 500
+
+# -----------------------------
+# SERVICES
+# -----------------------------
+
+@core_bp.route('/brand-studio')
+def brand_studio_home():
+    """Render Brand Studio home page."""
+    return render_template('br_home.html')
+
+@core_bp.route('/developers')
+def developer_tools_home():
+    """Render Developer Tools home page."""
+    return render_template('dev_home.html')
+
+@core_bp.route('/advisory')
+def advisory_services_home():
+    """Render Advisory Services home page."""
+    return render_template('ad_home.html')
+
+@core_bp.route('/finance')
+def finance_services_home():
+    """Render Finance Services home page."""
+    return render_template('fin_home.html')

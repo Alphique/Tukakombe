@@ -18,15 +18,16 @@ auth_bp = Blueprint(
 )
 
 # -------------------------------------------------------------------
-# LOGIN
+# LOGIN (UPDATED REDIRECTS)
 # -------------------------------------------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # Prevent logged-in users from accessing login again
+    # 1. Prevent logged-in users from accessing login again
     if session.get('user_id'):
         if session.get('role') in ('admin', 'super_admin'):
             return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('core.home'))
+        # Updated: redirect active client sessions to their dashboard
+        return redirect(url_for('finance.client_dashboard'))
 
     # Secure "next" redirect
     next_page = request.args.get('next')
@@ -56,20 +57,22 @@ def login():
         session.clear()
         session['user_id'] = user['id']
         session['role'] = user['role']
+        session['user_email'] = user['email'] # Useful for displaying on dashboard
 
         flash("Login successful.", "success")
 
-        # Priority redirect
+        # 2. Priority redirect (e.g., if they were trying to access a protected link)
         if next_page:
             return redirect(next_page)
 
+        # 3. Role-Based Dashboard Landing
         if user['role'] in ('admin', 'super_admin'):
             return redirect(url_for('admin.dashboard'))
-
-        return redirect(url_for('core.home'))
+        
+        # Updated: Send regular clients to the finance dashboard
+        return redirect(url_for('finance.client_dashboard'))
 
     return render_template('login.html')
-
 
 # -------------------------------------------------------------------
 # REGISTER

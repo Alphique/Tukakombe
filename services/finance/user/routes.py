@@ -253,3 +253,66 @@ def contact():
         flash("Message sent successfully.", "success")
         return redirect(url_for("finance.contact"))
     return render_template("fin_contact.html")
+
+# ... (Previous imports stay the same)
+
+# --------------------------------------------------
+# CLIENT DASHBOARD (PROTECTED)
+# --------------------------------------------------
+@finance_bp.route("/dashboard")
+@login_required
+def client_dashboard():
+    from utils.database import get_db_connection
+    user_id = session.get("user_id")
+    db = get_db_connection()
+    
+    # Get a summary for the dashboard cards
+    loan_stats = db.execute("""
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
+        FROM loan_applications WHERE user_id = ?
+    """, (user_id,)).fetchone()
+    
+    # Get the 3 most recent loans to show in a "Mini Table"
+    recent_loans = db.execute("""
+        SELECT 
+            la.*,
+            COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
+        FROM loan_applications la
+        LEFT JOIN personal_loan_details p ON la.id = p.application_id
+        LEFT JOIN business_loan_details b ON la.id = b.application_id
+        WHERE la.user_id = ? 
+        ORDER BY la.applied_date DESC LIMIT 3
+    """, (user_id,)).fetchall()
+    
+    db.close()
+    return render_template("fin_client_dashboard.html", stats=loan_stats, recent_loans=recent_loans)
+
+# --------------------------------------------------
+# MY LOANS LIST 
+# --------------------------------------------------
+@finance_bp.route("/my-loans")
+@login_required
+def my_loans():
+    from utils.database import get_db_connection
+    user_id = session.get("user_id")
+    db = get_db_connection()
+    
+    # We fetch all loans for the logged-in user
+    loans = db.execute("""
+        SELECT 
+            la.*,
+            COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
+        FROM loan_applications la
+        LEFT JOIN personal_loan_details p ON la.id = p.application_id
+        LEFT JOIN business_loan_details b ON la.id = b.application_id
+        WHERE la.user_id = ? 
+        ORDER BY la.applied_date DESC
+    """, (user_id,)).fetchall()
+    
+    db.close()
+    return render_template("fin_my_loans.html", loans=loans)
+
+# ... (rest of your routes: edit_loan, eligibility, etc.)
