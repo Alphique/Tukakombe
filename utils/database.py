@@ -1,10 +1,9 @@
-# utils/database.py
-
 import sqlite3
 import os
 import uuid
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import base64
 
 # ==================================================
 # PATHS & UPLOAD FOLDERS
@@ -252,7 +251,49 @@ def create_loan_application(user_id, loan_type):
     finally:
         conn.close()
 
+#-------------------------------------------------
+# PERSONAL LOAN HELPERS
+
 def save_personal_loan_details(application_id, data):
+    try:
+        raw_amt = data.get('ind-amt')
+        if not raw_amt:
+            raw_amt = data.get('ind_amt') 
+
+        if not raw_amt:
+            print("[VALIDATION ERROR] Loan amount field 'ind-amt' is missing")
+            return False
+        
+        clean_amt = str(raw_amt).replace(',', '').replace('$', '').strip()
+        loan_amount = float(clean_amt)
+        
+        if loan_amount <= 0:
+            return False
+
+        raw_period = data.get('ind-period')
+        repayment_period = int(raw_period) if raw_period and str(raw_period).strip().isdigit() else 30
+
+        dob_raw = data.get('ind-dob')
+        date_of_birth = None
+        if dob_raw:
+            try:
+                date_of_birth = datetime.strptime(dob_raw, '%Y-%m-%d').date()
+            except ValueError:
+                return False
+
+        signature_data = data.get('ind-signature-data')
+        signature_filename = None
+        if signature_data and signature_data.startswith('data:image'):
+            header, encoded = signature_data.split(',', 1)
+            signature_filename = f"signature_{uuid.uuid4().hex[:8]}.png"
+            signature_path = os.path.join(UPLOAD_BASE, 'signatures', signature_filename)
+            with open(signature_path, 'wb') as f:
+                f.write(base64.b64decode(encoded))
+
+    except Exception as e:
+        print(f"[VALIDATION ERROR] General Parsing error: {e}")
+        return False
+
     conn = get_db_connection()
     try:
         c = conn.cursor()
@@ -263,11 +304,26 @@ def save_personal_loan_details(application_id, data):
                 residential_address, terms_accepted, agreement_date
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            application_id, data.get('loan_amount'), data.get('purpose'),
-            data.get('repayment_period', 30), data.get('full_name'),
-            data.get('dob'), data.get('nrc'), data.get('email'),
-            data.get('phone'), data.get('address'), 1, datetime.now()
+            application_id,
+            loan_amount,
+            data.get('ind-purpose'),
+            repayment_period,
+            data.get('ind-name'),
+            date_of_birth,
+            data.get('ind-nrc'),
+            data.get('ind-email'),
+            data.get('ind-phone'),
+            data.get('ind-address'),
+            1,
+            datetime.now()
         ))
+        
+        if signature_filename:
+            c.execute("""
+                INSERT INTO application_attachments (application_id, document_category, file_name, file_path)
+                VALUES (?, ?, ?, ?)
+            """, (application_id, 'signature', signature_filename, f"static/uploads/signatures/{signature_filename}"))
+
         conn.commit()
         return True
     except sqlite3.Error as e:
@@ -278,25 +334,64 @@ def save_personal_loan_details(application_id, data):
         conn.close()
 
 # ==================================================
-# BUSINESS LOAN HELPERS
+# BUSINESS LOAN HELPERS (WITH CONTACT PERSON DETAILS)
+# ==================================================
 def save_business_loan_details(application_id, data):
+    try:
+        # --- Loan amount ---
+        raw_amt = data.get('bus-amt')
+        loan_amount = float(str(raw_amt).replace(',', '').strip()) if raw_amt else 0.0
+
+        if loan_amount <= 0:
+            print("[VALIDATION ERROR] Business loan amount must be greater than 0")
+            return False
+
+        # --- Repayment period ---
+        raw_period = data.get('bus-period')
+        repayment_period = int(raw_period) if raw_period and str(raw_period).isdigit() else 30
+
+    except (ValueError, TypeError) as e:
+        print(f"[VALIDATION ERROR] Business parsing error: {e}")
+        return False
+
     conn = get_db_connection()
     try:
         c = conn.cursor()
         c.execute("""
             INSERT INTO business_loan_details (
-                application_id, business_name, business_registration_number,
-                loan_amount, purpose, repayment_period_days, contact_person_name,
-                contact_email, contact_phone, business_address, terms_accepted, agreement_date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                application_id,
+                business_name,
+                business_registration_number,
+                loan_amount,
+                purpose,
+                repayment_period_days,
+                contact_person_name,
+                contact_email,
+                contact_phone,
+                contact_person_position,
+                business_address,
+                terms_accepted,
+                agreement_date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            application_id, data.get('business_name'), data.get('reg_number'),
-            data.get('loan_amount'), data.get('purpose'), data.get('repayment_period', 30),
-            data.get('contact_name'), data.get('email'), data.get('phone'),
-            data.get('address'), 1, datetime.now()
+            application_id,
+            data.get('bus-name'),
+            data.get('bus-reg'),
+            loan_amount,
+            data.get('bus-purpose'),
+            repayment_period,
+            data.get('bus-contact-name'),
+            data.get('bus-contact-email'),
+            data.get('bus-contact-phone'),
+            data.get('bus-contact-position'),
+            data.get('bus-reason'),
+            1 if data.get('bus-agreement') == 'on' else 0,
+            datetime.now()
         ))
+
         conn.commit()
         return True
+
     except sqlite3.Error as e:
         print(f"[DB ERROR] save_business_loan_details: {e}")
         conn.rollback()
@@ -306,6 +401,7 @@ def save_business_loan_details(application_id, data):
 
 # ==================================================
 # COLLATERAL HELPERS
+# ==================================================
 def save_collateral_items(application_id, loan_type, items_list):
     conn = get_db_connection()
     try:
@@ -329,6 +425,7 @@ def save_collateral_items(application_id, loan_type, items_list):
 
 # ==================================================
 # ATTACHMENT HELPERS
+# ==================================================
 def save_application_attachments(application_id, category, filename, filepath):
     conn = get_db_connection()
     try:
@@ -348,11 +445,8 @@ def save_application_attachments(application_id, category, filename, filepath):
 
 # ==================================================
 # ADMIN LOAN DECISION HELPERS
+# ==================================================
 def update_loan_status(loan_id, status, admin_notes, admin_id):
-    """
-    Updates the loan application with the admin's decision.
-    Links the action to the admin's user ID and sets the timestamp.
-    """
     conn = get_db_connection()
     try:
         c = conn.cursor()
@@ -376,6 +470,7 @@ def update_loan_status(loan_id, status, admin_notes, admin_id):
 
 # ==================================================
 # CALCULATION HELPERS
+# ==================================================
 def calculate_total_repayment(loan_amount, rate=0.30):
     try:
         principal = float(loan_amount)

@@ -20,12 +20,11 @@ def home():
     return render_template("fin_home.html")
 
 # --------------------------------------------------
-# LOANS (PROTECTED)
+# LOAN APPLICATION (PROTECTED)
 # --------------------------------------------------
 @finance_bp.route("/loans", methods=["GET", "POST"])
 @login_required
 def loans():
-
     from utils.database import (
         create_loan_application,
         save_personal_loan_details,
@@ -37,227 +36,142 @@ def loans():
     )
 
     if request.method == "POST":
-
-        flash("DEBUG: Loan form submitted", "info")
-
         loan_type = request.form.get("loan_type")
         user_id = session.get("user_id")
-
-        flash(f"DEBUG: loan_type={loan_type}", "info")
-        flash(f"DEBUG: user_id={user_id}", "info")
 
         if loan_type not in ("personal", "business"):
             flash("Invalid loan type selected.", "danger")
             return redirect(url_for("finance.loans"))
 
-        # --------------------------------------------------
-        # CREATE CORE APPLICATION
-        # --------------------------------------------------
-        application_id, application_number = create_loan_application(
-            user_id, loan_type
-        )
+        # 1. Create the Application Entry first
+        application_id, application_number = create_loan_application(user_id, loan_type)
 
         if not application_id:
-            flash("Failed to create loan application.", "danger")
+            flash("Failed to create loan application entry.", "danger")
             return redirect(url_for("finance.loans"))
 
-        flash(f"DEBUG: Application #{application_number}", "info")
-
         try:
+            total_repayment = 0
+            
             # --------------------------------------------------
-            # PERSONAL LOAN
+            # CASE A: PERSONAL LOAN
             # --------------------------------------------------
             if loan_type == "personal":
-                form_data = {
-                    "loan_amount": float(request.form.get("loan_amount", 0)),
-                    "purpose": request.form.get("purpose"),
-                    "repayment_period": int(request.form.get("repayment_days", 30)),
-                    "full_name": request.form.get("full_name"),
-                    "dob": request.form.get("date_of_birth"),
-                    "nrc": request.form.get("nrc_number"),
-                    "email": request.form.get("email"),
-                    "phone": request.form.get("phone_number"),
-                    "address": request.form.get("residential_address"),
-                }
+                success = save_personal_loan_details(application_id, request.form)
+                if not success:
+                    flash("Missing required personal loan fields.", "danger")
+                    return redirect(url_for("finance.loans"))
 
-                save_personal_loan_details(application_id, form_data)
-
-                total_repayment = calculate_total_repayment(form_data["loan_amount"])
+                amt_raw = request.form.get("ind-amt", "0").replace(',', '').replace('$', '')
+                amt = float(amt_raw) if amt_raw else 0.0
+                total_repayment = calculate_total_repayment(amt)
 
                 collateral_items = []
                 for item in request.form.getlist("collateral"):
-                    if item != "other":
+                    if item and item != "other":
                         collateral_items.append({
                             "name": item,
                             "type": "personal",
                             "value": 0,
-                            "condition": request.form.get("item_description", "")
+                            "condition": request.form.get("ind-description", "")
                         })
-
                 if collateral_items:
-                    save_collateral_items(application_id, loan_type, collateral_items)
+                    save_collateral_items(application_id, "personal", collateral_items)
 
             # --------------------------------------------------
-            # BUSINESS LOAN
+            # CASE B: BUSINESS LOAN
             # --------------------------------------------------
             else:
-                form_data = {
-                    "business_name": request.form.get("business_name"),
-                    "reg_number": request.form.get("business_reg_no"),
-                    "loan_amount": float(request.form.get("loan_amount", 0)),
-                    "purpose": request.form.get("purpose"),
-                    "repayment_period": int(request.form.get("repayment_days", 30)),
-                    "contact_name": request.form.get("contact_name"),
-                    "email": request.form.get("contact_email"),
-                    "phone": request.form.get("contact_phone"),
-                    "address": request.form.get("business_address"),
-                }
+                success = save_business_loan_details(application_id, request.form)
+                if not success:
+                    flash("Failed to save business details.", "danger")
+                    return redirect(url_for("finance.loans"))
 
-                save_business_loan_details(application_id, form_data)
+                amt_raw = request.form.get("bus-amt", "0").replace(',', '').replace('$', '')
+                amt = float(amt_raw) if amt_raw else 0.0
+                total_repayment = calculate_total_repayment(amt)
 
-                total_repayment = calculate_total_repayment(form_data["loan_amount"])
-
-                save_collateral_items(application_id, loan_type, [{
-                    "name": request.form.get("collateral_type"),
-                    "type": "business",
-                    "value": float(request.form.get("collateral_value", 0)),
-                    "condition": request.form.get("collateral_description")
-                }])
+                bus_collateral_name = request.form.get("bus-collateral-type")
+                if bus_collateral_name:
+                    save_collateral_items(application_id, "business", [{
+                        "name": bus_collateral_name,
+                        "type": "business",
+                        "value": float(request.form.get("bus-collateral-value", 0) or 0),
+                        "condition": request.form.get("bus-collateral-desc")
+                    }])
 
             # --------------------------------------------------
-            # UPDATE TOTAL REPAYMENT
+            # 2. FINAL DB UPDATE
             # --------------------------------------------------
-                conn = get_db_connection()
-                conn.execute(
-                     "UPDATE loan_applications SET total_repayment=?, updated_date=CURRENT_TIMESTAMP WHERE id=?",
-                  (total_repayment, application_id)
-                    )
-                conn.commit()
-                conn.close()
-            # --------------------------------------------------
-            # FILE ATTACHMENTS
-            # --------------------------------------------------
-            upload_dir = os.path.join(
-                "static", "uploads", "loans", application_number
+            conn = get_db_connection()
+            conn.execute(
+                "UPDATE loan_applications SET total_repayment=?, updated_date=CURRENT_TIMESTAMP WHERE id=?",
+                (total_repayment, application_id)
             )
+            conn.commit()
+            conn.close()
+
+            # --------------------------------------------------
+            # 3. FILE ATTACHMENTS HANDLING (FIXED FOR ADMIN)
+            # --------------------------------------------------
+            # Define specific keys used in the HTML form for both types
+            # Format: (Form Key, Admin Label)
+            file_mapping = [
+                # Personal Keys
+                ('ind-identity', 'ID Copy'),
+                ('ind-residence', 'Proof of Residence'),
+                ('ind-income', 'Proof of Income'),
+                ('ind-signature-data', 'Signature'),
+                # Business Keys (Fixed mapping)
+                ('bus-reg-cert', 'Business Registration'),
+                ('bus-tax-cert', 'Tax Certificate'),
+                ('bus-financials', 'Financial Statements'),
+                ('bus-bank-stmts', 'Bank Statements'),
+                ('bus-directors-id', 'Director ID'),
+                ('bus-address-proof', 'Business Address Proof'),
+                ('bus-collateral-docs', 'Collateral Documents'),
+                ('bus-collateral-proof', 'Collateral Proof'),
+                ('bus-collateral-photos', 'Collateral Photos'),
+                ('attachments', 'General Attachment')
+            ]
+
+            upload_dir = os.path.join("static", "uploads", "loans", application_number)
             os.makedirs(upload_dir, exist_ok=True)
 
-            for file in request.files.getlist("attachments"):
-                if file and file.filename:
-                    filename = secure_filename(file.filename)
-                    unique = f"{uuid.uuid4().hex}_{filename}"
-                    path = os.path.join(upload_dir, unique)
-                    file.save(path)
+            for file_key, label in file_mapping:
+                files = request.files.getlist(file_key)
+                for file in files:
+                    if file and file.filename != '':
+                        filename = secure_filename(file.filename)
+                        unique_fn = f"{uuid.uuid4().hex[:8]}_{filename}"
+                        save_path = os.path.join(upload_dir, unique_fn)
+                        
+                        # Save actual file to disk
+                        file.save(save_path)
 
-                    save_application_attachments(
-                        application_id,
-                        "loan_document",
-                        filename,
-                        path.replace("static/", "")
-                    )
+                        # Save to database application_attachments table
+                        # Store path as 'uploads/loans/APP_NUM/file.ext' for consistency
+                        db_relative_path = f"uploads/loans/{application_number}/{unique_fn}"
+                        
+                        save_application_attachments(
+                            application_id,
+                            label, # This is the category the admin sees
+                            filename,
+                            db_relative_path
+                        )
 
-            flash(f"Loan application {application_number} submitted successfully!", "success")
-            return redirect(url_for("finance.loans"))
+            flash(f"Application {application_number} submitted successfully!", "success")
+            return redirect(url_for("finance.my_loans"))
 
         except Exception as e:
-            flash(f"Submission failed: {str(e)}", "danger")
+            print(f"CRITICAL LOAN ROUTE ERROR: {e}")
+            flash(f"An error occurred: {str(e)}", "danger")
             return redirect(url_for("finance.loans"))
 
     return render_template("fin_loans.html")
 
 # --------------------------------------------------
-# MY LOANS (PROTECTED)
-# --------------------------------------------------
-@finance_bp.route("/loans/edit/<int:loan_id>", methods=["GET", "POST"])
-@login_required
-def edit_loan(loan_id):
-    from utils.database import get_db_connection, calculate_total_repayment
-    user_id = session.get("user_id")
-    db = get_db_connection()
-
-    # 1. Fetch existing application and verify ownership + status
-    loan = db.execute("""
-        SELECT * FROM loan_applications 
-        WHERE id = ? AND user_id = ? AND status = 'pending'
-    """, (loan_id, user_id)).fetchone()
-
-    if not loan:
-        flash("Application not found or cannot be edited (already processed).", "danger")
-        return redirect(url_for("finance.my_loans"))
-
-    if request.method == "POST":
-        loan_amount = float(request.form.get("loan_amount", 0))
-        total_repayment = calculate_total_repayment(loan_amount)
-        
-        # 2. Update Main Application
-        db.execute("""
-            UPDATE loan_applications 
-            SET total_repayment = ?, updated_date = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        """, (total_repayment, loan_id))
-
-        # 3. Update Specific Details based on type
-        if loan['loan_type'] == 'personal':
-            db.execute("""
-                UPDATE personal_loan_details SET 
-                loan_amount=?, purpose=?, repayment_period_days=?, full_name=?, phone_number=?, residential_address=?
-                WHERE application_id=?
-            """, (loan_amount, request.form.get("purpose"), int(request.form.get("repayment_days", 30)),
-                  request.form.get("full_name"), request.form.get("phone_number"), 
-                  request.form.get("residential_address"), loan_id))
-        else:
-            db.execute("""
-                UPDATE business_loan_details SET 
-                loan_amount=?, purpose=?, business_name=?, contact_phone=?, business_address=?
-                WHERE application_id=?
-            """, (loan_amount, request.form.get("purpose"), request.form.get("business_name"),
-                  request.form.get("contact_phone"), request.form.get("business_address"), loan_id))
-        
-        db.commit()
-        db.close()
-        flash("Application updated successfully!", "success")
-        return redirect(url_for("finance.my_loans"))
-
-    # Fetch details for pre-filling the form
-    details = None
-    if loan['loan_type'] == 'personal':
-        details = db.execute("SELECT * FROM personal_loan_details WHERE application_id=?", (loan_id,)).fetchone()
-    else:
-        details = db.execute("SELECT * FROM business_loan_details WHERE application_id=?", (loan_id,)).fetchone()
-    
-    db.close()
-    return render_template("fin_edit_loan.html", loan=loan, details=details)
-# --------------------------------------------------
-# ELIGIBILITY
-# --------------------------------------------------
-@finance_bp.route("/eligibility", methods=["GET", "POST"])
-def eligibility():
-    if request.method == "POST":
-        flash("Eligibility check completed.", "success")
-        return redirect(url_for("finance.eligibility"))
-    return render_template("fin_eligibility.html")
-
-# --------------------------------------------------
-# FAQ
-# --------------------------------------------------
-@finance_bp.route("/faq")
-def faq():
-    return render_template("fin_faq.html")
-
-# --------------------------------------------------
-# CONTACT
-# --------------------------------------------------
-@finance_bp.route("/contact", methods=["GET", "POST"])
-def contact():
-    if request.method == "POST":
-        flash("Message sent successfully.", "success")
-        return redirect(url_for("finance.contact"))
-    return render_template("fin_contact.html")
-
-# ... (Previous imports stay the same)
-
-# --------------------------------------------------
-# CLIENT DASHBOARD (PROTECTED)
+# DASHBOARD & LISTINGS
 # --------------------------------------------------
 @finance_bp.route("/dashboard")
 @login_required
@@ -266,7 +180,6 @@ def client_dashboard():
     user_id = session.get("user_id")
     db = get_db_connection()
     
-    # Get a summary for the dashboard cards
     loan_stats = db.execute("""
         SELECT 
             COUNT(*) as total,
@@ -275,11 +188,8 @@ def client_dashboard():
         FROM loan_applications WHERE user_id = ?
     """, (user_id,)).fetchone()
     
-    # Get the 3 most recent loans to show in a "Mini Table"
     recent_loans = db.execute("""
-        SELECT 
-            la.*,
-            COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
+        SELECT la.*, COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
         FROM loan_applications la
         LEFT JOIN personal_loan_details p ON la.id = p.application_id
         LEFT JOIN business_loan_details b ON la.id = b.application_id
@@ -290,9 +200,6 @@ def client_dashboard():
     db.close()
     return render_template("fin_client_dashboard.html", stats=loan_stats, recent_loans=recent_loans)
 
-# --------------------------------------------------
-# MY LOANS LIST 
-# --------------------------------------------------
 @finance_bp.route("/my-loans")
 @login_required
 def my_loans():
@@ -300,11 +207,8 @@ def my_loans():
     user_id = session.get("user_id")
     db = get_db_connection()
     
-    # We fetch all loans for the logged-in user
     loans = db.execute("""
-        SELECT 
-            la.*,
-            COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
+        SELECT la.*, COALESCE(p.full_name, b.business_name, 'Applicant') as display_name
         FROM loan_applications la
         LEFT JOIN personal_loan_details p ON la.id = p.application_id
         LEFT JOIN business_loan_details b ON la.id = b.application_id
@@ -315,4 +219,70 @@ def my_loans():
     db.close()
     return render_template("fin_my_loans.html", loans=loans)
 
-# ... (rest of your routes: edit_loan, eligibility, etc.)
+# --------------------------------------------------
+# EDITING & UTILITIES
+# --------------------------------------------------
+@finance_bp.route("/loans/edit/<int:loan_id>", methods=["GET", "POST"])
+@login_required
+def edit_loan(loan_id):
+    from utils.database import get_db_connection, calculate_total_repayment
+    user_id = session.get("user_id")
+    db = get_db_connection()
+
+    loan = db.execute("""
+        SELECT * FROM loan_applications 
+        WHERE id = ? AND user_id = ? AND status = 'pending'
+    """, (loan_id, user_id)).fetchone()
+
+    if not loan:
+        flash("Application not found or is already being processed.", "danger")
+        db.close()
+        return redirect(url_for("finance.my_loans"))
+
+    if request.method == "POST":
+        loan_amount = float(request.form.get("loan_amount", 0).replace(',', ''))
+        total_repayment = calculate_total_repayment(loan_amount)
+        
+        db.execute("UPDATE loan_applications SET total_repayment = ?, updated_date = CURRENT_TIMESTAMP WHERE id = ?", 
+                   (total_repayment, loan_id))
+
+        if loan['loan_type'] == 'personal':
+            db.execute("""
+                UPDATE personal_loan_details SET loan_amount=?, purpose=?, full_name=? WHERE application_id=?
+            """, (loan_amount, request.form.get("purpose"), request.form.get("full_name"), loan_id))
+        else:
+            db.execute("""
+                UPDATE business_loan_details SET loan_amount=?, purpose=?, business_name=? WHERE application_id=?
+            """, (loan_amount, request.form.get("purpose"), request.form.get("business_name"), loan_id))
+        
+        db.commit()
+        db.close()
+        flash("Application updated successfully!", "success")
+        return redirect(url_for("finance.my_loans"))
+
+    details = None
+    if loan['loan_type'] == 'personal':
+        details = db.execute("SELECT * FROM personal_loan_details WHERE application_id=?", (loan_id,)).fetchone()
+    else:
+        details = db.execute("SELECT * FROM business_loan_details WHERE application_id=?", (loan_id,)).fetchone()
+    
+    db.close()
+    return render_template("fin_edit_loan.html", loan=loan, details=details)
+
+@finance_bp.route("/eligibility", methods=["GET", "POST"])
+def eligibility():
+    if request.method == "POST":
+        flash("Eligibility check complete.", "success")
+        return redirect(url_for("finance.eligibility"))
+    return render_template("fin_eligibility.html")
+
+@finance_bp.route("/faq")
+def faq():
+    return render_template("fin_faq.html")
+
+@finance_bp.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        flash("Message sent successfully.", "success")
+        return redirect(url_for("finance.contact"))
+    return render_template("fin_contact.html")

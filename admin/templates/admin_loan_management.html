@@ -1,190 +1,154 @@
 {% extends "admin_base.html" %}
-
 {% block title %}Loan Management - {{ loan.application_number }}{% endblock %}
-
 {% block content %}
-<div style="max-width:1200px; margin:2rem auto; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#333">
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
-        <div>
-            <h2 style="color: var(--navy);">Loan Application: {{ loan.application_number }}</h2>
-            <p style="color: #666; font-size: 0.9rem;">Reviewing submission from <strong>{{ loan.applicant_email }}</strong></p>
-        </div>
-        <a href="{{ url_for('admin.list_loans') }}" style="text-decoration:none; color:#3498db; font-weight: 600;">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </a>
+{% set rate_table = {6:0.15,8:0.20,14:0.35,16:0.40,22:0.55,24:0.60,30:0.75,32:0.80,38:0.95,40:1.00,46:1.15,48:1.20} %}
+{% set period = 6 %}
+{% if loan.loan_type == 'personal' and personal_details %}
+{% set period = personal_details.repayment_period_days|default(6)|int %}
+{% set principal = personal_details.loan_amount|default(0)|float %}
+{% set purpose = personal_details.purpose %}
+{% set dob = personal_details.date_of_birth %}
+{% set email = personal_details.email %}
+{% set address = personal_details.residential_address %}
+{% elif business_details %}
+{% set period = (business_details.repayment_period_days or business_details.bus_period or 6)|int %}
+{% set principal = (business_details.loan_amount or business_details.bus_amt or 0)|float %}
+{% set purpose = business_details.purpose %}
+{% set business_years = business_details.business_years %}
+{% set monthly_revenue = business_details.monthly_revenue or business_details.bus_revenue or 0 %}
+{% set business_address = business_details.business_address %}
+{% else %}
+{% set principal = 0 %}
+{% endif %}
+{% set actual_rate = rate_table.get(period, 0.30) %}
+{% set interest_val = principal * actual_rate %}
+{% set total_due = principal + interest_val %}
+
+<div style="max-width:1400px;margin:2rem auto;font-family:'Segoe UI',sans-serif;color:#333;padding:0 20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <div>
+      <h2 style="color:var(--navy);margin:0">Loan Application: {{ loan.application_number }}</h2>
+      <p style="color:#666;font-size:0.9rem">Type: <strong style="text-transform:uppercase">{{loan.loan_type}}</strong> | Applicant: <strong>{{personal_details.full_name if loan.loan_type=='personal' else business_details.business_name}}</strong> | Applied: {{loan.applied_date[:19] if loan.applied_date and loan.applied_date|length>19 else loan.applied_date or 'N/A'}}</p>
     </div>
-
-    <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:1.5rem; margin-bottom:2rem; border-left:6px solid var(--navy)">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1.5rem">
-            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Loan Type</small><br><strong>{{ loan.loan_type|title }}</strong></div>
-            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Status</small><br>
-                <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight: 800;
-                    {% if loan.status=='approved' %}background:#d1fae5; color:#065f46;
-                    {% elif loan.status=='rejected' %}background:#fee2e2; color:#991b1b;
-                    {% elif loan.status=='missing_info' %}background:#fef3c7; color:#92400e;
-                    {% else %}background:#e0f2fe; color:#075985;{% endif %}">
-                    <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 4px;"></i>
-                    {{ loan.status|upper }}
-                </span>
-            </div>
-            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Submission Date</small><br><strong>{{ loan.applied_date if loan.applied_date else 'N/A' }}</strong></div>
-            <div><small style="color:#888; text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Interest Rate</small><br><strong>{{ (loan.interest_rate * 100)|round(1) if loan.interest_rate else 30 }}%</strong></div>
-        </div>
+    <div style="display:flex;gap:1rem">
+      <a href="{{url_for('admin.list_loans')}}" style="text-decoration:none;color:#3498db;font-weight:600;padding:8px 16px;border:1px solid #3498db;border-radius:6px"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+      <form action="{{url_for('admin.delete_loan', loan_id=loan.id)}}" method="POST" onsubmit="return confirm('Delete this loan application?');" style="margin:0">
+        <button type="submit" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer"><i class="fas fa-trash"></i> Delete</button>
+      </form>
     </div>
+  </div>
 
-    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2rem;">
-        
-        <div>
-            {% if loan.loan_type=='personal' and personal_details %}
-            <section style="background:white; padding:2rem; border-radius:12px; margin-bottom:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
-                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
-                    <i class="fas fa-user-circle"></i> Applicant Information
-                </h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
-                        <small style="color:#64748b;">Requested Amount</small><br>
-                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(personal_details.loan_amount) }}</strong>
-                    </div>
-                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
-                        <small style="color:#64748b;">Repayment Term</small><br>
-                        <strong style="font-size:1.5rem; color:#0f172a">{{ personal_details.repayment_period_days }} Days</strong>
-                    </div>
-                </div>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b; width:35%">Full Legal Name</td><td><strong>{{ personal_details.full_name }}</strong></td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">NRC Number</td><td>{{ personal_details.nrc_number }}</td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Phone Number</td><td>{{ personal_details.phone_number }}</td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Address</td><td>{{ personal_details.residential_address }}</td></tr>
-                    <tr><td style="padding:1rem 0; color:#64748b;">Purpose of Loan</td><td><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px;">{{ personal_details.purpose|replace('_', ' ')|title }}</span></td></tr>
-                </table>
-            </section>
-            
-            {% elif loan.loan_type=='business' and business_details %}
-            <section style="background:white; padding:2rem; border-radius:12px; margin-bottom:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
-                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
-                    <i class="fas fa-building"></i> Business Information
-                </h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
-                        <small style="color:#64748b;">Requested Amount</small><br>
-                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(business_details.loan_amount) }}</strong>
-                    </div>
-                    <div style="background:#f8fafc; padding:1.2rem; border-radius:8px; border: 1px solid #e2e8f0;">
-                        <small style="color:#64748b;">Monthly Revenue</small><br>
-                        <strong style="font-size:1.5rem; color:#0f172a">K{{ "{:,.2f}".format(business_details.monthly_revenue) if business_details.monthly_revenue else '0.00' }}</strong>
-                    </div>
-                </div>
-                <table style="width:100%; border-collapse:collapse;">
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b; width:35%">Business Name</td><td><strong>{{ business_details.business_name }}</strong></td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Registration No.</td><td>{{ business_details.business_registration_number }}</td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Contact Person</td><td>{{ business_details.contact_person_name }}</td></tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:1rem 0; color:#64748b;">Industry</td><td>{{ business_details.industry_type }}</td></tr>
-                    <tr><td style="padding:1rem 0; color:#64748b;">Years in Operation</td><td>{{ business_details.years_in_operation }} Years</td></tr>
-                </table>
-            </section>
-            {% endif %}
+  <div style="background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:1.5rem;margin-bottom:2rem;border-left:6px solid {%if loan.status=='approved'%}#10b981{%elif loan.status=='rejected'%}#ef4444{%else%}var(--navy){%endif%}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.5rem">
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Status</small><br><span style="padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:800;background:{%if loan.status=='approved'%}#d1fae5;color:#065f46{%elif loan.status=='rejected'%}#fee2e2;color:#991b1b{%else%}#e0f2fe;color:#075985{%endif%}"><i class="fas fa-{%if loan.status=='approved'%}check-circle{%elif loan.status=='rejected'%}times-circle{%else%}clock{%endif%}"></i> {{loan.status|upper}}</span></div>
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Rate</small><br><strong>{{(actual_rate * 100)|int}}%</strong></div>
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Term</small><br><strong>{{period}} Days</strong></div>
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Total Due</small><br><strong style="font-size:1.2rem">K{{"{:,.2f}".format(total_due)}}</strong></div>
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Principal</small><br><strong>K{{"{:,.2f}".format(principal)}}</strong></div>
+      <div><small style="color:#888;text-transform:uppercase;font-size:0.7rem;font-weight:700">Interest</small><br><strong>K{{"{:,.2f}".format(interest_val)}}</strong></div>
+    </div>
+  </div>
 
-            <section style="background:white; padding:2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05)">
-                <h3 style="border-bottom:2px solid #f0f0f0; padding-bottom:0.8rem; color:var(--navy); margin-bottom: 1.5rem;">
-                    <i class="fas fa-shield-alt"></i> Collateral Items ({{ collateral_items|length }})
-                </h3>
-                {% if collateral_items %}
-                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem">
-                    {% for item in collateral_items %}
-                    <div style="border:1px solid #e2e8f0; border-radius:10px; padding:1.2rem; background:#f8fafc">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem">
-                            <strong style="color:var(--navy)">{{ item.item_name|title }}</strong>
-                            <span style="font-size:0.7rem; background:#cbd5e1; padding:2px 8px; border-radius:10px;">{{ item.item_type|upper }}</span>
-                        </div>
-                        <div style="margin-bottom:0.5rem">
-                            <small style="color:#64748b">Market Value:</small><br>
-                            <strong style="color:#10b981">K{{ "{:,.2f}".format(item.estimated_value) }}</strong>
-                        </div>
-                        <p style="font-size:0.85rem; color:#475569; border-top:1px solid #e2e8f0; padding-top:0.5rem">
-                            {{ item.condition_description or 'No condition report provided.' }}
-                        </p>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div style="text-align:center; padding:2rem; color:#94a3b8; background:#f8fafc; border-radius:12px; border:2px dashed #e2e8f0">
-                    <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                    <p>No collateral listed for this application.</p>
-                </div>
+  <div style="display:grid;grid-template-columns:2.5fr 1.5fr;gap:2rem">
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      {% if loan.loan_type == 'business' %}
+      <section style="background:white;padding:2rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+        <h3 style="border-bottom:2px solid #f0f0f0;padding-bottom:0.8rem;color:var(--navy);margin-bottom:1.5rem"><i class="fas fa-building"></i> Business Details</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem">
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Business Info</h4><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b;width:45%">Business Name</td><td><strong>{{business_details.business_name or business_details.bus_name}}</strong></td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Registration</td><td>{{business_details.business_registration_number or business_details.bus_reg}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Years in Business</td><td>{{business_details.business_years or business_details.bus_years or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Monthly Revenue</td><td><strong>K{{"{:,.2f}".format(monthly_revenue)}}</strong></td></tr><tr><td style="padding:0.8rem 0;color:#64748b">Business Address</td><td>{{business_address or 'Not specified'}}</td></tr></table></div>
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Loan Info</h4><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b;width:45%">Loan Amount</td><td><strong>K{{"{:,.2f}".format(principal)}}</strong></td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Purpose</td><td>{{purpose or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Repayment Period</td><td>{{period}} days</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Loan Reason</td><td>{{business_details.reason_for_loan or business_details.bus_reason or 'Not specified'}}</td></tr><tr><td style="padding:0.8rem 0;color:#64748b">Terms Accepted</td><td>{{'Yes' if business_details.terms_accepted else 'No'}}</td></tr></table></div>
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Contact Info</h4><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b;width:45%">Contact Person</td><td>{{business_details.contact_person_name or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Contact Email</td><td>{{business_details.contact_email or 'Not specified'}}</td></tr><tr><td style="padding:0.8rem 0;color:#64748b">Contact Phone</td><td>{{business_details.contact_phone or 'Not specified'}}</td></tr></table></div>
+        </div>
+      </section>
+      {% else %}
+      <section style="background:white;padding:2rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+        <h3 style="border-bottom:2px solid #f0f0f0;padding-bottom:0.8rem;color:var(--navy);margin-bottom:1.5rem"><i class="fas fa-user-circle"></i> Personal Applicant Details</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem">
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Personal Info</h4><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b;width:45%">Full Name</td><td><strong>{{personal_details.full_name}}</strong></td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">NRC Number</td><td>{{personal_details.nrc_number}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Date of Birth</td><td>{{dob[:10] if dob and dob|length>10 else dob or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Email Address</td><td>{{email or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Phone Number</td><td>{{personal_details.phone_number}}</td></tr><tr><td style="padding:0.8rem 0;color:#64748b">Residential Address</td><td>{{address or 'Not specified'}}</td></tr></table></div>
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Loan Info</h4><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b;width:45%">Loan Amount</td><td><strong>K{{"{:,.2f}".format(principal)}}</strong></td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Purpose</td><td>{{purpose or 'Not specified'}}</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Repayment Period</td><td>{{period}} days</td></tr><tr style="border-bottom:1px solid #f1f5f9"><td style="padding:0.8rem 0;color:#64748b">Terms Accepted</td><td>{{'Yes' if personal_details.terms_accepted else 'No'}}</td></tr><tr><td style="padding:0.8rem 0;color:#64748b">Agreement Date</td><td>{{personal_details.agreement_date[:19] if personal_details.agreement_date and personal_details.agreement_date|length>19 else personal_details.agreement_date or 'Not specified'}}</td></tr></table></div>
+          <div><h4 style="color:#64748b;font-size:0.9rem;margin-bottom:0.8rem;text-transform:uppercase">Digital Signature</h4>
+            {# Find signature by checking document_category #}
+            {% set ns = namespace(sig=None) %}
+            {% for file in attachments %}
+                {% if file.document_category
+                      and 'signature' in file.document_category|lower %}
+                    {% set ns.sig = file %}
                 {% endif %}
-            </section>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% endfor %}
             
-            <div style="background:white; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); border:1px solid #e2e8f0">
-                <h3 style="margin-top:0; font-size: 1.1rem; display:flex; justify-content:space-between;">
-                    <span><i class="fas fa-file-download"></i> Documents</span>
-                    <span style="background:var(--navy); color:white; padding:2px 10px; border-radius:20px; font-size:0.7rem">{{ attachments|length }}</span>
-                </h3>
-                <div style="margin-top:1.5rem">
-                    {% for file in attachments %}
-                    <div style="padding:12px; margin-bottom:12px; background:#f8fafc; border-radius:8px; border:1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;">
-                            <strong style="font-size:0.85rem; display:block;">{{ file.document_category|replace('_',' ')|title }}</strong>
-                            <small style="color:#94a3b8; font-size: 0.75rem;">{{ file.file_name }}</small>
-                        </div>
-                        <a href="{{ url_for('admin.download_attachment', filename=file.file_path) }}" 
-                           style="background:var(--lime); color:var(--navy); padding:6px 10px; border-radius:6px; text-decoration:none; font-size:0.75rem; font-weight:700;">
-                           <i class="fas fa-download"></i>
-                        </a>
-                    </div>
-                    {% else %}
-                    <p style="color:#94a3b8; font-style:italic; font-size:0.9rem; text-align:center;">No files uploaded.</p>
-                    {% endfor %}
-                </div>
+            {% if ns.sig %}
+            <div style="border:2px dashed #e2e8f0;border-radius:8px;padding:1rem;background:#f8fafc;text-align:center">
+              <img src="{{ url_for('static', filename=ns.sig.file_path) }}"
+                   style="max-width:100%;height:120px;object-fit:contain;background:white;border:1px solid #ddd;padding:5px"
+                   alt="Signature"
+                   onerror="this.parentElement.innerHTML='<p style=color:red>Image path error: ' + this.src + '</p>'">
+              <p style="margin-top:0.5rem;color:#64748b;font-size:0.85rem">
+                Applicant's Digital Signature
+              </p>
+              <div style="display:flex;justify-content:center;gap:10px;margin-top:0.5rem">
+                <a href="{{ url_for('static', filename=ns.sig.file_path) }}"
+                   target="_blank"
+                   style="color:var(--navy);text-decoration:none;font-size:0.8rem">
+                  <i class="fas fa-expand"></i> View Full Size
+                </a>
+              </div>
             </div>
-
-            <div style="background: linear-gradient(135deg, #1e293b, #0f172a); color:white; padding:1.5rem; border-radius:12px;">
-                <h4 style="margin-top:0; color:var(--lime);"><i class="fas fa-calculator"></i> Repayment Estimate</h4>
-                {% set amt = (personal_details.loan_amount if personal_details else business_details.loan_amount if business_details else 0) %}
-                <table style="width:100%; margin-top:1rem; font-size:0.9rem;">
-                    <tr><td style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)">Principal</td><td style="text-align:right">K{{ "{:,.2f}".format(amt) }}</td></tr>
-                    <tr><td style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1)">Interest Rate</td><td style="text-align:right">{{ (loan.interest_rate*100)|round(0) if loan.interest_rate else 30 }}%</td></tr>
-                    <tr><td style="padding:12px 0; font-size:1.1rem; color:var(--lime);"><strong>Total Due</strong></td><td style="text-align:right; font-size:1.1rem;"><strong>K{{ "{:,.2f}".format(loan.total_repayment if loan.total_repayment else amt * 1.30) }}</strong></td></tr>
-                </table>
+            {% else %}
+            <div style="border:2px dashed #e2e8f0;border-radius:8px;padding:2rem;background:#f8fafc;text-align:center">
+              <i class="fas fa-signature" style="font-size:2rem;color:#cbd5e1"></i>
+              <p style="margin-top:0.5rem;color:#94a3b8">No signature captured</p>
             </div>
+            {% endif %}
+          </div>
         </div>
+      </section>
+      {% endif %}
+
+      <section style="background:white;padding:2rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem"><h3 style="border-bottom:2px solid #f0f0f0;padding-bottom:0.8rem;color:var(--navy);margin:0"><i class="fas fa-shield-alt"></i> Collateral Assessment</h3>{% if collateral_items %}<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">{{collateral_items|length}} item{{'s' if collateral_items|length>1 else ''}}</span>{% endif %}</div>
+        {% if collateral_items %}<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:1rem">{% for item in collateral_items %}<div style="border:1px solid #e2e8f0;border-radius:10px;padding:1.2rem;background:#f8fafc"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.8rem"><div><strong style="color:var(--navy);font-size:1rem">{{item.item_name or item.collateral_type or 'Collateral Item'}}</strong>{% if item.item_type %}<span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:12px;font-size:0.7rem;margin-left:0.5rem">{{item.item_type}}</span>{% endif %}</div><div style="color:#10b981;font-weight:700;font-size:1.1rem">K{{"{:,.2f}".format(item.estimated_value or item.collateral_value or 0)}}</div></div><p style="font-size:0.85rem;color:#666;margin-bottom:0.5rem;line-height:1.4">{{item.condition_description or item.collateral_desc or 'No description provided'}}</p><div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:0.8rem;border-top:1px solid #f1f5f9"><small style="color:#94a3b8">ID: {{item.id}}</small><small style="color:#94a3b8">Added: {{item.created_at[:10] if item.created_at and item.created_at|length>10 else item.created_at or 'N/A'}}</small></div></div>{% endfor %}</div>{% else %}<div style="border:2px dashed #e2e8f0;border-radius:10px;padding:3rem;background:#f8fafc;text-align:center"><i class="fas fa-shield-alt" style="font-size:3rem;color:#cbd5e1;margin-bottom:1rem"></i><h4 style="color:#94a3b8;margin-bottom:0.5rem">No Collateral Items</h4><p style="color:#cbd5e1;font-size:0.9rem">No collateral provided</p></div>{% endif %}
+      </section>
+
+      {% if loan.admin_notes %}<section style="background:white;padding:2rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)"><h3 style="border-bottom:2px solid #f0f0f0;padding-bottom:0.8rem;color:var(--navy);margin-bottom:1.5rem"><i class="fas fa-sticky-note"></i> Admin Notes</h3><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:1.5rem"><div style="display:flex;align-items:center;margin-bottom:1rem"><div style="background:var(--navy);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:1rem"><i class="fas fa-user-tie"></i></div><div><strong>Admin Notes</strong><div style="color:#64748b;font-size:0.85rem">{% if loan.updated_date %}Last updated: {{loan.updated_date[:19] if loan.updated_date and loan.updated_date|length>19 else loan.updated_date or 'N/A'}}{% endif %}</div></div></div><p style="color:#334155;line-height:1.6;white-space:pre-wrap">{{loan.admin_notes}}</p></div></section>{% endif %}
     </div>
 
-    <div style="margin-top:3rem; background:#1e293b; color:white; padding:2.5rem; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2)">
-        <h3 style="margin-top:0; color:var(--white);"><i class="fas fa-gavel"></i> Administrative Decision</h3>
-        <p style="color:#94a3b8; margin-bottom:2rem;">Set the final status for this loan. This action will be logged and the client will be updated.</p>
-        
-        <form action="{{ url_for('admin.view_loan', loan_id=loan.id) }}" method="POST">
-            <div style="margin-bottom:1.5rem">
-                <label style="display:block; margin-bottom:0.8rem; font-weight:600;">Internal Decision Notes / Feedback to Client:</label>
-                <textarea name="admin_notes" rows="5" style="width:100%; border-radius:8px; padding:15px; border:none; background:rgba(255,255,255,0.1); color:white; font-family: inherit;" placeholder="State the reason for approval, rejection, or specify missing documents...">{{ loan.admin_notes or '' }}</textarea>
-            </div>
-            
-            <div style="display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap">
-                <div style="flex:1; min-width:250px">
-                    <label style="display:block; margin-bottom:0.8rem; font-weight:600;">Change Application Status:</label>
-                    <select name="status" style="width:100%; padding:12px; border-radius:8px; background:white; color:var(--navy); border:none; font-weight:bold; cursor:pointer;">
-                        <option value="pending" {% if loan.status=='pending' %}selected{% endif %}>🕒 Pending Review</option>
-                        <option value="approved" {% if loan.status=='approved' %}selected{% endif %}>✅ Approve Loan</option>
-                        <option value="rejected" {% if loan.status=='rejected' %}selected{% endif %}>❌ Reject Loan</option>
-                        <option value="missing_info" {% if loan.status=='missing_info' %}selected{% endif %}>⚠️ Request More Info</option>
-                    </select>
-                </div>
-                <button type="submit" style="background:var(--lime); color:var(--navy); border:none; padding:12px 40px; border-radius:8px; font-weight:800; cursor:pointer; font-size:1rem; transition: transform 0.2s;">
-                    UPDATE APPLICATION
-                </button>
-            </div>
-        </form>
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div style="background:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border:1px solid #e2e8f0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 style="margin:0;font-size:1.1rem"><i class="fas fa-paperclip"></i> Documents & Attachments</h3>{% if attachments %}<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">{{attachments|length}} file{{'s' if attachments|length>1 else ''}}</span>{% endif %}</div>
+        <div style="margin-top:1rem">{% if attachments %}<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:1rem">{% for file in attachments %}{% set preview_url = url_for('static', filename=file.file_path) %}{% set is_image = file.file_path and file.file_path.lower().endswith(('.png','.jpg','.jpeg','.webp','.jfif','.gif')) %}{% set is_pdf = file.file_path and file.file_path.lower().endswith('.pdf') %}<div style="border:1px solid #f1f5f9;border-radius:8px;overflow:hidden;background:#f8fafc;transition:transform 0.2s" class="document-card"><div style="padding:12px;border-bottom:1px solid #f1f5f9"><small style="display:block;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;font-size:0.7rem">{{file.document_category or "Attachment"}}</small><small style="color:#94a3b8;font-size:0.7rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{file.file_name or file.file_path.split('/')[-1]}}</small></div><div style="background:white;padding:12px;text-align:center;min-height:100px;display:flex;align-items:center;justify-content:center">{% if is_image %}<a href="{{preview_url}}" target="_blank" style="display:block;width:100%"><img src="{{preview_url}}" style="width:100%;height:120px;object-fit:cover;border-radius:4px" alt="{{file.document_category}}"></a>{% elif is_pdf %}<div style="color:#ef4444"><i class="fas fa-file-pdf" style="font-size:3rem"></i></div>{% else %}<div style="color:#64748b"><i class="fas fa-file" style="font-size:3rem"></i></div>{% endif %}</div><div style="padding:12px;border-top:1px solid #f1f5f9;display:grid;grid-template-columns:1fr 1fr;gap:4px"><a href="{{preview_url}}" target="_blank" style="background:var(--navy);color:white;padding:6px;border-radius:4px;text-decoration:none;font-size:0.7rem;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px"><i class="fas fa-eye"></i> View</a><a href="{{url_for('admin.download_attachment', filename=file.file_path)}}" style="background:var(--lime);color:var(--navy);padding:6px;border-radius:4px;text-decoration:none;font-size:0.7rem;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px"><i class="fas fa-download"></i> Save</a></div></div>{% endfor %}</div>{% else %}<div style="border:2px dashed #e2e8f0;border-radius:8px;padding:3rem;text-align:center"><i class="fas fa-folder-open" style="font-size:3rem;color:#cbd5e1;margin-bottom:1rem"></i><p style="color:#94a3b8;font-size:0.9rem">No documents attached</p></div>{% endif %}</div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#1e293b 0%,#334155 100%);color:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+        <h4 style="margin:0 0 1.2rem 0;color:var(--lime);border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;display:flex;align-items:center;gap:0.5rem"><i class="fas fa-calculator"></i> Financial Summary</h4>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)"><small style="color:#cbd5e1">Principal Amount</small><span style="font-weight:600">K{{"{:,.2f}".format(principal)}}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)"><small style="color:#cbd5e1">Interest Rate</small><span style="font-weight:600">{{(actual_rate * 100)|int}}%</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)"><small style="color:#cbd5e1">Interest Amount</small><span style="color:#fbbf24;font-weight:600">K{{"{:,.2f}".format(interest_val)}}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)"><small style="color:#cbd5e1">Term Period</small><span style="font-weight:600">{{period}} days</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:15px;padding-top:10px;border-top:2px solid rgba(255,255,255,0.1);font-size:1.1rem;font-weight:700"><span style="color:white">TOTAL DUE</span><span style="color:var(--lime);font-size:1.3rem">K{{"{:,.2f}".format(total_due)}}</span></div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.05)"><small style="color:#94a3b8;display:block;text-align:center">Calculated based on {{period}}-day term</small></div>
+      </div>
+
+      <div style="background:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border:1px solid #e2e8f0">
+        <h4 style="margin:0 0 1rem 0;color:var(--navy);font-size:1rem"><i class="fas fa-history"></i> Application Timeline</h4>
+        <div style="position:relative;padding-left:20px"><div style="position:absolute;left:8px;top:0;bottom:0;width:2px;background:#e2e8f0"></div>
+          <div style="position:relative;margin-bottom:1.5rem"><div style="position:absolute;left:-24px;top:0;width:12px;height:12px;border-radius:50%;background:#10b981;border:2px solid white;box-shadow:0 0 0 2px #10b981"></div><div><strong style="color:#334155;font-size:0.9rem">Application Submitted</strong><div style="color:#64748b;font-size:0.85rem">{{loan.applied_date[:19] if loan.applied_date and loan.applied_date|length>19 else loan.applied_date or 'N/A'}}</div></div></div>
+          {% if loan.updated_date %}<div style="position:relative;margin-bottom:1.5rem"><div style="position:absolute;left:-24px;top:0;width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid white;box-shadow:0 0 0 2px #3b82f6"></div><div><strong style="color:#334155;font-size:0.9rem">Last Updated</strong><div style="color:#64748b;font-size:0.85rem">{{loan.updated_date[:19] if loan.updated_date and loan.updated_date|length>19 else loan.updated_date or 'N/A'}}</div></div></div>{% endif %}
+          {% if loan.decision_date %}<div style="position:relative"><div style="position:absolute;left:-24px;top:0;width:12px;height:12px;border-radius:50%;background:{%if loan.status=='approved'%}#10b981{%elif loan.status=='rejected'%}#ef4444{%else%}#f59e0b{%endif%};border:2px solid white;box-shadow:0 0 0 2px {%if loan.status=='approved'%}#10b981{%elif loan.status=='rejected'%}#ef4444{%else%}#f59e0b{%endif%}"></div><div><strong style="color:#334155;font-size:0.9rem">Decision Made</strong><div style="color:#64748b;font-size:0.85rem">{{loan.decision_date[:19] if loan.decision_date and loan.decision_date|length>19 else loan.decision_date or 'N/A'}}</div><div style="color:#64748b;font-size:0.85rem;margin-top:2px">Status: <span style="color:{%if loan.status=='approved'%}#10b981{%elif loan.status=='rejected'%}#ef4444{%else%}#f59e0b{%endif%};font-weight:600">{{loan.status|upper}}</span></div></div></div>{% endif %}
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div style="margin-top:2rem;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:white;padding:2rem;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15)">
+    <h3 style="margin-top:0;color:var(--lime);display:flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem"><i class="fas fa-gavel"></i> Admin Decision Panel</h3>
+    <form action="{{url_for('admin.view_loan', loan_id=loan.id)}}" method="POST">
+      <div style="margin-bottom:1.5rem"><label style="display:block;color:#cbd5e1;margin-bottom:0.5rem;font-size:0.9rem"><i class="fas fa-comment-alt"></i> Decision Notes</label><textarea name="admin_notes" rows="4" style="width:100%;border-radius:8px;padding:12px;background:rgba(255,255,255,0.07);color:white;border:1px solid rgba(255,255,255,0.1);font-family:'Segoe UI',sans-serif" placeholder="Enter detailed notes about your decision...">{{loan.admin_notes or ''}}</textarea><small style="color:#94a3b8;font-size:0.8rem;display:block;margin-top:0.5rem">These notes will be visible in application history</small></div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:end"><div><label style="display:block;color:#cbd5e1;margin-bottom:0.5rem;font-size:0.9rem"><i class="fas fa-tag"></i> Update Status</label><select name="status" style="width:100%;padding:12px;border-radius:8px;background:rgba(255,255,255,0.07);color:white;border:1px solid rgba(255,255,255,0.1);font-size:1rem"><option value="pending" {%if loan.status=='pending'%}selected{%endif%} style="background:#1e293b">⏳ Pending</option><option value="approved" {%if loan.status=='approved'%}selected{%endif%} style="background:#1e293b">✅ Approve</option><option value="rejected" {%if loan.status=='rejected'%}selected{%endif%} style="background:#1e293b">❌ Reject</option></select></div><button type="submit" style="background:linear-gradient(135deg,var(--lime) 0%,#84cc16 100%);color:var(--navy);border:none;padding:14px 28px;border-radius:8px;font-weight:800;cursor:pointer;font-size:1rem;display:flex;align-items:center;gap:0.5rem;box-shadow:0 4px 12px rgba(132,204,22,0.3);transition:transform 0.2s,box-shadow 0.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(132,204,22,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(132,204,22,0.3)'"><i class="fas fa-save"></i> UPDATE DECISION</button></div>
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.1)"><small style="color:#94a3b8;font-size:0.8rem;display:block;text-align:center"><i class="fas fa-info-circle"></i> This action updates loan status and sends notifications</small></div>
+    </form>
+  </div>
 </div>
 
-<style>
-    @media (max-width: 992px) {
-        div[style*="grid-template-columns: 2fr 1fr"] { grid-template-columns: 1fr !important; }
-    }
-    button:hover { transform: scale(1.02); opacity: 0.9; }
-</style>
+<style>section{animation:fadeIn 0.3s ease-out}.document-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.1)}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}</style>
+<script>document.addEventListener('DOMContentLoaded',function(){const statusSelect=document.querySelector('select[name="status"]');const form=document.querySelector('form');form.addEventListener('submit',function(e){if(statusSelect.value==='rejected'&&!confirm('Are you sure you want to REJECT this loan application? This action cannot be undone.')){e.preventDefault();return false}const submitBtn=form.querySelector('button[type="submit"]');const originalText=submitBtn.innerHTML;submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> PROCESSING...';submitBtn.disabled=true;return true});document.querySelectorAll('.document-card').forEach(card=>{card.style.cursor='pointer';card.addEventListener('click',function(e){if(!e.target.closest('a')){const link=this.querySelector('a[target="_blank"]');if(link){window.open(link.href,'_blank')}}})})});</script>
 {% endblock %}

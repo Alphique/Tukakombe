@@ -1,0 +1,162 @@
+{% extends "fin_base.html" %}
+{% block content %}
+
+<style>
+    :root{--navy:#1a2a40;--navy-dark:#0d1621;--navy-light:#2c3e5a;--lime:#a2d242;--lime-light:#c5e86c;--lime-dark:#8eb936;--teal:#4ecdc4;--white:#fff;--off-white:#f8fafc;--cream:#fef6e4;--transition:all .3s ease}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+    body{background:var(--off-white);color:var(--navy-dark);line-height:1.6;padding-bottom:50px}
+    .main-content{max-width:900px;margin:30px auto;padding:0 20px}
+    .steps-container{display:flex;justify-content:space-between;margin-bottom:30px;position:relative}
+    .steps-container::before{content:'';position:absolute;top:20px;left:0;width:100%;height:2px;background:#cbd5e1;z-index:1}
+    .step{width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;z-index:2;font-weight:700}
+    .step.active{border-color:var(--lime);background:var(--lime);color:var(--navy)}
+    .form-card{background:#fff;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.05);overflow:hidden;display:none}
+    .form-card.active{display:block;animation:fadeIn .4s ease}
+    .card-header{background:var(--navy);color:#fff;padding:20px 30px}
+    .card-body{padding:30px}
+    .form-group{margin-bottom:20px}
+    label{display:block;font-weight:600;margin-bottom:8px;color:var(--navy)}
+    .form-control{width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:15px}
+    .btn-group{display:flex;justify-content:space-between;margin-top:30px}
+    .btn{padding:12px 25px;border-radius:8px;font-weight:700;cursor:pointer;border:none;transition:var(--transition)}
+    .btn-next{background:var(--lime);color:var(--navy)}
+    .btn-back{background:transparent;border:1px solid #cbd5e1}
+    .admin-note{background:var(--cream);padding:15px;border-radius:10px;border-left:4px solid var(--teal);margin-bottom:20px}
+    canvas{border:1px solid #ddd;width:100%;height:150px;background:#fff;border-radius:8px}
+</style>
+
+<main class="main-content">
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('finance.my_loans') }}" style="text-decoration: none; color: var(--navy-light); font-weight: 600;">
+            <i class="fas fa-arrow-left"></i> Back to My Loans
+        </a>
+    </div>
+
+    {% if loan.admin_notes %}
+    <div class="admin-note">
+        <strong style="color: var(--navy);">Message from Advisor:</strong>
+        <p style="margin-top:5px; font-size: 14px;">{{ loan.admin_notes }}</p>
+    </div>
+    {% endif %}
+
+    <div class="card-header" style="border-radius: 16px 16px 0 0;">
+        <h2 style="color: white;">Editing App #{{ loan.application_number }}</h2>
+        <p style="font-size: 14px; opacity: 0.8;">Status: {{ loan.status | title }}</p>
+    </div>
+
+    <form id="editForm" method="POST" action="{{ url_for('finance.edit_loan', loan_id=loan.id) }}" enctype="multipart/form-data">
+        <input type="hidden" name="loan_type" value="{{ loan.loan_type }}">
+        
+        <div class="steps-container" style="margin-top: 30px;">
+            <div class="step active" id="dot1">1</div>
+            <div class="step" id="dot2">2</div>
+            <div class="step" id="dot3">3</div>
+        </div>
+
+        <div class="form-card active" id="step1">
+            <div class="card-body">
+                {% if loan.loan_type == 'personal' %}
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="ind-name" class="form-control" value="{{ details.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Loan Amount (ZMW)</label>
+                        <input type="number" name="ind-amt" class="form-control" value="{{ details.amount }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>NRC Number</label>
+                        <input type="text" name="ind-nrc" class="form-control" value="{{ details.nrc_number }}" required>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" name="bus-name" class="form-control" value="{{ details.business_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Business Reg #</label>
+                        <input type="text" name="bus-reg" class="form-control" value="{{ details.registration_number }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Loan Amount (ZMW)</label>
+                        <input type="number" name="bus-amt" class="form-control" value="{{ details.amount }}" required>
+                    </div>
+                {% endif %}
+                
+                <div class="btn-group">
+                    <span></span>
+                    <button type="button" class="btn btn-next" onclick="showStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card" id="step2">
+            <div class="card-body">
+                <p style="margin-bottom: 15px; color: #64748b; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> Only upload files if you want to <strong>replace</strong> the existing documents.
+                </p>
+                
+                <div class="form-group">
+                    <label>Update Identity Proof</label>
+                    <input type="file" name="ind-identity" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Update Proof of Residence</label>
+                    <input type="file" name="ind-residence" class="form-control">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-back" onclick="showStep(1)">Back</button>
+                    <button type="button" class="btn btn-next" onclick="showStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card" id="step3">
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Update Signature (Optional)</label>
+                    <canvas id="sig-canvas"></canvas>
+                    <input type="hidden" name="ind-signature-data" id="sig-data">
+                    <button type="button" class="btn btn-back" style="margin-top:5px; padding:5px 10px;" onclick="clearSig()">Clear</button>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: normal;"><input type="checkbox" name="agreement" required> I confirm the updated details are correct.</label>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-back" onclick="showStep(2)">Back</button>
+                    <button type="submit" class="btn btn-next" style="background: var(--teal); color: white;">Update Application</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+    let signaturePad;
+    
+    function showStep(n) {
+        document.querySelectorAll('.form-card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step'+n).classList.add('active');
+        document.getElementById('dot'+n).classList.add('active');
+    }
+
+    window.onload = function() {
+        const canvas = document.getElementById('sig-canvas');
+        signaturePad = new SignaturePad(canvas);
+        
+        document.getElementById('editForm').onsubmit = function() {
+            if (!signaturePad.isEmpty()) {
+                document.getElementById('sig-data').value = signaturePad.toDataURL();
+            }
+        };
+    };
+
+    function clearSig() { signaturePad.clear(); }
+</script>
+{% endblock %}

@@ -1,6 +1,11 @@
+# app.py
 from flask import Flask
 from config.settings import Config
 from utils.database import initialize_db
+from request_logger import log_requests
+
+
+
 
 def create_app():
     app = Flask(__name__)
@@ -13,6 +18,7 @@ def create_app():
     with app.app_context():
         initialize_db()
 
+    log_requests(app)
     # --------------------------
     # AUTH (USERS)
     # --------------------------

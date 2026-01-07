@@ -110,6 +110,9 @@
                     <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" name="ind-name" id="ind-name" class="form-control" required></div>
                     <div class="form-group"><label>Date of Birth <span class="required">*</span></label><input type="date" name="ind-dob" id="ind-dob" class="form-control" required></div>
                     <div class="form-group"><label>NRC Number <span class="required">*</span></label><input type="text" name="ind-nrc" id="ind-nrc" class="form-control" placeholder="e.g., 123456/78/9" required pattern="\d{6}\/\d{2}\/\d{1}"></div>
+                    <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" name="ind-email" id="ind-email" class="form-control" required></div>
+                    <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" name="ind-phone" id="ind-phone" class="form-control" required></div>
+                    <div class="form-group"><label>Residential Address <span class="required">*</span></label><textarea name="ind-address" id="ind-address" class="form-control" rows="2" required></textarea></div>
                     <div class="upload-slot"><div class="slot-title"><i class="fas fa-passport"></i> 1. Proof of Identity <span class="required">*</span></div><div class="slot-desc">Upload NRC, Passport, or Driver's License (PDF, JPG, PNG up to 5MB)</div><input type="file" name="ind-identity" id="ind-identity" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png" required></div>
                     <div class="upload-slot"><div class="slot-title"><i class="fas fa-home"></i> 2. Proof of Residence <span class="required">*</span></div><div class="slot-desc">Utility bill, Rent agreement, or Utility bill + Landlord agreement</div><input type="file" name="ind-residence" id="ind-residence" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png" required></div>
                     <div class="upload-slot"><div class="slot-title"><i class="fas fa-file-invoice"></i> 3. Proof of Income <span class="optional-badge">Optional</span></div><div class="slot-desc">Recent payslips (last 3 months) or bank statements</div><input type="file" name="ind-income" id="ind-income" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
@@ -136,8 +139,10 @@
                 <div class="card-body">
                     <div class="form-group"><label>Business Name <span class="required">*</span></label><input type="text" name="bus-name" id="bus-name" class="form-control" required></div>
                     <div class="form-group"><label>Business Registration Number <span class="required">*</span></label><input type="text" name="bus-reg" id="bus-reg" class="form-control" required></div>
-                    <div class="form-group"><label>Years in Operation <span class="required">*</span></label><input type="number" name="bus-years" id="bus-years" class="form-control" min="1" required></div>
-                    <div class="form-group"><label>Monthly Revenue (ZMW) <span class="required">*</span></label><input type="number" name="bus-revenue" id="bus-revenue" class="form-control" required></div>
+                    <div class="form-group"><label>Contact Person Name <span class="required">*</span></label><input type="text" name="bus-contact-name" id="bus-contact-name" class="form-control" required></div>
+                    <div class="form-group"><label>Contact Person Email <span class="required">*</span></label><input type="email" name="bus-contact-email" id="bus-contact-email" class="form-control" required></div>
+                    <div class="form-group"><label>Contact Person Phone <span class="required">*</span></label><input type="tel" name="bus-contact-phone" id="bus-contact-phone" class="form-control" required></div>
+                    <div class="form-group"><label>Contact Person Position</label><input type="text" name="bus-contact-position" id="bus-contact-position" class="form-control" placeholder="e.g., Director, Manager"></div>
                     <div class="btn-group"><button type="button" class="btn btn-back btn-back-type" onclick="goBackToType()"><i class="fas fa-arrow-left"></i> Back to Loan Type</button><button type="button" class="btn btn-next" onclick="validateAndProceed('bus',1,2)">Next: Loan Request <i class="fas fa-arrow-right"></i></button></div>
                 </div>
             </div>
@@ -189,28 +194,146 @@
             </div>
         </form>
     </main>
-    <script>
-        let loanType='',indSignaturePad,busSignaturePad;
-        function selectLoanType(t,e){loanType=t;document.querySelectorAll('.type-card').forEach(t=>{t.classList.remove('active')});e.classList.add('active');'personal'===t?document.getElementById('loan_type_ind').value='personal':'business'===t&&(document.getElementById('loan_type_bus').value='business');document.getElementById('startBtn').disabled=!1}
-        function goBackToType(){document.getElementById('step0').style.display='block';document.getElementById('individualForm').style.display='none';document.getElementById('businessForm').style.display='none';loanType='';document.getElementById('startBtn').disabled=!0;document.querySelectorAll('.type-card').forEach(t=>t.classList.remove('active'));document.getElementById('loan_type_ind').value='';document.getElementById('loan_type_bus').value=''}
-        function startApplication(){document.getElementById('step0').style.display='none';'personal'===loanType?(document.getElementById('individualForm').style.display='block',document.getElementById('businessForm').style.display='none',showIndStep(1)):'business'===loanType&&(document.getElementById('individualForm').style.display='none',document.getElementById('businessForm').style.display='block',showBusStep(1))}
-        function showIndStep(t){document.querySelectorAll('#individualForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#individualForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('ind-step'+t).classList.add('active');window.scrollTo(0,0)}
-        function updateIndCalc(){let t=parseFloat(document.getElementById('ind-amt').value)||0,e=parseInt(document.getElementById('ind-period').value)||12,o=.3,a=t*o*(e/12),n=t+a,l=n/e;document.getElementById('ind-totalRepay').innerText="Total Repayment: K "+n.toLocaleString(void 0,{minimumFractionDigits:2});document.getElementById('ind-monthlyRepay').innerText="Monthly: K "+l.toLocaleString(void 0,{minimumFractionDigits:2})}
-        function showBusStep(t){document.querySelectorAll('#businessForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#businessForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('bus-step'+t).classList.add('active');window.scrollTo(0,0)}
-        function updateBusCalc(){let t=parseFloat(document.getElementById('bus-amt').value)||0,e=parseInt(document.getElementById('bus-period').value)||12,o=.3,a=t*o*(e/12),n=t+a,l=n/e;document.getElementById('bus-totalRepay').innerText="Total Repayment: K "+n.toLocaleString(void 0,{minimumFractionDigits:2});document.getElementById('bus-monthlyRepay').innerText="Monthly: K "+l.toLocaleString(void 0,{minimumFractionDigits:2})}
-        function showItems(t,e){document.querySelectorAll('.items-container').forEach(o=>o.classList.remove('active'));document.querySelectorAll('.category-btn').forEach(o=>o.classList.remove('active'));document.getElementById(t).classList.add('active');e.classList.add('active');'other'===t?(document.getElementById('other-input').classList.add('active'),document.getElementById('other-checkbox').checked=!0):(document.getElementById('other-input').classList.remove('active'),document.getElementById('other-checkbox').checked=!1)}
-        function toggleSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box').classList.remove('active');document.getElementById('sig-upload-box').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box').classList.add('active'),event.target.classList.add('active'),indSignaturePad||(indSignaturePad=new SignaturePad(document.getElementById('sig-canvas-ind')))):(document.getElementById('sig-upload-box').classList.add('active'),event.target.classList.add('active'))}
-        function toggleBusSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box-bus').classList.remove('active');document.getElementById('sig-upload-box-bus').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box-bus').classList.add('active'),event.target.classList.add('active'),busSignaturePad||(busSignaturePad=new SignaturePad(document.getElementById('sig-canvas-bus')))):(document.getElementById('sig-upload-box-bus').classList.add('active'),event.target.classList.add('active'))}
-        function clearIndSig(){indSignaturePad&&indSignaturePad.clear()}function clearBusSig(){busSignaturePad&&busSignaturePad.clear()}
-        function validateAndProceed(t,e,o){if(validateStep(t,e))'ind'===t?showIndStep(o):showBusStep(o)}
-        function validateStep(t,e){return'ind'===t?validateIndStep(e):validateBusStep(e)}
-        function validateIndStep(t){if(1===t){let e=document.getElementById('ind-amt').value,o=document.getElementById('ind-purpose').value,a=document.getElementById('ind-period').value;if(!e||!o||!a)return alert("Please fill all required fields in Loan Details."),!1;if(parseFloat(e)<100)return alert("Minimum loan amount is K100."),!1}else if(2===t){let e=document.querySelectorAll('input[name="collateral"]:checked').length>0,o=document.getElementById('other-checkbox').checked,a=document.getElementById('other-description').value,n=document.getElementById('ind-description').value,l=document.getElementById('ind-collateral-photos').files;if(!e&&!o)return alert("Please select at least one collateral item or specify in 'Other' category."),!1;if(o&&!a.trim())return alert("Please describe your collateral item in the 'Other' field."),!1;if(!n.trim())return alert("Please describe the item's condition."),!1;if(0===l.length)return alert("Please upload at least one photo of your collateral item(s)."),!1;document.getElementById('other-description-hidden').value=a}else if(3===t){let e=document.getElementById('ind-name').value,o=document.getElementById('ind-dob').value,a=document.getElementById('ind-nrc').value,n=document.getElementById('ind-identity').files[0],l=document.getElementById('ind-residence').files[0];if(!e||!o||!a)return alert("Please fill all required personal information fields."),!1;if(!n)return alert("Please upload Proof of Identity."),!1;if(!l)return alert("Please upload Proof of Residence."),!1;if(!/^\d{6}\/\d{2}\/\d{1}$/.test(a))return alert("Please enter NRC in format: 123456/78/9"),!1}return!0}
-        function validateBusStep(t){if(1===t){let e=document.getElementById('bus-name').value,o=document.getElementById('bus-reg').value,a=document.getElementById('bus-years').value,n=document.getElementById('bus-revenue').value;if(!e||!o||!a||!n)return alert("Please fill all required business details."),!1;if(parseInt(a)<1)return alert("Business must be operating for at least 1 year."),!1}else if(2===t){let e=document.getElementById('bus-amt').value,o=document.getElementById('bus-purpose').value,a=document.getElementById('bus-reason').value,n=document.getElementById('bus-period').value;if(!e||!o||!a||!n)return alert("Please fill all required loan request fields."),!1;if(parseFloat(e)<1e3)return alert("Minimum business loan amount is K1,000."),!1}else if(3===t){let e=document.getElementById('bus-collateral-type').value,o=document.getElementById('bus-collateral-desc').value,a=document.getElementById('bus-collateral-value').value,n=document.getElementById('bus-collateral-proof').files[0],l=document.getElementById('bus-collateral-photos').files;if(!e||!o||!a||!n)return alert("Please fill all required collateral information."),!1;if(0===l.length)return alert("Please upload at least one photo of your business collateral."),!1}else if(4===t){let e=document.getElementById('bus-reg-cert').files[0],o=document.getElementById('bus-tax-cert').files[0],a=document.getElementById('bus-directors-id').files[0],n=document.getElementById('bus-address-proof').files[0];if(!e||!o||!a||!n)return alert("Please upload all required business documents."),!1}return!0}
-        document.getElementById('individualForm').onsubmit=function(t){let e=document.querySelector('#ind-step4 .sig-method.active')?.textContent.trim();if('Draw Signature'===e){if(!indSignaturePad||indSignaturePad.isEmpty())return alert("Please provide your signature."),t.preventDefault(),!1;document.getElementById('ind-signature-data').value=indSignaturePad.toDataURL()}else if(!document.getElementById('ind-sig-upload').files[0])return alert("Please upload your signature."),t.preventDefault(),!1;if(!document.getElementById('ind-agreement').checked)return alert("Please agree to the terms and conditions."),t.preventDefault(),!1;showAlert('Submitting your personal loan application...','info')};
-        document.getElementById('businessForm').onsubmit=function(t){let e=document.querySelector('#bus-step5 .sig-method.active')?.textContent.trim();if('Draw Signature'===e){if(!busSignaturePad||busSignaturePad.isEmpty())return alert("Please provide your signature."),t.preventDefault(),!1;document.getElementById('bus-signature-data').value=busSignaturePad.toDataURL()}else if(!document.getElementById('bus-sig-upload').files[0])return alert("Please upload your signature."),t.preventDefault(),!1;if(!document.getElementById('bus-agreement').checked)return alert("Please agree to the terms and conditions."),t.preventDefault(),!1;showAlert('Submitting your business loan application...','info')};
-        function showAlert(t,e){document.querySelectorAll('.alert').forEach(o=>o.remove());let a=document.createElement('div');a.className=`alert alert-${e}`;a.innerHTML=`${t}<button class="alert-close" onclick="this.parentElement.style.display='none'">×</button>`;document.querySelector('.main-content').insertBefore(a,document.querySelector('.main-content').firstChild);'info'===e&&setTimeout(()=>{a.parentElement&&(a.style.display='none')},1e4)}
-        document.addEventListener('DOMContentLoaded',function(){let t=document.getElementById('other-checkbox');t&&t.addEventListener('change',function(){if(this.checked){document.getElementById('other-input').classList.add('active');let t=document.querySelector('.category-btn:nth-child(4)');t&&showItems('other',t)}else document.getElementById('other-input').classList.remove('active')});updateIndCalc();updateBusCalc();let e=document.getElementById('backend-message');e&&setTimeout(()=>{e.style.display='none'},1e4)});
-    </script>
+   <script>
+    let loanType='',indSignaturePad,busSignaturePad;
+
+    // 1. RATE MAPPING TABLE (Matches your specific rules)
+    const INTEREST_RATES = {
+        6:  0.15,  // 1 week
+        8:  0.20,  // 2 weeks
+        14: 0.35,  // 3 weeks
+        16: 0.40,  // 4 weeks (1 Month)
+        22: 0.55,  // 5 weeks
+        24: 0.60,  // 6 weeks
+        30: 0.75,  // 7 weeks
+        32: 0.80,  // 8 weeks (2 Months)
+        38: 0.95,  // 2 Months 1 Week
+        40: 1.00,  // 2 Months 2 Weeks
+        46: 1.15,  // 2 Months 3 Weeks
+        48: 1.20   // 3 Months
+    };
+
+    // 2. HELPER TO GET NUMBER OF WEEKS FOR INSTALLMENT CALCULATION
+    function getWeekCount(periodValue) {
+        const keys = [6, 8, 14, 16, 22, 24, 30, 32, 38, 40, 46, 48];
+        return keys.indexOf(periodValue) + 1; // Index 0 is 1 week, Index 1 is 2 weeks, etc.
+    }
+
+    function selectLoanType(t,e){loanType=t;document.querySelectorAll('.type-card').forEach(t=>{t.classList.remove('active')});e.classList.add('active');'personal'===t?document.getElementById('loan_type_ind').value='personal':'business'===t&&(document.getElementById('loan_type_bus').value='business');document.getElementById('startBtn').disabled=!1}
+    function goBackToType(){document.getElementById('step0').style.display='block';document.getElementById('individualForm').style.display='none';document.getElementById('businessForm').style.display='none';loanType='';document.getElementById('startBtn').disabled=!0;document.querySelectorAll('.type-card').forEach(t=>t.classList.remove('active'));document.getElementById('loan_type_ind').value='';document.getElementById('loan_type_bus').value=''}
+    function startApplication(){document.getElementById('step0').style.display='none';'personal'===loanType?(document.getElementById('individualForm').style.display='block',document.getElementById('businessForm').style.display='none',showIndStep(1)):'business'===loanType&&(document.getElementById('individualForm').style.display='none',document.getElementById('businessForm').style.display='block',showBusStep(1))}
+    function showIndStep(t){document.querySelectorAll('#individualForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#individualForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('ind-step'+t).classList.add('active');window.scrollTo(0,0)}
+
+    // UPDATED INDIVIDUAL CALCULATOR
+    function updateIndCalc(){
+        let t=parseFloat(document.getElementById('ind-amt').value)||0;
+        let p=parseInt(document.getElementById('ind-period').value)||6;
+        let rate = INTEREST_RATES[p] || 0;
+        let interest = t * rate;
+        let total = t + interest;
+        let weeks = getWeekCount(p);
+        let installment = total / weeks;
+        
+        document.getElementById('ind-totalRepay').innerText="Total Repayment: K "+total.toLocaleString(void 0,{minimumFractionDigits:2});
+        document.getElementById('ind-monthlyRepay').innerText="Weekly: K "+installment.toLocaleString(void 0,{minimumFractionDigits:2});
+    }
+
+    function showBusStep(t){document.querySelectorAll('#businessForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#businessForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('bus-step'+t).classList.add('active');window.scrollTo(0,0)}
+
+    // UPDATED BUSINESS CALCULATOR
+    function updateBusCalc(){
+        let t=parseFloat(document.getElementById('bus-amt').value)||0;
+        let p=parseInt(document.getElementById('bus-period').value)||6;
+        let rate = INTEREST_RATES[p] || 0;
+        let interest = t * rate;
+        let total = t + interest;
+        let weeks = getWeekCount(p);
+        let installment = total / weeks;
+
+        document.getElementById('bus-totalRepay').innerText="Total Repayment: K "+total.toLocaleString(void 0,{minimumFractionDigits:2});
+        document.getElementById('bus-monthlyRepay').innerText="Weekly: K "+installment.toLocaleString(void 0,{minimumFractionDigits:2});
+    }
+
+    function showItems(t,e){document.querySelectorAll('.items-container').forEach(o=>o.classList.remove('active'));document.querySelectorAll('.category-btn').forEach(o=>o.classList.remove('active'));document.getElementById(t).classList.add('active');e.classList.add('active');'other'===t?(document.getElementById('other-input').classList.add('active'),document.getElementById('other-checkbox').checked=!0):(document.getElementById('other-input').classList.remove('active'),document.getElementById('other-checkbox').checked=!1)}
+    function toggleSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box').classList.remove('active');document.getElementById('sig-upload-box').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box').classList.add('active'),event.target.classList.add('active'),indSignaturePad||(indSignaturePad=new SignaturePad(document.getElementById('sig-canvas-ind')))):(document.getElementById('sig-upload-box').classList.add('active'),event.target.classList.add('active'))}
+    function toggleBusSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box-bus').classList.remove('active');document.getElementById('sig-upload-box-bus').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box-bus').classList.add('active'),event.target.classList.add('active'),busSignaturePad||(busSignaturePad=new SignaturePad(document.getElementById('sig-canvas-bus')))):(document.getElementById('sig-upload-box-bus').classList.add('active'),event.target.classList.add('active'))}
+    function clearIndSig(){indSignaturePad&&indSignaturePad.clear()}function clearBusSig(){busSignaturePad&&busSignaturePad.clear()}
+    function validateAndProceed(t,e,o){if(validateStep(t,e))'ind'===t?showIndStep(o):showBusStep(o)}
+    function validateStep(t,e){return'ind'===t?validateIndStep(e):validateBusStep(e)}
+    function validateIndStep(t){
+        if(1===t){
+            let e=document.getElementById('ind-amt').value,o=document.getElementById('ind-purpose').value,a=document.getElementById('ind-period').value;
+            if(!e||!o||!a)return alert("Please fill all required fields in Loan Details."),!1;
+            if(parseFloat(e)<100)return alert("Minimum loan amount is K100."),!1;
+        }else if(2===t){
+            let e=document.querySelectorAll('input[name="collateral"]:checked').length>0,o=document.getElementById('other-checkbox').checked,a=document.getElementById('other-description').value,n=document.getElementById('ind-description').value,l=document.getElementById('ind-collateral-photos').files;
+            if(!e&&!o)return alert("Please select at least one collateral item or specify in 'Other' category."),!1;
+            if(o&&!a.trim())return alert("Please describe your collateral item in the 'Other' field."),!1;
+            if(!n.trim())return alert("Please describe the item's condition."),!1;
+            if(0===l.length)return alert("Please upload at least one photo of your collateral item(s)."),!1;
+            document.getElementById('other-description-hidden').value=a;
+        }else if(3===t){
+            let e=document.getElementById('ind-name').value,o=document.getElementById('ind-dob').value,a=document.getElementById('ind-nrc').value,n=document.getElementById('ind-email').value,l=document.getElementById('ind-phone').value,i=document.getElementById('ind-address').value,s=document.getElementById('ind-identity').files[0],d=document.getElementById('ind-residence').files[0];
+            if(!e||!o||!a||!n||!l||!i)return alert("Please fill all required personal information fields."),!1;
+            if(!/^\S+@\S+\.\S+$/.test(n))return alert("Please enter a valid email address."),!1;
+            if(!s)return alert("Please upload Proof of Identity."),!1;
+            if(!d)return alert("Please upload Proof of Residence."),!1;
+            if(!/^\d{6}\/\d{2}\/\d{1}$/.test(a))return alert("Please enter NRC in format: 123456/78/9"),!1;
+        }
+        return!0
+    }
+    function validateBusStep(t){
+        if(1===t){
+            let e=document.getElementById('bus-name').value,o=document.getElementById('bus-reg').value,a=document.getElementById('bus-contact-name').value,n=document.getElementById('bus-contact-email').value,l=document.getElementById('bus-contact-phone').value;
+            if(!e||!o||!a||!n||!l)return alert("Please fill all required business details."),!1;
+            if(!/^\S+@\S+\.\S+$/.test(n))return alert("Please enter a valid email address for contact person."),!1;
+        }else if(2===t){
+            let e=document.getElementById('bus-amt').value,o=document.getElementById('bus-purpose').value,a=document.getElementById('bus-reason').value,n=document.getElementById('bus-period').value;
+            if(!e||!o||!a||!n)return alert("Please fill all required loan request fields."),!1;
+            if(parseFloat(e)<1e3)return alert("Minimum business loan amount is K1,000."),!1;
+        }else if(3===t){
+            let e=document.getElementById('bus-collateral-type').value,o=document.getElementById('bus-collateral-desc').value,a=document.getElementById('bus-collateral-value').value,n=document.getElementById('bus-collateral-proof').files[0],l=document.getElementById('bus-collateral-photos').files;
+            if(!e||!o||!a||!n)return alert("Please fill all required collateral information."),!1;
+            if(0===l.length)return alert("Please upload at least one photo of your business collateral."),!1;
+        }else if(4===t){
+            let e=document.getElementById('bus-reg-cert').files[0],o=document.getElementById('bus-tax-cert').files[0],a=document.getElementById('bus-directors-id').files[0],n=document.getElementById('bus-address-proof').files[0];
+            if(!e||!o||!a||!n)return alert("Please upload all required business documents."),!1;
+        }
+        return!0
+    }
+    document.getElementById('individualForm').onsubmit=function(t){
+        let e=document.querySelector('#ind-step4 .sig-method.active')?.textContent.trim();
+        if('Draw Signature'===e){
+            if(!indSignaturePad||indSignaturePad.isEmpty())return alert("Please provide your signature."),t.preventDefault(),!1;
+            document.getElementById('ind-signature-data').value=indSignaturePad.toDataURL()
+        }else if(!document.getElementById('ind-sig-upload').files[0])return alert("Please upload your signature."),t.preventDefault(),!1;
+        if(!document.getElementById('ind-agreement').checked)return alert("Please agree to the terms and conditions."),t.preventDefault(),!1;
+        showAlert('Submitting your personal loan application...','info')
+    };
+    document.getElementById('businessForm').onsubmit=function(t){
+        let e=document.querySelector('#bus-step5 .sig-method.active')?.textContent.trim();
+        if('Draw Signature'===e){
+            if(!busSignaturePad||busSignaturePad.isEmpty())return alert("Please provide your signature."),t.preventDefault(),!1;
+            document.getElementById('bus-signature-data').value=busSignaturePad.toDataURL()
+        }else if(!document.getElementById('bus-sig-upload').files[0])return alert("Please upload your signature."),t.preventDefault(),!1;
+        if(!document.getElementById('bus-agreement').checked)return alert("Please agree to the terms and conditions."),t.preventDefault(),!1;
+        showAlert('Submitting your business loan application...','info')
+    };
+    function showAlert(t,e){document.querySelectorAll('.alert').forEach(o=>o.remove());let a=document.createElement('div');a.className=`alert alert-${e}`;a.innerHTML=`${t}<button class="alert-close" onclick="this.parentElement.style.display='none'">×</button>`;document.querySelector('.main-content').insertBefore(a,document.querySelector('.main-content').firstChild);'info'===e&&setTimeout(()=>{a.parentElement&&(a.style.display='none')},1e4)}
+    document.addEventListener('DOMContentLoaded',function(){
+        let t=document.getElementById('other-checkbox');
+        t&&t.addEventListener('change',function(){
+            if(this.checked){
+                document.getElementById('other-input').classList.add('active');
+                let t=document.querySelector('.category-btn:nth-child(4)');
+                t&&showItems('other',t)
+            }else document.getElementById('other-input').classList.remove('active')
+        });
+        updateIndCalc();updateBusCalc();
+        let e=document.getElementById('backend-message');
+        e&&setTimeout(()=>{e.style.display='none'},1e4)
+    });
+</script>
 </body>
 </html>
 {% endblock %}

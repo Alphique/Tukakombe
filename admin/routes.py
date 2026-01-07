@@ -283,7 +283,6 @@ def delete_product_inquiry(inquiry_id):
 @role_required('admin', 'super_admin')
 def list_loans():
     db = get_db_connection()
-    # We join personal and business details to get the names
     query = """
         SELECT 
             la.id, 
@@ -302,10 +301,12 @@ def list_loans():
     loans = db.execute(query).fetchall()
     db.close()
     return render_template('admin_loans_list.html', loans=loans)
+
 # ------------------------------
-# View & Manage Loan
+# VIEW & MANAGE LOAN (FIXED FOR BUSINESS ATTACHMENTS)
 # ------------------------------
-# View & Manage Loan
+# ------------------------------
+# VIEW & MANAGE LOAN (FIXED MATCHING)
 # ------------------------------
 @admin_bp.route('/loans/<int:loan_id>', methods=['GET', 'POST'])
 @login_required
@@ -316,19 +317,15 @@ def view_loan(loan_id):
     if request.method == 'POST':
         status = request.form.get('status')
         admin_notes = request.form.get('admin_notes')
-        
-        # Update status and set decision_date/updated_date
         db.execute("""
             UPDATE loan_applications 
             SET status = ?, admin_notes = ?, updated_date = CURRENT_TIMESTAMP, decision_date = CURRENT_TIMESTAMP
             WHERE id = ?
         """, (status, admin_notes, loan_id))
         db.commit()
-        
         flash(f"Loan status updated successfully.", "success")
         return redirect(url_for('admin.view_loan', loan_id=loan_id))
 
-    # Fetch main loan data
     loan = db.execute("""
         SELECT la.*, u.email AS applicant_email 
         FROM loan_applications la
@@ -341,22 +338,56 @@ def view_loan(loan_id):
         flash("Loan not found.", "error")
         return redirect(url_for('admin.list_loans'))
 
-    # Fetch all sub-details for the actual data display
-    attachments = db.execute("SELECT * FROM application_attachments WHERE application_id = ?", (loan_id,)).fetchall()
-    collateral_items = db.execute("SELECT * FROM collateral_items WHERE application_id = ?", (loan_id,)).fetchall()
     personal_details = db.execute("SELECT * FROM personal_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
     business_details = db.execute("SELECT * FROM business_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
+    collateral_items = db.execute("SELECT * FROM collateral_items WHERE application_id = ?", (loan_id,)).fetchall()
+
+    # --- FIXED: Extract specific variables for the template formatting ---
+    m_revenue = 0.0
+    b_address = 'Not specified'
+    
+    if business_details:
+        # Check for monthly_revenue in the row object, default to 0 if None
+        m_revenue = business_details['monthly_revenue'] if business_details['monthly_revenue'] is not None else 0.0
+        # Check for business_address
+        b_address = business_details['business_address'] or 'Not specified'
+
+    # Get attachments from the dedicated table
+    attachments_raw = db.execute("SELECT * FROM application_attachments WHERE application_id = ?", (loan_id,)).fetchall()
+    attachments = [dict(row) for row in attachments_raw]
+
+    # Check business_details for files using BOTH hyphens and underscores
+    if business_details:
+        business_dict = dict(business_details)
+        file_fields = {
+            'bus_reg_cert': 'Business Registration', 'bus-reg-cert': 'Business Registration',
+            'bus_tax_cert': 'Tax Certificate', 'bus-tax-cert': 'Tax Certificate',
+            'bus_financials': 'Financial Records', 'bus-financials': 'Financial Records',
+            'bus_bank_stmts': 'Bank Statements', 'bus-bank-stmts': 'Bank Statements',
+            'bus_directors_id': 'Directors ID', 'bus-directors-id': 'Directors ID',
+            'bus_address_proof': 'Address Proof', 'bus-address-proof': 'Address Proof',
+            'bus_collateral_docs': 'Collateral Docs', 'bus-collateral-docs': 'Collateral Docs'
+        }
+        
+        for field_name, label in file_fields.items():
+            file_path = business_dict.get(field_name)
+            if file_path:
+                if not any(a.get('file_path') == file_path for a in attachments):
+                    attachments.append({
+                        'document_category': label,
+                        'file_path': file_path
+                    })
     
     db.close()
-
-    # CRITICAL: Template name must match your file name exactly
     return render_template(
         'admin_loan_management.html', 
         loan=loan,
         attachments=attachments,
         collateral_items=collateral_items,
         personal_details=personal_details,
-        business_details=business_details
+        business_details=business_details,
+        monthly_revenue=m_revenue,    # Pass explicitly to fix template error
+        business_address=b_address     # Pass explicitly to fix template error
     )
 
 # ------------------------------
@@ -366,7 +397,6 @@ def view_loan(loan_id):
 @login_required
 @role_required('admin', 'super_admin')
 def filter_loans():
-    """Filter loans by status and/or type"""
     status = request.args.get('status')
     loan_type = request.args.get('loan_type')
     db = get_db_connection()
@@ -384,14 +414,22 @@ def filter_loans():
     return render_template('admin_loans_list.html', loans=loans, filter_status=status, loan_type=loan_type)
 
 # ------------------------------
-# Download Loan Attachments
+# Download Loan Attachments (FIXED PATHS)
 # ------------------------------
-@admin_bp.route('/loans/attachments/<filename>')
+@admin_bp.route('/loans/attachments/<path:filename>')
 @login_required
 @role_required('admin', 'super_admin')
 def download_attachment(filename):
+    # Your logs show files in subfolders like: PERS-20260107.../image.png
+    # This logic handles both flat and nested file paths
     try:
-        return send_from_directory(LOAN_UPLOAD_FOLDER, filename, as_attachment=True)
+        # Check if file exists in the LOAN_UPLOAD_FOLDER directly
+        if os.path.exists(os.path.join(LOAN_UPLOAD_FOLDER, filename)):
+            return send_from_directory(LOAN_UPLOAD_FOLDER, filename, as_attachment=True)
+        
+        # Strip prefixes if the database stored the full static path
+        clean_name = filename.split('uploads/loans/')[-1]
+        return send_from_directory(LOAN_UPLOAD_FOLDER, clean_name, as_attachment=True)
     except Exception:
         flash(f"File not found: {filename}", "error")
         return redirect(request.referrer or url_for('admin.list_loans'))
