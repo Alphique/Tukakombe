@@ -28,7 +28,7 @@
         .header{background:var(--navy);color:var(--white);padding:15px 0;position:sticky;top:0;z-index:1000}.header-container{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 20px}.logo{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:800}.logo span{color:var(--lime)}
         .main-content{max-width:900px;margin:30px auto;padding:0 20px}
         .loan-type-selector{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:30px 0}.type-card{background:#fff;border-radius:16px;padding:40px 30px;text-align:center;cursor:pointer;border:2px solid #e2e8f0;transition:var(--transition)}.type-card:hover{transform:translateY(-5px);border-color:var(--teal);box-shadow:0 10px 25px rgba(0,0,0,.1)}.type-card.active{border-color:var(--lime);background:rgba(162,210,66,.05)}.type-icon{font-size:48px;margin-bottom:20px;color:var(--navy-light)}.type-title{font-size:24px;font-weight:700;margin-bottom:10px;color:var(--navy)}.type-desc{color:#64748b;font-size:14px}
-        .steps-container{display:flex;justify-content:space-between;margin-bottom:30px;position:relative}.steps-container::before{content:'';position:absolute;top:20px;left:0;width:100%;height:2px;background:#cbd5e1;z-index:1}.step{width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;z-index:2;font-weight:700}.step.active{border-color:var(--lime);background:var(--lime);color:var(--navy)}.step.completed{background:var(--teal);border-color:var(--teal);color:#fff}
+        .steps-container{display:flex;justify-content:space-between;margin-bottom:30px;position:relative}.steps-container::before{content:'';position:absolute;top:20px;left:0;width:100%;height:2px;background:#cbd5e1;z-index:1}.step{width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;z-index:2;font-weight:700;cursor:pointer;transition:var(--transition)}.step:hover{border-color:var(--lime-light)}.step.active{border-color:var(--lime);background:var(--lime);color:var(--navy)}.step.completed{background:var(--teal);border-color:var(--teal);color:#fff}
         .form-card{background:#fff;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.05);overflow:hidden;display:none}.form-card.active{display:block;animation:fadeIn .4s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         .card-header{background:var(--navy);color:#fff;padding:20px 30px}.card-body{padding:30px}
         .form-group{margin-bottom:20px}label{display:block;font-weight:600;margin-bottom:8px;color:var(--navy)}.form-control{width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:15px}.required{color:#e74c3c}
@@ -45,6 +45,8 @@
         .info-note{background:#e8f4fd;color:#0c5460;padding:12px;border-radius:8px;border-left:4px solid #17a2b8;margin-bottom:20px;font-size:14px}
         .existing-file{background:#f8f9fa;padding:10px;border-radius:6px;border:1px dashed #6c757d;margin-bottom:10px;font-size:13px}
         .file-info{display:flex;align-items:center;gap:10px}
+        .current-value{background:#e8f5e8;padding:8px 12px;border-radius:6px;margin-top:5px;font-size:14px;border-left:3px solid #28a745}
+        .edit-hint{color:#6c757d;font-size:13px;margin-top:5px;font-style:italic}
     </style>
 </head>
 <body>
@@ -78,17 +80,27 @@
 
         <div class="info-note">
             <i class="fas fa-edit"></i> <strong>Editing Application #{{ loan.application_number }}</strong>
+            <p style="margin-top:5px; margin-bottom:0;">Status: <strong>{{ loan.status|title }}</strong> | Applied: {{ loan.applied_date|datetimeformat }}</p>
             <p style="margin-top:5px; margin-bottom:0;">You can update your information below. Leave file uploads empty to keep existing documents.</p>
         </div>
 
         {% if loan.loan_type == 'personal' %}
         <form id="individualForm" method="POST" action="{{ url_for('finance.edit_loan', loan_id=loan.id) }}" enctype="multipart/form-data">
             <input type="hidden" name="loan_type" id="loan_type_ind" value="personal">
-            <div class="steps-container"><div class="step active" id="ind-dot1">1</div><div class="step" id="ind-dot2">2</div><div class="step" id="ind-dot3">3</div><div class="step" id="ind-dot4">4</div></div>
+            <div class="steps-container">
+                <div class="step active" id="ind-dot1" onclick="goToStep('ind', 1)">1</div>
+                <div class="step" id="ind-dot2" onclick="goToStep('ind', 2)">2</div>
+                <div class="step" id="ind-dot3" onclick="goToStep('ind', 3)">3</div>
+                <div class="step" id="ind-dot4" onclick="goToStep('ind', 4)">4</div>
+            </div>
             <div class="form-card active" id="ind-step1">
                 <div class="card-header"><h2><i class="fas fa-money-bill-wave"></i> Loan Details</h2></div>
                 <div class="card-body">
-                    <div class="form-group"><label>Loan Amount (ZMW) <span class="required">*</span></label><input type="number" name="ind-amt" id="ind-amt" class="form-control" value="{{ loan.loan_amount or details.loan_amount }}" required min="100" oninput="updateIndCalc()"></div>
+                    <div class="form-group">
+                        <label>Loan Amount (ZMW) <span class="required">*</span></label>
+                        <input type="number" name="ind-amt" id="ind-amt" class="form-control" value="{{ loan.loan_amount or details.loan_amount }}" required min="100" oninput="updateIndCalc()">
+                        <div class="edit-hint">Original amount: K{{ loan.loan_amount|default('0.00') }}</div>
+                    </div>
                     <div class="form-group"><label>Purpose of Loan <span class="required">*</span></label>
                         <select name="ind-purpose" id="ind-purpose" class="form-control" required>
                             <option value="">Select purpose</option>
@@ -113,8 +125,15 @@
                             <option value="48" {% if details.repayment_period_days == 48 %}selected{% endif %}>3 Months</option>
                         </select>
                     </div>
-                    <div class="calc-summary"><div id="ind-totalRepay">Total Repayment: K 0.00</div><div id="ind-monthlyRepay" style="display:none">Monthly: K 0.00</div></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Back to Loans</button><button type="button" class="btn btn-next" onclick="validateAndProceed('ind',1,2)">Next: Collateral <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="calc-summary">
+                        <div id="ind-totalRepay">Total Repayment: K 0.00</div>
+                        <div id="ind-weeklyRepay">Weekly: K 0.00</div>
+                        <div id="ind-interestRate" style="font-size:12px; color:#666; margin-top:5px;">Interest Rate: 0%</div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Back to Loans</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('ind',1,2)">Next: Collateral <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="ind-step2">
@@ -129,7 +148,7 @@
                         <div class="file-info">
                             <i class="fas fa-check-circle" style="color: #28a745;"></i>
                             <div>
-                                <strong>Existing Collateral:</strong>
+                                <strong>Existing Collateral Items:</strong>
                                 {% for item in collateral_items %}
                                 <div>{{ item.item_name }} - {{ item.condition_description[:50] }}{% if item.condition_description|length > 50 %}...{% endif %}</div>
                                 {% endfor %}
@@ -138,7 +157,10 @@
                     </div>
                     {% endif %}
                     
-                    <div class="form-group"><label>Item Description & Condition <span class="required">*</span></label><textarea name="ind-description" id="ind-description" class="form-control" rows="3" placeholder="Brand, Model, Serial Number, Working condition..." required>{{ details.condition_description or '' }}</textarea></div>
+                    <div class="form-group">
+                        <label>Item Description & Condition</label>
+                        <textarea name="ind-description" id="ind-description" class="form-control" rows="3" placeholder="Brand, Model, Serial Number, Working condition...">{{ details.condition_description or '' }}</textarea>
+                    </div>
                     <div class="form-group"><label>Update Photos of Collateral Items</label>
                         <div class="upload-slot" style="margin-bottom:10px">
                             <div class="slot-title"><i class="fas fa-images"></i> Collateral Images</div>
@@ -153,18 +175,33 @@
                             <input type="file" name="ind-serial-photos" id="ind-serial-photos" class="form-control" style="margin-top:10px" accept=".jpg,.jpeg,.png,.heic,.pdf" multiple>
                         </div>
                     </div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showIndStep(1)">Back</button><button type="button" class="btn btn-next" onclick="validateAndProceed('ind',2,3)">Next: KYC Documents <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showIndStep(1)">Back</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('ind',2,3)">Next: KYC Documents <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="ind-step3">
                 <div class="card-header"><h2><i class="fas fa-id-card"></i> Personal & KYC Documents</h2></div>
                 <div class="card-body">
-                    <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" name="ind-name" id="ind-name" class="form-control" value="{{ details.full_name }}" required></div>
-                    <div class="form-group"><label>Date of Birth <span class="required">*</span></label><input type="date" name="ind-dob" id="ind-dob" class="form-control" value="{{ details.date_of_birth }}" required></div>
-                    <div class="form-group"><label>NRC Number <span class="required">*</span></label><input type="text" name="ind-nrc" id="ind-nrc" class="form-control" value="{{ details.nrc_number }}" placeholder="e.g., 123456/78/9" required pattern="\d{6}\/\d{2}\/\d{1}"></div>
-                    <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" name="ind-email" id="ind-email" class="form-control" value="{{ details.email }}" required></div>
-                    <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" name="ind-phone" id="ind-phone" class="form-control" value="{{ details.phone_number }}" required></div>
-                    <div class="form-group"><label>Residential Address <span class="required">*</span></label><textarea name="ind-address" id="ind-address" class="form-control" rows="2" required>{{ details.residential_address }}</textarea></div>
+                    <div class="form-group"><label>Full Name <span class="required">*</span></label>
+                        <input type="text" name="ind-name" id="ind-name" class="form-control" value="{{ details.full_name }}" required>
+                    </div>
+                    <div class="form-group"><label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" name="ind-dob" id="ind-dob" class="form-control" value="{{ details.date_of_birth }}" required>
+                    </div>
+                    <div class="form-group"><label>NRC Number <span class="required">*</span></label>
+                        <input type="text" name="ind-nrc" id="ind-nrc" class="form-control" value="{{ details.nrc_number }}" placeholder="e.g., 123456/78/9" required pattern="\d{6}\/\d{2}\/\d{1}">
+                    </div>
+                    <div class="form-group"><label>Email <span class="required">*</span></label>
+                        <input type="email" name="ind-email" id="ind-email" class="form-control" value="{{ details.email }}" required>
+                    </div>
+                    <div class="form-group"><label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" name="ind-phone" id="ind-phone" class="form-control" value="{{ details.phone_number }}" required>
+                    </div>
+                    <div class="form-group"><label>Residential Address <span class="required">*</span></label>
+                        <textarea name="ind-address" id="ind-address" class="form-control" rows="2" required>{{ details.residential_address }}</textarea>
+                    </div>
                     
                     {% if attachments %}
                     <div class="existing-file">
@@ -173,26 +210,53 @@
                             <div>
                                 <strong>Existing Documents:</strong>
                                 {% for att in attachments %}
+                                {% if att.document_category in ['ID Copy', 'Proof of Residence', 'Proof of Income', 'Signature'] %}
                                 <div>{{ att.document_category }} - {{ att.file_name }}</div>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                     {% endif %}
                     
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-passport"></i> 1. Update Proof of Identity</div><div class="slot-desc">Upload NRC, Passport, or Driver's License (PDF, JPG, PNG). Leave empty to keep current.</div><input type="file" name="ind-identity" id="ind-identity" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-home"></i> 2. Update Proof of Residence</div><div class="slot-desc">Utility bill, Rent agreement, or Utility bill + Landlord agreement. Leave empty to keep current.</div><input type="file" name="ind-residence" id="ind-residence" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-file-invoice"></i> 3. Update Proof of Income <span class="optional-badge">Optional</span></div><div class="slot-desc">Recent payslips (last 3 months) or bank statements. Leave empty to keep current.</div><input type="file" name="ind-income" id="ind-income" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showIndStep(2)">Back</button><button type="button" class="btn btn-next" onclick="validateAndProceed('ind',3,4)">Next: Agreement <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-passport"></i> 1. Update Proof of Identity</div>
+                        <div class="slot-desc">Upload NRC, Passport, or Driver's License (PDF, JPG, PNG). Leave empty to keep current.</div>
+                        <input type="file" name="ind-identity" id="ind-identity" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-home"></i> 2. Update Proof of Residence</div>
+                        <div class="slot-desc">Utility bill, Rent agreement, or Utility bill + Landlord agreement. Leave empty to keep current.</div>
+                        <input type="file" name="ind-residence" id="ind-residence" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-file-invoice"></i> 3. Update Proof of Income <span class="optional-badge">Optional</span></div>
+                        <div class="slot-desc">Recent payslips (last 3 months) or bank statements. Leave empty to keep current.</div>
+                        <input type="file" name="ind-income" id="ind-income" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showIndStep(2)">Back</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('ind',3,4)">Next: Agreement <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="ind-step4">
                 <div class="card-header"><h2><i class="fas fa-pen-fancy"></i> Finalize Agreement</h2></div>
                 <div class="card-body">
                     <label>How would you like to sign? <span class="required">*</span></label>
-                    <div class="sig-toggle"><div class="sig-method active" onclick="toggleSig('draw')">Draw New Signature</div><div class="sig-method" onclick="toggleSig('upload')">Upload New Signature</div></div>
-                    <div id="sig-draw-box" class="active"><canvas id="sig-canvas-ind"></canvas><button type="button" class="btn btn-back" style="margin-top:5px;padding:5px 10px" onclick="clearIndSig()">Clear</button><input type="hidden" name="ind-signature-data" id="ind-signature-data"></div>
-                    <div id="sig-upload-box"><label>Upload New Signature Image</label><input type="file" name="ind-sig-upload" id="ind-sig-upload" class="form-control" accept=".png,.jpg,.jpeg"></div>
+                    <div class="sig-toggle">
+                        <div class="sig-method active" onclick="toggleSig('draw')">Draw New Signature</div>
+                        <div class="sig-method" onclick="toggleSig('upload')">Upload New Signature</div>
+                    </div>
+                    <div id="sig-draw-box" class="active">
+                        <canvas id="sig-canvas-ind"></canvas>
+                        <button type="button" class="btn btn-back" style="margin-top:5px;padding:5px 10px" onclick="clearIndSig()">Clear</button>
+                        <input type="hidden" name="ind-signature-data" id="ind-signature-data">
+                    </div>
+                    <div id="sig-upload-box">
+                        <label>Upload New Signature Image</label>
+                        <input type="file" name="ind-sig-upload" id="ind-sig-upload" class="form-control" accept=".png,.jpg,.jpeg">
+                    </div>
                     
                     <div class="existing-file" style="margin-top: 20px;">
                         <div class="file-info">
@@ -204,32 +268,72 @@
                         </div>
                     </div>
                     
-                    <div class="form-group" style="margin-top:20px"><label style="font-weight:normal;font-size:13px"><input type="checkbox" name="ind-agreement" id="ind-agreement" required> I agree that the updated information provided is true and I accept the terms of Tukakombe Loans.</label></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showIndStep(3)">Back</button><button type="submit" class="btn btn-next" style="background:var(--teal);color:#fff">Update Application</button></div>
+                    <div class="form-group" style="margin-top:20px">
+                        <label style="font-weight:normal;font-size:13px">
+                            <input type="checkbox" name="ind-agreement" id="ind-agreement" required> 
+                            I agree that the updated information provided is true and I accept the terms of Tukakombe Loans.
+                        </label>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showIndStep(3)">Back</button>
+                        <button type="submit" class="btn btn-next" style="background:var(--teal);color:#fff">Update Application</button>
+                    </div>
                 </div>
             </div>
         </form>
         {% else %}
         <form id="businessForm" method="POST" action="{{ url_for('finance.edit_loan', loan_id=loan.id) }}" enctype="multipart/form-data">
             <input type="hidden" name="loan_type" id="loan_type_bus" value="business">
-            <div class="steps-container"><div class="step active" id="bus-dot1">1</div><div class="step" id="bus-dot2">2</div><div class="step" id="bus-dot3">3</div><div class="step" id="bus-dot4">4</div><div class="step" id="bus-dot5">5</div></div>
+            <div class="steps-container">
+                <div class="step active" id="bus-dot1" onclick="goToStep('bus', 1)">1</div>
+                <div class="step" id="bus-dot2" onclick="goToStep('bus', 2)">2</div>
+                <div class="step" id="bus-dot3" onclick="goToStep('bus', 3)">3</div>
+                <div class="step" id="bus-dot4" onclick="goToStep('bus', 4)">4</div>
+                <div class="step" id="bus-dot5" onclick="goToStep('bus', 5)">5</div>
+            </div>
             <div class="form-card active" id="bus-step1">
                 <div class="card-header"><h2><i class="fas fa-building"></i> Business Details</h2></div>
                 <div class="card-body">
-                    <div class="form-group"><label>Business Name <span class="required">*</span></label><input type="text" name="bus-name" id="bus-name" class="form-control" value="{{ details.business_name }}" required></div>
-                    <div class="form-group"><label>Business Registration Number <span class="required">*</span></label><input type="text" name="bus-reg" id="bus-reg" class="form-control" value="{{ details.business_registration_number }}" required></div>
-                    <div class="form-group"><label>Contact Person Name <span class="required">*</span></label><input type="text" name="bus-contact-name" id="bus-contact-name" class="form-control" value="{{ details.contact_person_name }}" required></div>
-                    <div class="form-group"><label>Contact Person Email <span class="required">*</span></label><input type="email" name="bus-contact-email" id="bus-contact-email" class="form-control" value="{{ details.contact_email }}" required></div>
-                    <div class="form-group"><label>Contact Person Phone <span class="required">*</span></label><input type="tel" name="bus-contact-phone" id="bus-contact-phone" class="form-control" value="{{ details.contact_phone }}" required></div>
-                    <div class="form-group"><label>Contact Person Position</label><input type="text" name="bus-contact-position" id="bus-contact-position" class="form-control" value="{{ details.contact_person_position }}" placeholder="e.g., Director, Manager"></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Back to Loans</button><button type="button" class="btn btn-next" onclick="validateAndProceed('bus',1,2)">Next: Loan Request <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="form-group">
+                        <label>Business Name <span class="required">*</span></label>
+                        <input type="text" name="bus-name" id="bus-name" class="form-control" value="{{ details.business_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Business Registration Number <span class="required">*</span></label>
+                        <input type="text" name="bus-reg" id="bus-reg" class="form-control" value="{{ details.business_registration_number }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Person Name <span class="required">*</span></label>
+                        <input type="text" name="bus-contact-name" id="bus-contact-name" class="form-control" value="{{ details.contact_person_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Person Email <span class="required">*</span></label>
+                        <input type="email" name="bus-contact-email" id="bus-contact-email" class="form-control" value="{{ details.contact_email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Person Phone <span class="required">*</span></label>
+                        <input type="tel" name="bus-contact-phone" id="bus-contact-phone" class="form-control" value="{{ details.contact_phone }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Person Position</label>
+                        <input type="text" name="bus-contact-position" id="bus-contact-position" class="form-control" value="{{ details.contact_person_position }}" placeholder="e.g., Director, Manager">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Back to Loans</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('bus',1,2)">Next: Loan Request <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="bus-step2">
                 <div class="card-header"><h2><i class="fas fa-money-bill-wave"></i> Loan Request</h2></div>
                 <div class="card-body">
-                    <div class="form-group"><label>Loan Amount Required (ZMW) <span class="required">*</span></label><input type="number" name="bus-amt" id="bus-amt" class="form-control" value="{{ loan.loan_amount or details.loan_amount }}" placeholder="e.g., 50000" required min="1000" oninput="updateBusCalc()"></div>
-                    <div class="form-group"><label>Reason for Borrowing <span class="required">*</span></label>
+                    <div class="form-group">
+                        <label>Loan Amount Required (ZMW) <span class="required">*</span></label>
+                        <input type="number" name="bus-amt" id="bus-amt" class="form-control" value="{{ loan.loan_amount or details.loan_amount }}" placeholder="e.g., 50000" required min="1000" oninput="updateBusCalc()">
+                        <div class="edit-hint">Original amount: K{{ loan.loan_amount|default('0.00') }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason for Borrowing <span class="required">*</span></label>
                         <select name="bus-purpose" id="bus-purpose" class="form-control" required>
                             <option value="">Select reason</option>
                             <option value="expansion" {% if details.purpose == 'expansion' %}selected{% endif %}>Business Expansion</option>
@@ -240,8 +344,12 @@
                             <option value="other" {% if details.purpose == 'other' %}selected{% endif %}>Other</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Detailed Reason <span class="required">*</span></label><textarea name="bus-reason" id="bus-reason" class="form-control" rows="4" placeholder="Provide detailed explanation of how the loan will be used..." required>{{ details.business_address }}</textarea></div>
-                    <div class="form-group"><label>Repayment Period<span class="required">*</span></label>
+                    <div class="form-group">
+                        <label>Detailed Reason <span class="required">*</span></label>
+                        <textarea name="bus-reason" id="bus-reason" class="form-control" rows="4" placeholder="Provide detailed explanation of how the loan will be used..." required>{{ details.business_address or '' }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Repayment Period<span class="required">*</span></label>
                         <select name="bus-period" id="bus-period" class="form-control" required onchange="updateBusCalc()">
                             <option value="6" {% if details.repayment_period_days == 6 %}selected{% endif %}>1 Week</option>
                             <option value="8" {% if details.repayment_period_days == 8 %}selected{% endif %}>2 Weeks</option>
@@ -254,8 +362,15 @@
                             <option value="48" {% if details.repayment_period_days == 48 %}selected{% endif %}>3 Months</option>
                         </select>
                     </div>
-                    <div class="calc-summary"><div id="bus-totalRepay">Total Repayment: K 0.00</div><div id="bus-monthlyRepay" style="display:none">Monthly: K 0.00</div></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showBusStep(1)">Back</button><button type="button" class="btn btn-next" onclick="validateAndProceed('bus',2,3)">Next: Collateral <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="calc-summary">
+                        <div id="bus-totalRepay">Total Repayment: K 0.00</div>
+                        <div id="bus-weeklyRepay">Weekly: K 0.00</div>
+                        <div id="bus-interestRate" style="font-size:12px; color:#666; margin-top:5px;">Interest Rate: 0%</div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showBusStep(1)">Back</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('bus',2,3)">Next: Collateral <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="bus-step3">
@@ -272,14 +387,15 @@
                             <div>
                                 <strong>Existing Collateral:</strong>
                                 {% for item in collateral_items %}
-                                <div>{{ item.item_name }} - Value: K{{ item.estimated_value }} - {{ item.condition_description[:50] }}{% if item.condition_description|length > 50 %}...{% endif %}</div>
+                                <div>{{ item.item_name }} - Value: K{{ item.estimated_value|default('0') }} - {{ item.condition_description[:50] }}{% if item.condition_description|length > 50 %}...{% endif %}</div>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                     {% endif %}
                     
-                    <div class="form-group"><label>Type of Collateral <span class="required">*</span></label>
+                    <div class="form-group">
+                        <label>Type of Collateral <span class="required">*</span></label>
                         <select name="bus-collateral-type" id="bus-collateral-type" class="form-control" required>
                             <option value="">Select type</option>
                             <option value="property" {% if collateral_items and collateral_items[0].item_type == 'property' %}selected{% endif %}>Commercial Property</option>
@@ -289,24 +405,39 @@
                             <option value="guarantor" {% if collateral_items and collateral_items[0].item_type == 'guarantor' %}selected{% endif %}>Personal Guarantor</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Collateral Description <span class="required">*</span></label><textarea name="bus-collateral-desc" id="bus-collateral-desc" class="form-control" rows="4" placeholder="Describe collateral in detail including value, condition, location..." required>{% if collateral_items %}{{ collateral_items[0].condition_description }}{% endif %}</textarea></div>
-                    <div class="form-group"><label>Estimated Collateral Value (ZMW) <span class="required">*</span></label><input type="number" name="bus-collateral-value" id="bus-collateral-value" class="form-control" value="{% if collateral_items %}{{ collateral_items[0].estimated_value }}{% endif %}" required></div>
-                    <div class="form-group"><label>Update Collateral Ownership Proof</label><input type="file" name="bus-collateral-proof" id="bus-collateral-proof" class="form-control" accept=".pdf,.jpg,.jpeg,.png"><div class="slot-desc">Title deed, purchase receipt, registration documents. Leave empty to keep current.</div></div>
-                    <div class="form-group"><label>Update Collateral Photos/Documents</label>
+                    <div class="form-group">
+                        <label>Collateral Description <span class="required">*</span></label>
+                        <textarea name="bus-collateral-desc" id="bus-collateral-desc" class="form-control" rows="4" placeholder="Describe collateral in detail including value, condition, location..." required>{% if collateral_items %}{{ collateral_items[0].condition_description }}{% endif %}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Collateral Value (ZMW) <span class="required">*</span></label>
+                        <input type="number" name="bus-collateral-value" id="bus-collateral-value" class="form-control" value="{% if collateral_items %}{{ collateral_items[0].estimated_value }}{% else %}0{% endif %}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Update Collateral Ownership Proof</label>
+                        <input type="file" name="bus-collateral-proof" id="bus-collateral-proof" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="slot-desc">Title deed, purchase receipt, registration documents. Leave empty to keep current.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Update Collateral Photos/Documents</label>
                         <div class="upload-slot" style="margin-bottom:10px">
                             <div class="slot-title"><i class="fas fa-camera"></i> Collateral Visual Documentation</div>
                             <div class="slot-desc">Upload new photos of collateral. Leave empty to keep current photos.</div>
                             <input type="file" name="bus-collateral-photos" id="bus-collateral-photos" class="form-control" style="margin-top:10px" accept=".jpg,.jpeg,.png,.heic" multiple>
                         </div>
                     </div>
-                    <div class="form-group"><label>Update Additional Collateral Documents</label>
+                    <div class="form-group">
+                        <label>Update Additional Collateral Documents</label>
                         <div class="upload-slot">
                             <div class="slot-title"><i class="fas fa-file-alt"></i> Supporting Documents <span class="optional-badge">Optional</span></div>
                             <div class="slot-desc">Upload any additional documents. Leave empty to keep current.</div>
                             <input type="file" name="bus-collateral-docs" id="bus-collateral-docs" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
                         </div>
                     </div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showBusStep(2)">Back</button><button type="button" class="btn btn-next" onclick="validateAndProceed('bus',3,4)">Next: KYC Documents <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showBusStep(2)">Back</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('bus',3,4)">Next: KYC Documents <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="bus-step4">
@@ -319,29 +450,68 @@
                             <div>
                                 <strong>Existing Documents:</strong>
                                 {% for att in attachments %}
+                                {% if att.document_category in ['Business Registration', 'Tax Certificate', 'Financial Statements', 'Bank Statements', 'Director ID', 'Business Address Proof', 'Collateral Documents', 'Collateral Proof', 'Collateral Photos'] %}
                                 <div>{{ att.document_category }} - {{ att.file_name }}</div>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                     {% endif %}
                     
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-file-alt"></i> 1. Update Business Registration Certificate</div><div class="slot-desc">Upload certified copy of business registration. Leave empty to keep current.</div><input type="file" name="bus-reg-cert" id="bus-reg-cert" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-file-invoice-dollar"></i> 2. Update Tax Compliance Certificate</div><div class="slot-desc">ZRA Tax Compliance Certificate. Leave empty to keep current.</div><input type="file" name="bus-tax-cert" id="bus-tax-cert" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-chart-line"></i> 3. Update Audited Financials <span class="optional-badge">Optional</span></div><div class="slot-desc">Audited financial statements for last 12 months. Leave empty to keep current.</div><input type="file" name="bus-financials" id="bus-financials" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-bank"></i> 4. Update Bank Statements</div><div class="slot-desc">Business bank account statements for last 6 months. Leave empty to keep current.</div><input type="file" name="bus-bank-stmts" id="bus-bank-stmts" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-id-card"></i> 5. Update Directors' Identification</div><div class="slot-desc">NRC/Passport copies of all directors. Leave empty to keep current.</div><input type="file" name="bus-directors-id" id="bus-directors-id" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png" multiple></div>
-                    <div class="upload-slot"><div class="slot-title"><i class="fas fa-home"></i> 6. Update Proof of Business Address</div><div class="slot-desc">Utility bill or lease agreement for business premises. Leave empty to keep current.</div><input type="file" name="bus-address-proof" id="bus-address-proof" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png"></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showBusStep(3)">Back</button><button type="button" class="btn btn-next" onclick="validateAndProceed('bus',4,5)">Next: Agreement <i class="fas fa-arrow-right"></i></button></div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-file-alt"></i> 1. Update Business Registration Certificate</div>
+                        <div class="slot-desc">Upload certified copy of business registration. Leave empty to keep current.</div>
+                        <input type="file" name="bus-reg-cert" id="bus-reg-cert" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-file-invoice-dollar"></i> 2. Update Tax Compliance Certificate</div>
+                        <div class="slot-desc">ZRA Tax Compliance Certificate. Leave empty to keep current.</div>
+                        <input type="file" name="bus-tax-cert" id="bus-tax-cert" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-chart-line"></i> 3. Update Audited Financials <span class="optional-badge">Optional</span></div>
+                        <div class="slot-desc">Audited financial statements for last 12 months. Leave empty to keep current.</div>
+                        <input type="file" name="bus-financials" id="bus-financials" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-bank"></i> 4. Update Bank Statements</div>
+                        <div class="slot-desc">Business bank account statements for last 6 months. Leave empty to keep current.</div>
+                        <input type="file" name="bus-bank-stmts" id="bus-bank-stmts" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-id-card"></i> 5. Update Directors' Identification</div>
+                        <div class="slot-desc">NRC/Passport copies of all directors. Leave empty to keep current.</div>
+                        <input type="file" name="bus-directors-id" id="bus-directors-id" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                    </div>
+                    <div class="upload-slot">
+                        <div class="slot-title"><i class="fas fa-home"></i> 6. Update Proof of Business Address</div>
+                        <div class="slot-desc">Utility bill or lease agreement for business premises. Leave empty to keep current.</div>
+                        <input type="file" name="bus-address-proof" id="bus-address-proof" class="form-control" style="margin-top:10px" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showBusStep(3)">Back</button>
+                        <button type="button" class="btn btn-next" onclick="validateAndProceed('bus',4,5)">Next: Agreement <i class="fas fa-arrow-right"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="form-card" id="bus-step5">
                 <div class="card-header"><h2><i class="fas fa-handshake"></i> Finalize Agreement</h2></div>
                 <div class="card-body">
                     <label>Authorized Signatory Signature <span class="required">*</span></label>
-                    <div class="sig-toggle"><div class="sig-method active" onclick="toggleBusSig('draw')">Draw New Signature</div><div class="sig-method" onclick="toggleBusSig('upload')">Upload New Signature</div></div>
-                    <div id="sig-draw-box-bus" class="active"><canvas id="sig-canvas-bus"></canvas><button type="button" class="btn btn-back" style="margin-top:5px;padding:5px 10px" onclick="clearBusSig()">Clear</button><input type="hidden" name="bus-signature-data" id="bus-signature-data"></div>
-                    <div id="sig-upload-box-bus"><label>Upload New Signature Image</label><input type="file" name="bus-sig-upload" id="bus-sig-upload" class="form-control" accept=".png,.jpg,.jpeg"></div>
+                    <div class="sig-toggle">
+                        <div class="sig-method active" onclick="toggleBusSig('draw')">Draw New Signature</div>
+                        <div class="sig-method" onclick="toggleBusSig('upload')">Upload New Signature</div>
+                    </div>
+                    <div id="sig-draw-box-bus" class="active">
+                        <canvas id="sig-canvas-bus"></canvas>
+                        <button type="button" class="btn btn-back" style="margin-top:5px;padding:5px 10px" onclick="clearBusSig()">Clear</button>
+                        <input type="hidden" name="bus-signature-data" id="bus-signature-data">
+                    </div>
+                    <div id="sig-upload-box-bus">
+                        <label>Upload New Signature Image</label>
+                        <input type="file" name="bus-sig-upload" id="bus-sig-upload" class="form-control" accept=".png,.jpg,.jpeg">
+                    </div>
                     
                     <div class="existing-file" style="margin-top: 20px;">
                         <div class="file-info">
@@ -353,8 +523,16 @@
                         </div>
                     </div>
                     
-                    <div class="form-group" style="margin-top:20px"><label style="font-weight:normal;font-size:13px"><input type="checkbox" name="bus-agreement" id="bus-agreement" required> I certify that I am an authorized signatory and agree to the updated business loan terms.</label></div>
-                    <div class="btn-group"><button type="button" class="btn btn-back" onclick="showBusStep(4)">Back</button><button type="submit" class="btn btn-next" style="background:var(--teal);color:#fff">Update Application</button></div>
+                    <div class="form-group" style="margin-top:20px">
+                        <label style="font-weight:normal;font-size:13px">
+                            <input type="checkbox" name="bus-agreement" id="bus-agreement" required> 
+                            I certify that I am an authorized signatory and agree to the updated business loan terms.
+                        </label>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-back" onclick="showBusStep(4)">Back</button>
+                        <button type="submit" class="btn btn-next" style="background:var(--teal);color:#fff">Update Application</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -382,7 +560,17 @@
     // 2. HELPER TO GET NUMBER OF WEEKS FOR INSTALLMENT CALCULATION
     function getWeekCount(periodValue) {
         const keys = [6, 8, 14, 16, 22, 24, 30, 32, 38, 40, 46, 48];
-        return keys.indexOf(parseInt(periodValue)) + 1; // Index 0 is 1 week, Index 1 is 2 weeks, etc.
+        const index = keys.indexOf(parseInt(periodValue));
+        return index >= 0 ? index + 1 : 1; // Index 0 is 1 week, Index 1 is 2 weeks, etc.
+    }
+
+    // 3. Function to navigate to any step
+    function goToStep(loanType, stepNumber) {
+        if (loanType === 'ind') {
+            showIndStep(stepNumber);
+        } else if (loanType === 'bus') {
+            showBusStep(stepNumber);
+        }
     }
 
     // Auto-start with correct form
@@ -391,143 +579,356 @@
             document.getElementById('individualForm').style.display = 'block';
             document.getElementById('businessForm').style.display = 'none';
             showIndStep(1);
-            updateIndCalc();
+            setTimeout(() => {
+                updateIndCalc();
+            }, 100);
         } else {
             document.getElementById('individualForm').style.display = 'none';
             document.getElementById('businessForm').style.display = 'block';
             showBusStep(1);
-            updateBusCalc();
+            setTimeout(() => {
+                updateBusCalc();
+            }, 100);
         }
         
         // Initialize signature pads
         const indCanvas = document.getElementById('sig-canvas-ind');
         if(indCanvas) {
             indCanvas.width = indCanvas.offsetWidth;
+            indCanvas.height = 150;
             indSignaturePad = new SignaturePad(indCanvas);
         }
         
         const busCanvas = document.getElementById('sig-canvas-bus');
         if(busCanvas) {
             busCanvas.width = busCanvas.offsetWidth;
+            busCanvas.height = 150;
             busSignaturePad = new SignaturePad(busCanvas);
         }
         
         // Hide backend message after timeout
-        let e=document.getElementById('backend-message');
-        e&&setTimeout(()=>{e.style.display='none'},1e4);
+        let e = document.getElementById('backend-message');
+        e && setTimeout(() => { e.style.display = 'none'; }, 10000);
     });
 
-    function showIndStep(t){document.querySelectorAll('#individualForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#individualForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('ind-step'+t).classList.add('active');window.scrollTo(0,0)}
+    function showIndStep(step) {
+        // Hide all form cards
+        document.querySelectorAll('#individualForm .form-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Update step indicators
+        document.querySelectorAll('#individualForm .step').forEach((stepEl, index) => {
+            stepEl.classList.remove('active', 'completed');
+            if (index + 1 < step) {
+                stepEl.classList.add('completed');
+            } else if (index + 1 === step) {
+                stepEl.classList.add('active');
+            }
+        });
+        
+        // Show the selected step
+        document.getElementById('ind-step' + step).classList.add('active');
+        
+        // Update calculator when on step 1
+        if (step === 1) {
+            setTimeout(() => {
+                updateIndCalc();
+            }, 100);
+        }
+        
+        window.scrollTo(0,0);
+    }
 
-    // UPDATED INDIVIDUAL CALCULATOR
-    function updateIndCalc(){
-        let t=parseFloat(document.getElementById('ind-amt')?.value)||0;
-        let p=parseInt(document.getElementById('ind-period')?.value)||6;
-        let rate = INTEREST_RATES[p] || 0;
-        let interest = t * rate;
-        let total = t + interest;
-        let weeks = getWeekCount(p);
+    // UPDATED INDIVIDUAL CALCULATOR - EXACTLY LIKE LOAN APPLICATION
+    function updateIndCalc() {
+        const amountInput = document.getElementById('ind-amt');
+        const periodSelect = document.getElementById('ind-period');
+        
+        if (!amountInput || !periodSelect) return;
+        
+        let loanAmount = parseFloat(amountInput.value) || 0;
+        let periodValue = parseInt(periodSelect.value) || 6;
+        let rate = INTEREST_RATES[periodValue] || 0;
+        let interest = loanAmount * rate;
+        let total = loanAmount + interest;
+        let weeks = getWeekCount(periodValue);
         let installment = total / weeks;
         
-        if(document.getElementById('ind-totalRepay')) {
-            document.getElementById('ind-totalRepay').innerText="Total Repayment: K "+total.toLocaleString(void 0,{minimumFractionDigits:2});
-            document.getElementById('ind-monthlyRepay').innerText="Weekly: K "+installment.toLocaleString(void 0,{minimumFractionDigits:2});
+        const totalRepayEl = document.getElementById('ind-totalRepay');
+        const weeklyRepayEl = document.getElementById('ind-weeklyRepay');
+        const interestRateEl = document.getElementById('ind-interestRate');
+        
+        if (totalRepayEl) {
+            totalRepayEl.innerText = "Total Repayment: K " + total.toLocaleString(void 0, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        if (weeklyRepayEl) {
+            weeklyRepayEl.innerText = "Weekly: K " + installment.toLocaleString(void 0, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        if (interestRateEl) {
+            interestRateEl.innerText = "Interest Rate: " + (rate * 100).toFixed(0) + "%";
         }
     }
 
-    function showBusStep(t){document.querySelectorAll('#businessForm .form-card').forEach(e=>e.classList.remove('active'));document.querySelectorAll('#businessForm .step').forEach((e,o)=>{e.classList.remove('active','completed');o+1<t&&e.classList.add('completed');o+1===t&&e.classList.add('active')});document.getElementById('bus-step'+t).classList.add('active');window.scrollTo(0,0)}
+    function showBusStep(step) {
+        // Hide all form cards
+        document.querySelectorAll('#businessForm .form-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Update step indicators
+        document.querySelectorAll('#businessForm .step').forEach((stepEl, index) => {
+            stepEl.classList.remove('active', 'completed');
+            if (index + 1 < step) {
+                stepEl.classList.add('completed');
+            } else if (index + 1 === step) {
+                stepEl.classList.add('active');
+            }
+        });
+        
+        // Show the selected step
+        document.getElementById('bus-step' + step).classList.add('active');
+        
+        // Update calculator when on step 2
+        if (step === 2) {
+            setTimeout(() => {
+                updateBusCalc();
+            }, 100);
+        }
+        
+        window.scrollTo(0,0);
+    }
 
-    // UPDATED BUSINESS CALCULATOR
-    function updateBusCalc(){
-        let t=parseFloat(document.getElementById('bus-amt')?.value)||0;
-        let p=parseInt(document.getElementById('bus-period')?.value)||6;
-        let rate = INTEREST_RATES[p] || 0;
-        let interest = t * rate;
-        let total = t + interest;
-        let weeks = getWeekCount(p);
+    // UPDATED BUSINESS CALCULATOR - EXACTLY LIKE LOAN APPLICATION
+    function updateBusCalc() {
+        const amountInput = document.getElementById('bus-amt');
+        const periodSelect = document.getElementById('bus-period');
+        
+        if (!amountInput || !periodSelect) return;
+        
+        let loanAmount = parseFloat(amountInput.value) || 0;
+        let periodValue = parseInt(periodSelect.value) || 6;
+        let rate = INTEREST_RATES[periodValue] || 0;
+        let interest = loanAmount * rate;
+        let total = loanAmount + interest;
+        let weeks = getWeekCount(periodValue);
         let installment = total / weeks;
-
-        if(document.getElementById('bus-totalRepay')) {
-            document.getElementById('bus-totalRepay').innerText="Total Repayment: K "+total.toLocaleString(void 0,{minimumFractionDigits:2});
-            document.getElementById('bus-monthlyRepay').innerText="Weekly: K "+installment.toLocaleString(void 0,{minimumFractionDigits:2});
+        
+        const totalRepayEl = document.getElementById('bus-totalRepay');
+        const weeklyRepayEl = document.getElementById('bus-weeklyRepay');
+        const interestRateEl = document.getElementById('bus-interestRate');
+        
+        if (totalRepayEl) {
+            totalRepayEl.innerText = "Total Repayment: K " + total.toLocaleString(void 0, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        if (weeklyRepayEl) {
+            weeklyRepayEl.innerText = "Weekly: K " + installment.toLocaleString(void 0, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        if (interestRateEl) {
+            interestRateEl.innerText = "Interest Rate: " + (rate * 100).toFixed(0) + "%";
         }
     }
 
-    function toggleSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box').classList.remove('active');document.getElementById('sig-upload-box').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box').classList.add('active'),event.target.classList.add('active'),indSignaturePad||(indSignaturePad=new SignaturePad(document.getElementById('sig-canvas-ind')))):(document.getElementById('sig-upload-box').classList.add('active'),event.target.classList.add('active'))}
-    function toggleBusSig(t){document.querySelectorAll('.sig-method').forEach(e=>e.classList.remove('active'));document.getElementById('sig-draw-box-bus').classList.remove('active');document.getElementById('sig-upload-box-bus').classList.remove('active');'draw'===t?(document.getElementById('sig-draw-box-bus').classList.add('active'),event.target.classList.add('active'),busSignaturePad||(busSignaturePad=new SignaturePad(document.getElementById('sig-canvas-bus')))):(document.getElementById('sig-upload-box-bus').classList.add('active'),event.target.classList.add('active'))}
-    function clearIndSig(){indSignaturePad&&indSignaturePad.clear()}function clearBusSig(){busSignaturePad&&busSignaturePad.clear()}
-    function validateAndProceed(t,e,o){if(validateStep(t,e))'ind'===t?showIndStep(o):showBusStep(o)}
-    function validateStep(t,e){return'ind'===t?validateIndStep(e):validateBusStep(e)}
-    function validateIndStep(t){
-        if(1===t){
-            let e=document.getElementById('ind-amt').value,o=document.getElementById('ind-purpose').value,a=document.getElementById('ind-period').value;
-            if(!e||!o||!a)return alert("Please fill all required fields in Loan Details."),!1;
-            if(parseFloat(e)<100)return alert("Minimum loan amount is K100."),!1;
-        }else if(2===t){
-            let n=document.getElementById('ind-description').value;
-            if(!n.trim())return alert("Please describe the item's condition."),!1;
-        }else if(3===t){
-            let e=document.getElementById('ind-name').value,o=document.getElementById('ind-dob').value,a=document.getElementById('ind-nrc').value,n=document.getElementById('ind-email').value,l=document.getElementById('ind-phone').value,i=document.getElementById('ind-address').value;
-            if(!e||!o||!a||!n||!l||!i)return alert("Please fill all required personal information fields."),!1;
-            if(!/^\S+@\S+\.\S+$/.test(n))return alert("Please enter a valid email address."),!1;
-            if(!/^\d{6}\/\d{2}\/\d{1}$/.test(a))return alert("Please enter NRC in format: 123456/78/9"),!1;
+    function toggleSig(method) {
+        document.querySelectorAll('.sig-method').forEach(el => el.classList.remove('active'));
+        document.getElementById('sig-draw-box').classList.remove('active');
+        document.getElementById('sig-upload-box').classList.remove('active');
+        
+        if (method === 'draw') {
+            document.getElementById('sig-draw-box').classList.add('active');
+            event.target.classList.add('active');
+            if (!indSignaturePad) {
+                const canvas = document.getElementById('sig-canvas-ind');
+                canvas.width = canvas.offsetWidth;
+                indSignaturePad = new SignaturePad(canvas);
+            }
+        } else {
+            document.getElementById('sig-upload-box').classList.add('active');
+            event.target.classList.add('active');
         }
-        return!0
-    }
-    function validateBusStep(t){
-        if(1===t){
-            let e=document.getElementById('bus-name').value,o=document.getElementById('bus-reg').value,a=document.getElementById('bus-contact-name').value,n=document.getElementById('bus-contact-email').value,l=document.getElementById('bus-contact-phone').value;
-            if(!e||!o||!a||!n||!l)return alert("Please fill all required business details."),!1;
-            if(!/^\S+@\S+\.\S+$/.test(n))return alert("Please enter a valid email address for contact person."),!1;
-        }else if(2===t){
-            let e=document.getElementById('bus-amt').value,o=document.getElementById('bus-purpose').value,a=document.getElementById('bus-reason').value,n=document.getElementById('bus-period').value;
-            if(!e||!o||!a||!n)return alert("Please fill all required loan request fields."),!1;
-            if(parseFloat(e)<1e3)return alert("Minimum business loan amount is K1,000."),!1;
-        }else if(3===t){
-            let e=document.getElementById('bus-collateral-type').value,o=document.getElementById('bus-collateral-desc').value,a=document.getElementById('bus-collateral-value').value;
-            if(!e||!o||!a)return alert("Please fill all required collateral information."),!1;
-        }
-        return!0
     }
     
-    // Form submission handlers - modified for edit mode (files not required)
-    document.getElementById('individualForm')?.onsubmit=function(t){
-        let e=document.querySelector('#ind-step4 .sig-method.active')?.textContent.trim();
-        if('Draw New Signature'===e){
-            if(indSignaturePad && !indSignaturePad.isEmpty()){
-                document.getElementById('ind-signature-data').value=indSignaturePad.toDataURL();
+    function toggleBusSig(method) {
+        document.querySelectorAll('.sig-method').forEach(el => el.classList.remove('active'));
+        document.getElementById('sig-draw-box-bus').classList.remove('active');
+        document.getElementById('sig-upload-box-bus').classList.remove('active');
+        
+        if (method === 'draw') {
+            document.getElementById('sig-draw-box-bus').classList.add('active');
+            event.target.classList.add('active');
+            if (!busSignaturePad) {
+                const canvas = document.getElementById('sig-canvas-bus');
+                canvas.width = canvas.offsetWidth;
+                busSignaturePad = new SignaturePad(canvas);
             }
-        } else if(document.getElementById('ind-sig-upload').files[0]){
+        } else {
+            document.getElementById('sig-upload-box-bus').classList.add('active');
+            event.target.classList.add('active');
+        }
+    }
+    
+    function clearIndSig() {
+        indSignaturePad && indSignaturePad.clear();
+    }
+    
+    function clearBusSig() {
+        busSignaturePad && busSignaturePad.clear();
+    }
+    
+    function validateAndProceed(loanType, currentStep, nextStep) {
+        if (validateStep(loanType, currentStep)) {
+            if (loanType === 'ind') {
+                showIndStep(nextStep);
+            } else {
+                showBusStep(nextStep);
+            }
+        }
+    }
+    
+    function validateStep(loanType, step) {
+        return loanType === 'ind' ? validateIndStep(step) : validateBusStep(step);
+    }
+    
+    function validateIndStep(step) {
+        if (step === 1) {
+            let amount = document.getElementById('ind-amt').value;
+            let purpose = document.getElementById('ind-purpose').value;
+            let period = document.getElementById('ind-period').value;
+            
+            if (!amount || !purpose || !period) {
+                alert("Please fill all required fields in Loan Details.");
+                return false;
+            }
+            if (parseFloat(amount) < 100) {
+                alert("Minimum loan amount is K100.");
+                return false;
+            }
+        } else if (step === 2) {
+            // Collateral step - description is optional in edit mode
+        } else if (step === 3) {
+            let name = document.getElementById('ind-name').value;
+            let dob = document.getElementById('ind-dob').value;
+            let nrc = document.getElementById('ind-nrc').value;
+            let email = document.getElementById('ind-email').value;
+            let phone = document.getElementById('ind-phone').value;
+            let address = document.getElementById('ind-address').value;
+            
+            if (!name || !dob || !nrc || !email || !phone || !address) {
+                alert("Please fill all required personal information fields.");
+                return false;
+            }
+            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+            if (!/^\d{6}\/\d{2}\/\d{1}$/.test(nrc)) {
+                alert("Please enter NRC in format: 123456/78/9");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function validateBusStep(step) {
+        if (step === 1) {
+            let businessName = document.getElementById('bus-name').value;
+            let regNumber = document.getElementById('bus-reg').value;
+            let contactName = document.getElementById('bus-contact-name').value;
+            let contactEmail = document.getElementById('bus-contact-email').value;
+            let contactPhone = document.getElementById('bus-contact-phone').value;
+            
+            if (!businessName || !regNumber || !contactName || !contactEmail || !contactPhone) {
+                alert("Please fill all required business details.");
+                return false;
+            }
+            if (!/^\S+@\S+\.\S+$/.test(contactEmail)) {
+                alert("Please enter a valid email address for contact person.");
+                return false;
+            }
+        } else if (step === 2) {
+            let amount = document.getElementById('bus-amt').value;
+            let purpose = document.getElementById('bus-purpose').value;
+            let reason = document.getElementById('bus-reason').value;
+            let period = document.getElementById('bus-period').value;
+            
+            if (!amount || !purpose || !reason || !period) {
+                alert("Please fill all required loan request fields.");
+                return false;
+            }
+            if (parseFloat(amount) < 1000) {
+                alert("Minimum business loan amount is K1,000.");
+                return false;
+            }
+        } else if (step === 3) {
+            let collateralType = document.getElementById('bus-collateral-type').value;
+            let collateralDesc = document.getElementById('bus-collateral-desc').value;
+            let collateralValue = document.getElementById('bus-collateral-value').value;
+            
+            if (!collateralType || !collateralDesc || !collateralValue) {
+                alert("Please fill all required collateral information.");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Form submission handlers - modified for edit mode
+    document.getElementById('individualForm')?.addEventListener('submit', function(event) {
+        let sigMethod = document.querySelector('#ind-step4 .sig-method.active')?.textContent.trim();
+        
+        if (sigMethod === 'Draw New Signature') {
+            if (indSignaturePad && !indSignaturePad.isEmpty()) {
+                document.getElementById('ind-signature-data').value = indSignaturePad.toDataURL();
+            }
+        } else if (document.getElementById('ind-sig-upload').files[0]) {
             // Signature uploaded, will be processed by backend
         }
-        if(!document.getElementById('ind-agreement').checked){
+        
+        if (!document.getElementById('ind-agreement').checked) {
             alert("Please agree to the terms and conditions.");
-            t.preventDefault();
+            event.preventDefault();
             return false;
         }
-        showAlert('Updating your personal loan application...','info');
+        
+        showAlert('Updating your personal loan application...', 'info');
         return true;
-    };
+    });
     
-    document.getElementById('businessForm')?.onsubmit=function(t){
-        let e=document.querySelector('#bus-step5 .sig-method.active')?.textContent.trim();
-        if('Draw New Signature'===e){
-            if(busSignaturePad && !busSignaturePad.isEmpty()){
-                document.getElementById('bus-signature-data').value=busSignaturePad.toDataURL();
+    document.getElementById('businessForm')?.addEventListener('submit', function(event) {
+        let sigMethod = document.querySelector('#bus-step5 .sig-method.active')?.textContent.trim();
+        
+        if (sigMethod === 'Draw New Signature') {
+            if (busSignaturePad && !busSignaturePad.isEmpty()) {
+                document.getElementById('bus-signature-data').value = busSignaturePad.toDataURL();
             }
-        } else if(document.getElementById('bus-sig-upload').files[0]){
+        } else if (document.getElementById('bus-sig-upload').files[0]) {
             // Signature uploaded, will be processed by backend
         }
-        if(!document.getElementById('bus-agreement').checked){
+        
+        if (!document.getElementById('bus-agreement').checked) {
             alert("Please agree to the terms and conditions.");
-            t.preventDefault();
+            event.preventDefault();
             return false;
         }
-        showAlert('Updating your business loan application...','info');
+        
+        showAlert('Updating your business loan application...', 'info');
         return true;
-    };
+    });
     
-    function showAlert(t,e){document.querySelectorAll('.alert').forEach(o=>o.remove());let a=document.createElement('div');a.className=`alert alert-${e}`;a.innerHTML=`${t}<button class="alert-close" onclick="this.parentElement.style.display='none'">×</button>`;document.querySelector('.main-content').insertBefore(a,document.querySelector('.main-content').firstChild);'info'===e&&setTimeout(()=>{a.parentElement&&(a.style.display='none')},1e4)}
+    function showAlert(message, type) {
+        document.querySelectorAll('.alert').forEach(alert => alert.remove());
+        let alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.innerHTML = `${message}<button class="alert-close" onclick="this.parentElement.style.display='none'">×</button>`;
+        document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.main-content').firstChild);
+        if (type === 'info') {
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.style.display = 'none';
+                }
+            }, 10000);
+        }
+    }
 </script>
 </body>
 </html>
