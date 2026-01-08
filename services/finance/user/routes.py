@@ -4,6 +4,8 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import base64
+from utils.database import get_db_connection, calculate_total_repayment
 
 finance_bp = Blueprint(
     "finance",
@@ -220,55 +222,134 @@ def my_loans():
     return render_template("fin_my_loans.html", loans=loans)
 
 # --------------------------------------------------
-# EDITING & UTILITIES
+# EDIT LOAN APPLICATION
 # --------------------------------------------------
-@finance_bp.route("/loans/edit/<int:loan_id>", methods=["GET", "POST"])
+@finance_bp.route('/loans/edit/<int:loan_id>', methods=['GET', 'POST'])
 @login_required
 def edit_loan(loan_id):
-    from utils.database import get_db_connection, calculate_total_repayment
-    user_id = session.get("user_id")
     db = get_db_connection()
-
-    loan = db.execute("""
-        SELECT * FROM loan_applications 
-        WHERE id = ? AND user_id = ? AND status = 'pending'
-    """, (loan_id, user_id)).fetchone()
+    
+    # Ensure the loan belongs to the logged-in user
+    loan = db.execute(
+        "SELECT * FROM loan_applications WHERE id = ? AND user_id = ?", 
+        (loan_id, session['user_id'])
+    ).fetchone()
 
     if not loan:
-        flash("Application not found or is already being processed.", "danger")
         db.close()
-        return redirect(url_for("finance.my_loans"))
+        flash("Loan application not found.", "error")
+        return redirect(url_for('finance.my_loans'))
 
-    if request.method == "POST":
-        loan_amount = float(request.form.get("loan_amount", 0).replace(',', ''))
-        total_repayment = calculate_total_repayment(loan_amount)
-        
-        db.execute("UPDATE loan_applications SET total_repayment = ?, updated_date = CURRENT_TIMESTAMP WHERE id = ?", 
-                   (total_repayment, loan_id))
+    # Fetch existing details
+    personal_details = db.execute("SELECT * FROM personal_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
+    business_details = db.execute("SELECT * FROM business_loan_details WHERE application_id = ?", (loan_id,)).fetchone()
+    details = personal_details if loan['loan_type'] == 'personal' else business_details
 
-        if loan['loan_type'] == 'personal':
+    if request.method == 'POST':
+        try:
+            loan_type = request.form.get('loan_type')
+            
+            # 1. Clean Numeric Data
+            raw_amt = request.form.get('ind-amt') if loan_type == 'personal' else request.form.get('bus-amt')
+            loan_amount = float(str(raw_amt).replace(',', '').strip()) if raw_amt else 0.0
+            
+            # 2. Update Main Table
             db.execute("""
-                UPDATE personal_loan_details SET loan_amount=?, purpose=?, full_name=? WHERE application_id=?
-            """, (loan_amount, request.form.get("purpose"), request.form.get("full_name"), loan_id))
-        else:
-            db.execute("""
-                UPDATE business_loan_details SET loan_amount=?, purpose=?, business_name=? WHERE application_id=?
-            """, (loan_amount, request.form.get("purpose"), request.form.get("business_name"), loan_id))
-        
-        db.commit()
-        db.close()
-        flash("Application updated successfully!", "success")
-        return redirect(url_for("finance.my_loans"))
+                UPDATE loan_applications 
+                SET loan_amount = ?, updated_date = CURRENT_TIMESTAMP, status = 'pending' 
+                WHERE id = ?
+            """, (loan_amount, loan_id))
 
-    details = None
-    if loan['loan_type'] == 'personal':
-        details = db.execute("SELECT * FROM personal_loan_details WHERE application_id=?", (loan_id,)).fetchone()
-    else:
-        details = db.execute("SELECT * FROM business_loan_details WHERE application_id=?", (loan_id,)).fetchone()
-    
-    db.close()
-    return render_template("fin_edit_loan.html", loan=loan, details=details)
+            # 3. Process Signature (if a new one was drawn)
+            sig_data = request.form.get('ind-signature-data') or request.form.get('bus-signature-data')
+            new_sig_path = None
+            if sig_data and 'base64' in sig_data:
+                header, encoded = sig_data.split(",", 1)
+                data = base64.b64decode(encoded)
+                sig_filename = f"sig_upd_{loan_id}_{int(time.time())}.png"
+                sig_path = os.path.join(LOAN_UPLOAD_FOLDER, sig_filename)
+                with open(sig_path, "wb") as f:
+                    f.write(data)
+                new_sig_path = sig_filename
 
+            # 4. Update Detailed Tables
+            if loan_type == 'personal':
+                db.execute("""
+                    UPDATE personal_loan_details SET 
+                        full_name = ?, nrc_number = ?, dob = ?, email = ?, 
+                        phone = ?, address = ?, purpose = ?, period = ?
+                        {sig_query}
+                    WHERE application_id = ?
+                """.format(sig_query=", signature_path = ?" if new_sig_path else ""), 
+                tuple(filter(None, [
+                    request.form.get('ind-name'), request.form.get('ind-nrc'),
+                    request.form.get('ind-dob'), request.form.get('ind-email'),
+                    request.form.get('ind-phone'), request.form.get('ind-address'),
+                    request.form.get('ind-purpose'), request.form.get('ind-period'),
+                    new_sig_path, loan_id
+                ])))
+            else:
+                # Business Update
+                raw_rev = request.form.get('bus-revenue')
+                monthly_revenue = float(str(raw_rev).replace(',', '').strip()) if raw_rev else 0.0
+                
+                db.execute("""
+                    UPDATE business_loan_details SET 
+                        business_name = ?, business_registration_number = ?,
+                        contact_person_name = ?, contact_person_email = ?,
+                        contact_person_phone = ?, contact_person_position = ?,
+                        monthly_revenue = ?, loan_amount = ?
+                        {sig_query}
+                    WHERE application_id = ?
+                """.format(sig_query=", signature_path = ?" if new_sig_path else ""),
+                tuple(filter(None, [
+                    request.form.get('bus-name'), request.form.get('bus-reg'),
+                    request.form.get('bus-contact-name'), request.form.get('bus-contact-email'),
+                    request.form.get('bus-contact-phone'), request.form.get('bus-contact-position'),
+                    monthly_revenue, loan_amount, new_sig_path, loan_id
+                ])))
+
+            # 5. Handle File Replacements (KYC & Business Docs)
+            file_fields = {
+                'ind-identity': 'identity_proof_path',
+                'ind-residence': 'address_proof_path',
+                'ind-income': 'income_proof_path',
+                'bus-reg-cert': 'bus_reg_cert',
+                'bus-tax-cert': 'bus_tax_cert',
+                'bus-bank-stmts': 'bus_bank_stmts'
+            }
+            
+            for form_key, db_col in file_fields.items():
+                file = request.files.get(form_key)
+                if file and file.filename != '':
+                    filename = secure_filename(f"upd_{loan_id}_{form_key}_{file.filename}")
+                    file.save(os.path.join(LOAN_UPLOAD_FOLDER, filename))
+                    table = "personal_loan_details" if loan_type == 'personal' else "business_loan_details"
+                    db.execute(f"UPDATE {table} SET {db_col} = ? WHERE application_id = ?", (filename, loan_id))
+
+            # 6. Handle New Collateral Photos (Multiple)
+            collateral_files = request.files.getlist('ind-collateral-photos')
+            for file in collateral_files:
+                if file and file.filename != '':
+                    filename = secure_filename(f"coll_{loan_id}_{int(time.time())}_{file.filename}")
+                    file.save(os.path.join(LOAN_UPLOAD_FOLDER, filename))
+                    db.execute("INSERT INTO application_attachments (application_id, document_category, file_path) VALUES (?, ?, ?)",
+                               (loan_id, 'Collateral Image', filename))
+
+            db.commit()
+            flash("Application successfully updated and resubmitted!", "success")
+            return redirect(url_for('finance.my_loans'))
+
+        except Exception as e:
+            db.rollback()
+            current_app.logger.error(f"Edit Error: {e}")
+            flash("An error occurred while saving your changes.", "error")
+        finally:
+            db.close()
+
+    return render_template('fin_edit_loan.html', loan=loan, details=details)
+# --------------------------------------------------
+# ADDITIONAL PAGES
 @finance_bp.route("/eligibility", methods=["GET", "POST"])
 def eligibility():
     if request.method == "POST":

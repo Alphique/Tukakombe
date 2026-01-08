@@ -303,9 +303,6 @@ def list_loans():
     return render_template('admin_loans_list.html', loans=loans)
 
 # ------------------------------
-# VIEW & MANAGE LOAN (FIXED FOR BUSINESS ATTACHMENTS)
-# ------------------------------
-# ------------------------------
 # VIEW & MANAGE LOAN (FIXED MATCHING)
 # ------------------------------
 @admin_bp.route('/loans/<int:loan_id>', methods=['GET', 'POST'])
