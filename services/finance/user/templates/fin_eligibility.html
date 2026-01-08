@@ -1,50 +1,283 @@
-<!-- services/finance/user/templates/fin_eligibility.html -->
 {% extends "fin_base.html" %}
 
 {% block fin_content %}
-<h1>Eligibility Criteria</h1>
+<style>
+    :root {
+        --navy: #1a2a40;
+        --lime: #a2d242;
+        --teal: #4ecdc4;
+        --off-white: #f8fafc;
+    }
 
-<p>
-    To qualify for a Tuka Finance loan, your business should meet the following requirements:
-</p>
+    .eligibility-wrapper {
+        max-width: 650px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
 
-<ul>
-    <li>Registered business operating for at least 6 months</li>
-    <li>Valid business registration documents</li>
-    <li>Bank account in business name</li>
-    <li>Minimum revenue threshold depending on loan type</li>
-    <li>Good credit history</li>
-</ul>
+    .glass-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(26, 42, 64, 0.1);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
 
-<section>
-    <h2>Additional Notes</h2>
-    <p>
-        Our team reviews applications carefully and may request supplementary documents.
-        Contact us if you are unsure about eligibility.
-    </p>
-</section>
+    .brand-header {
+        background: var(--navy);
+        padding: 2rem;
+        text-align: center;
+        color: #fff;
+    }
 
-<section>
-    <h2>Check Your Eligibility</h2>
-    <form method="POST" action="{{ url_for('finance.eligibility') }}">
-        <div class="form-group mb-3">
-            <label for="business_name">Business Name</label>
-            <input type="text" class="form-control" id="business_name" name="business_name" required>
+    .brand-header h2 { font-weight: 800; margin: 0; }
+    .brand-header span { color: var(--lime); }
+
+    .form-section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--teal);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 5px;
+    }
+
+    .card-body { padding: 2rem; }
+
+    /* Floating Labels Styling */
+    .form-group { margin-bottom: 1.2rem; }
+    label { 
+        font-weight: 600; 
+        color: var(--navy); 
+        margin-bottom: 6px; 
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 12px 15px;
+        border: 2px solid #edf2f7;
+        background: #fdfdfd;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+        background: #fff;
+    }
+
+    /* Calculator Box Improvement */
+    .calc-box {
+        background: var(--off-white);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        margin-top: 2rem;
+    }
+
+    .calc-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .calc-total {
+        border-top: 2px dashed #cbd5e1;
+        margin-top: 10px;
+        padding-top: 10px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--navy);
+    }
+
+    .collateral-warning {
+        background: #fff5f5;
+        color: #c53030;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-top: 10px;
+        border: 1px solid #feb2b2;
+    }
+
+    .btn-submit {
+        background: var(--lime);
+        color: var(--navy);
+        border: none;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-submit:hover {
+        background: var(--navy);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive Grid */
+    .row-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    @media (max-width: 576px) {
+        .row-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="eligibility-wrapper">
+    <div class="glass-card">
+        <div class="brand-header">
+            <h2>Tuka<span>kombe</span></h2>
+            <p class="mb-0 opacity-75">Eligibility & Repayment Check</p>
         </div>
-        <div class="form-group mb-3">
-            <label for="annual_turnover">Annual Revenue (ZMW)</label>
-            <input type="number" class="form-control" id="annual_turnover" name="annual_turnover" required>
+
+        <div class="card-body">
+            <form method="POST" id="eligibilityForm">
+                
+                <div class="form-section-title">Loan Details</div>
+                
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label>Loan Type</label>
+                        <select class="form-control" name="loan_type" required>
+                            <option value="">Select</option>
+                            <option value="personal">Personal</option>
+                            <option value="business">Business</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Revenue Cycle</label>
+                        <select class="form-control" name="submission_type" required>
+                            <option value="">Select</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Repayment Period</label>
+                    <select class="form-control" name="period" id="period" required>
+                        {% for i in range(1,13) %}
+                        <option value="{{ i }}">
+                            {{ i }} Weeks{% if i==8 %} (2 Months){% elif i==12 %} (3 Months){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label>Revenue (ZMW)</label>
+                        <input type="number" class="form-control" name="revenue" id="revenue" placeholder="e.g. 5000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Requested Amount</label>
+                        <input type="number" class="form-control" name="amount" id="amount" placeholder="e.g. 1000" required>
+                    </div>
+                </div>
+
+                <div class="form-section-title mt-4">Security & Collateral</div>
+
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label>Collateral Item</label>
+                        <input type="text" class="form-control" name="collateral_type" placeholder="e.g. Samsung TV" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Value (ZMW)</label>
+                        <input type="number" class="form-control" name="collateral_value" placeholder="e.g. 3500" required>
+                    </div>
+                </div>
+
+                <div class="calc-box">
+                    <h5 class="mb-3" style="color:var(--navy); font-weight:700;"><i class="fas fa-calculator me-2"></i>Live Breakdown</h5>
+                    
+                    <div class="calc-row">
+                        <span>Interest Rate</span>
+                        <span id="interestRate" class="badge bg-dark">0%</span>
+                    </div>
+                    
+                    <div class="calc-row">
+                        <span>Interest Amount</span>
+                        <span>ZMW <span id="interestAmount">0.00</span></span>
+                    </div>
+
+                    <div class="calc-row calc-total">
+                        <span>Total Payable</span>
+                        <span>ZMW <span id="totalPayable">0.00</span></span>
+                    </div>
+
+                    <div class="collateral-warning">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        <strong>Min. Collateral Required:</strong> 
+                        ZMW <span id="minCollateral">0.00</span>
+                    </div>
+                </div>
+
+                <button class="btn-submit shadow">Check Eligibility Now</button>
+            </form>
+
+            {% if result %}
+            <div class="alert mt-4 alert-{{ 'success' if result.status == 'success' else 'danger' }}" style="border-radius:12px; font-weight:600;">
+                <i class="fas {{ 'fa-check-circle' if result.status == 'success' else 'fa-times-circle' }} me-2"></i>
+                {{ result.message }}
+            </div>
+            {% endif %}
         </div>
-        <div class="form-group mb-3">
-            <label for="loan_type">Loan Type</label>
-            <select class="form-control" id="loan_type" name="loan_type" required>
-                <option value="">Select a loan type</option>
-                <option value="startup">Business Startup Loan</option>
-                <option value="working_capital">Working Capital Loan</option>
-                <option value="expansion">Expansion & Growth Loan</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Check Eligibility</button>
-    </form>
-</section>
+    </div>
+</div>
+
+<script>
+// I kept your logic EXACTLY as it was
+const interestMap = {
+    1: 0.15, 2: 0.20, 3: 0.35, 4: 0.40,
+    5: 0.55, 6: 0.60, 7: 0.75, 8: 0.80,
+    9: 0.95, 10: 1.00, 11: 1.15, 12: 1.20
+};
+
+const periodEl = document.getElementById("period");
+const amountEl = document.getElementById("amount");
+
+const interestRateEl = document.getElementById("interestRate");
+const interestAmountEl = document.getElementById("interestAmount");
+const totalPayableEl = document.getElementById("totalPayable");
+const minCollateralEl = document.getElementById("minCollateral");
+
+function calculateLoan() {
+    const period = parseInt(periodEl.value);
+    const amount = parseFloat(amountEl.value);
+
+    if (!period || !amount) return;
+
+    const rate = interestMap[period] || 0;
+    const interest = amount * rate;
+    const total = amount + interest;
+    const minCollateral = total + (amount * 0.30);
+
+    interestRateEl.innerText = (rate * 100).toFixed(0) + "%";
+    interestAmountEl.innerText = interest.toLocaleString(undefined, {minimumFractionDigits: 2});
+    totalPayableEl.innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
+    minCollateralEl.innerText = minCollateral.toLocaleString(undefined, {minimumFractionDigits: 2});
+}
+
+periodEl.addEventListener("change", calculateLoan);
+amountEl.addEventListener("input", calculateLoan);
+</script>
+
 {% endblock %}

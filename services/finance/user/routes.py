@@ -350,17 +350,77 @@ def edit_loan(loan_id):
     return render_template('fin_edit_loan.html', loan=loan, details=details)
 # --------------------------------------------------
 # ADDITIONAL PAGES
+# --------------------------------------------------
+#----------------------------
+# Loan Eligibility Checker  
 @finance_bp.route("/eligibility", methods=["GET", "POST"])
 def eligibility():
-    if request.method == "POST":
-        flash("Eligibility check complete.", "success")
-        return redirect(url_for("finance.eligibility"))
-    return render_template("fin_eligibility.html")
+    result = None
 
+    INTEREST_MAP = {
+        1: 0.15, 2: 0.20, 3: 0.35, 4: 0.40,
+        5: 0.55, 6: 0.60, 7: 0.75, 8: 0.80,
+        9: 0.95, 10: 1.00, 11: 1.15, 12: 1.20
+    }
+
+    if request.method == "POST":
+        submission_type = request.form["submission_type"]
+        period = int(request.form["period"])
+        revenue = float(request.form["revenue"])
+        amount = float(request.form["amount"])
+        collateral_value = float(request.form["collateral_value"])
+
+        interest_rate = INTEREST_MAP.get(period, 0)
+        interest = amount * interest_rate
+        total_due = amount + interest
+
+        # Revenue calculation
+        if submission_type == "weekly":
+            total_revenue = revenue * period
+        else:
+            months = period / 4
+            total_revenue = revenue * months
+
+        # Revenue check
+        if total_revenue < total_due:
+            result = {
+                "status": "danger",
+                "message": (
+                    "Request a lower amount. Your revenue only supports loans "
+                    "equal to or below your income for this period."
+                )
+            }
+
+        # Collateral check (+10% buffer)
+        elif collateral_value < (total_due + (amount * 0.10)):
+            result = {
+                "status": "danger",
+                "message": (
+                    "Ineligible. Your collateral value is insufficient. "
+                    "Add higher-value collateral or request a smaller loan."
+                )
+            }
+
+        else:
+            result = {
+                "status": "success",
+                "message": (
+                    "Eligible! Your revenue and collateral meet the "
+                    "requirements for this loan period."
+                )
+            }
+
+    return render_template("fin_eligibility.html", result=result)
+
+#----------------------------
+# Frequntly asked questions
+#----------------------------
 @finance_bp.route("/faq")
 def faq():
     return render_template("fin_faq.html")
-
+#---------------------------------------------
+# Contact Us Page (GET and POST)
+#---------------------------------------------
 @finance_bp.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
