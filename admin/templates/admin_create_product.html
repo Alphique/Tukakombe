@@ -1,401 +1,182 @@
 {% extends "base.html" %}
-{% block title %}Add Product | Inventory Studio{% endblock %}
+
+{% block title %}
+    {% if product %}Edit {{ product.name }}{% else %}Add New Product{% endif %} | Tukakombe Admin
+{% endblock %}
 
 {% block content %}
-<div class="studio-master-wrapper">
-    <div class="product-studio-container">
-        
-        <header class="studio-header-card">
-            <div class="header-content">
-                <span class="studio-badge">Inventory Studio</span>
-                <h1>📦 New Product</h1>
-                <p>List a new item in your storefront with high-quality details.</p>
+<style>
+    :root {
+        --navy: #0a192f;
+        --navy-light: #112240;
+        --lime: #bef264;
+        --slate: #64748b;
+        --off-white: #f8fafc;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+        margin: 40px auto;
+        max-width: 1000px;
+    }
+
+    .card-header {
+        background: var(--navy);
+        padding: 30px 40px;
+        color: white;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .card-body { padding: 40px; }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .custom-input {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: var(--off-white);
+        transition: 0.3s;
+    }
+
+    .custom-input:focus {
+        outline: none;
+        border-color: var(--lime);
+        background: white;
+    }
+
+    /* Multi-Image Upload Styling */
+    .upload-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        background: var(--off-white);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--lime);
+        background: #f1f5f9;
+    }
+
+    #image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .preview-thumb {
+        width: 100%;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 3px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-submit {
+        background: var(--lime);
+        color: var(--navy);
+        font-weight: 800;
+        padding: 18px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container" style="padding: 0 20px;">
+    <div class="admin-card">
+        <div class="card-header">
+            <h2 style="margin: 0;">Add Marketplace Listing</h2>
+            <p style="margin: 5px 0 0 0; color: var(--lime);">Upload multiple high-quality photos to attract buyers</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                
+                <div>
+                    <div style="margin-bottom: 25px;">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="name" class="custom-input" placeholder="e.g. 2018 Toyota Hilux" required>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label class="form-label">Price (ZMW)</label>
+                        <input type="number" step="0.01" name="price" class="custom-input" placeholder="K 0.00" required>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="custom-input" rows="8" placeholder="Describe the item condition..." required></textarea>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Gallery Photos</label>
+                    <div class="upload-zone" onclick="document.getElementById('image-input').click()">
+                        <div id="image-placeholder">
+                            <i class="fas fa-images" style="font-size: 3rem; color: var(--slate); margin-bottom: 15px;"></i>
+                            <p style="margin: 0; font-weight: 700;">Click to select photos</p>
+                            <p style="font-size: 0.8rem; color: var(--slate);">Hold Ctrl/Cmd to select multiple</p>
+                        </div>
+                        <div id="image-preview-grid"></div>
+                        <input type="file" id="image-input" name="images" accept="image/*" hidden multiple onchange="previewImages(event)">
+                    </div>
+                    
+                    <div style="margin-top: 25px; padding: 20px; background: #fdfcf0; border: 1px solid #f2eebf; border-radius: 12px;">
+                        <p style="margin: 0; font-size: 0.85rem; color: #854d0e;">
+                            <strong>Pro Tip:</strong> Listings with 4+ photos sell 3x faster. Show different angles of the item.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn-cancel">Cancel</a>
-        </header>
 
-        <form method="POST" enctype="multipart/form-data" class="product-form-layout" id="product-form">
-            <div class="form-main-column">
-                <div class="form-card">
-                    <h3 class="card-title"><i class="fas fa-info-circle"></i> General Information</h3>
-                    <div class="input-group">
-                        <label for="name">Product Name</label>
-                        <input type="text" name="name" id="name" class="studio-input" placeholder="e.g. Premium Leather Tote" required>
-                    </div>
-
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label for="price">Price (ZMW)</label>
-                            <div class="price-input-wrapper">
-                                <span class="currency-tag">K</span>
-                                <input type="number" name="price" id="price" step="0.01" placeholder="0.00" required>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="category">Category</label>
-                            <select name="category" id="category" class="studio-input">
-                                <option value="electronics">Electronics</option>
-                                <option value="fashion">Fashion</option>
-                                <option value="home">Home & Living</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="description">Full Description</label>
-                        <textarea name="description" id="description" class="studio-input" rows="5" placeholder="Details about materials and features..." required></textarea>
-                    </div>
-                </div>
-
-                <div class="form-card">
-                    <h3 class="card-title"><i class="fas fa-boxes"></i> Inventory & Tracking</h3>
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label for="sku">SKU Code</label>
-                            <input type="text" name="sku" id="sku" class="studio-input" placeholder="INV-001">
-                        </div>
-                        <div class="input-group">
-                            <label for="stock">Stock Quantity</label>
-                            <input type="number" name="stock" id="stock" class="studio-input" placeholder="0">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-side-column">
-                <div class="side-card">
-                    <h3 class="card-title">Product Media</h3>
-                    <div class="image-drop-zone" id="drop-zone">
-                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <p>Drag & drop or <span>browse</span></p>
-                        <input type="file" name="image" id="product-img" hidden accept="image/*">
-                    </div>
-                </div>
-
-                <div class="action-card-fixed">
-                    <button type="submit" class="btn-publish">
-                        <span>Create Product</span>
-                        <i class="fas fa-plus-circle"></i>
-                    </button>
-                    <button type="button" class="btn-draft">Save Draft</button>
-                </div>
+            <div style="margin-top: 40px; display: flex; align-items: center; gap: 20px; border-top: 1px solid #e2e8f0; padding-top: 30px;">
+                <button type="submit" class="btn-submit">Publish to Marketplace</button>
+                <a href="{{ url_for('market_place.admin_products') }}" style="text-decoration: none; color: var(--slate); font-weight: 600;">Cancel</a>
             </div>
         </form>
     </div>
 </div>
 
-<style>
-/* --- THE LAYOUT FIX --- */
-:root {
-    --navy: #1a2a40;
-    --lime: #a2d242;
-    --white: #ffffff;
-    --off-white: #f1f5f9;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-.studio-master-wrapper {
-    background: var(--off-white);
-    /* FIX: Start content below the fixed header automatically */
-    min-height: 100vh;
-    width: 100%;
-    
-    /* Adjust these values based on your actual header height */
-    /* If your fixed header is 64px tall, use: */
-    padding-top: 80px; /* Slightly more than header height for breathing room */
-    
-    /* If you have a fixed footer, adjust this too */
-    padding-bottom: 40px;
-    
-    display: flex;
-    flex-direction: column;
-}
-
-.product-studio-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 95%;
-    flex: 1;
-}
-
-/* If you have a fixed navbar, ensure proper z-index */
-nav.fixed-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    /* Your navbar styles here */
-}
-
-/* --- Refined Header Card --- */
-.studio-header-card {
-    background: var(--white);
-    padding: 2rem;
-    border-radius: 16px;
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    border-left: 8px solid var(--lime);
-    position: relative;
-    z-index: 1;
-}
-
-.studio-badge {
-    background: var(--navy);
-    color: var(--lime);
-    padding: 5px 15px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    display: inline-block;
-}
-
-.header-content h1 { 
-    color: var(--navy); 
-    margin: 0; 
-    font-size: 1.8rem; 
-    font-weight: 800; 
-}
-
-.header-content p { 
-    color: #64748b; 
-    margin: 5px 0 0; 
-}
-
-.btn-cancel {
-    text-decoration: none;
-    color: #ef4444;
-    font-weight: 600;
-    padding: 10px 20px;
-    border: 1px solid #fee2e2;
-    border-radius: 8px;
-    transition: 0.3s;
-    background: white;
-}
-
-.btn-cancel:hover { 
-    background: #fef2f2; 
-}
-
-/* --- Forms & Grid --- */
-.product-form-layout {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 2rem;
-    align-items: start;
-}
-
-.form-card, .side-card {
-    background: var(--white);
-    padding: 2rem;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-}
-
-.card-title {
-    font-size: 1rem;
-    color: var(--navy);
-    margin-bottom: 1.5rem;
-    font-weight: 700;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 0.8rem;
-}
-
-.card-title i {
-    margin-right: 8px;
-    color: var(--lime);
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: var(--navy);
-    margin-bottom: 0.5rem;
-}
-
-.studio-input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
-    font-size: 0.9rem;
-    transition: border 0.3s;
-}
-
-.studio-input:focus {
-    outline: none;
-    border-color: var(--lime);
-    background: white;
-}
-
-.input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.price-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.currency-tag {
-    position: absolute;
-    left: 12px;
-    font-weight: bold;
-    color: var(--navy);
-    z-index: 2;
-}
-
-.price-input-wrapper input {
-    padding-left: 30px;
-}
-
-/* --- Image Drop Zone --- */
-.image-drop-zone {
-    border: 2px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 3rem 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: #f8fafc;
-}
-
-.image-drop-zone:hover {
-    border-color: var(--lime);
-    background: #f1f8e9;
-}
-
-.upload-icon {
-    font-size: 2.5rem;
-    color: #94a3b8;
-    margin-bottom: 1rem;
-}
-
-.image-drop-zone p {
-    color: #64748b;
-    margin-bottom: 0.5rem;
-}
-
-.image-drop-zone span {
-    color: var(--navy);
-    font-weight: 600;
-    text-decoration: underline;
-}
-
-/* --- Action Section --- */
-.action-card-fixed {
-    background: var(--navy);
-    padding: 2rem;
-    border-radius: 16px;
-    color: white;
-}
-
-.btn-publish {
-    width: 100%;
-    background: var(--lime);
-    color: var(--navy);
-    padding: 1.2rem;
-    border: none;
-    border-radius: 12px;
-    font-weight: 800;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.btn-publish:hover {
-    background: #b8e252;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(162, 210, 66, 0.3);
-}
-
-.btn-draft {
-    width: 100%;
-    margin-top: 1rem;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: white;
-    padding: 0.8rem;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-}
-
-.btn-draft:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.3);
-}
-
-/* --- Responsive Design --- */
-@media (max-width: 992px) {
-    .product-form-layout { 
-        grid-template-columns: 1fr; 
+<script>
+    function previewImages(event) {
+        const grid = document.getElementById('image-preview-grid');
+        const placeholder = document.getElementById('image-placeholder');
+        grid.innerHTML = ''; 
+        
+        if (event.target.files.length > 0) {
+            placeholder.style.display = 'none';
+            Array.from(event.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-thumb';
+                    grid.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        } else {
+            placeholder.style.display = 'block';
+        }
     }
-    
-    .studio-master-wrapper { 
-        padding-top: 100px; 
-    }
-    
-    .input-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .studio-header-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .btn-cancel {
-        align-self: flex-end;
-    }
-    
-    .studio-master-wrapper { 
-        padding-top: 90px; 
-        padding-bottom: 30px;
-    }
-    
-    .form-card, .side-card {
-        padding: 1.5rem;
-    }
-}
-
-/* Optional: If you need to see exactly where content starts */
-/* Uncomment this for debugging:
-.studio-master-wrapper::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: rgba(255,0,0,0.2);
-    z-index: 9999;
-    pointer-events: none;
-}
-*/
-</style>
+</script>
 {% endblock %}

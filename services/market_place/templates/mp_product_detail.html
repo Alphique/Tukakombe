@@ -1,23 +1,531 @@
-{% extends "base.html" %}
-{% block title %}{{ product['name'] }}{% endblock %}
+{% extends "mp_base.html" %}
+{% block title %}{{ product['name'] }} | Tukakombe{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    :root {
+        --navy: #0a192f;
+        --navy-light: #112240;
+        --lime: #bef264;
+        --lime-dark: #a3e635;
+        --slate: #64748b;
+        --slate-light: #94a3b8;
+        --border: #e2e8f0;
+        --white: #ffffff;
+        --bg-soft: #f8fafc;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --success: #10b981;
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    /* adjust top offset to account for fixed header (increase if header taller) */
+    .detail-wrapper {
+        max-width: 1300px;
+        margin: 0 auto 60px;
+        padding: 180px 20px 30px 20px; /* ensure content sits well below fixed header */
+    }
+
+    /* BREADCRUMBS */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+        color: var(--slate);
+    }
+    .breadcrumb a { color: var(--slate); text-decoration: none; transition: 0.2s; }
+    .breadcrumb a:hover { color: var(--navy); }
+
+    /* LAYOUT GRID */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 450px;
+        gap: 40px;
+        align-items: start;
+    }
+
+    /* --- GALLERY UPGRADE --- */
+    .gallery-container {
+        background: var(--white);
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .main-slider {
+        height: 520px;
+        border-radius: 14px;
+        background: linear-gradient(180deg,#fbfdff,#f4f7fb);
+        overflow: hidden;
+        border: 1px solid rgba(14,30,50,0.04);
+        display:flex; align-items:center; justify-content:center;
+    }
+
+    .main-slider .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-slider img {
+        max-width: 92%;
+        max-height: 92%;
+        object-fit: contain;
+        transition: transform 0.45s cubic-bezier(0.165, 0.84, 0.44, 1);
+        cursor: zoom-in;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 12px 34px rgba(12,34,56,0.06);
+    }
+
+    .main-slider .swiper-slide:hover img {
+        transform: scale(1.08);
+    }
+
+    .image-counter {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        background: rgba(10, 25, 47, 0.7);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        z-index: 20;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .thumb-slider {
+        height: 96px;
+        padding: 6px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .thumb-slider .swiper-slide {
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.65;
+        transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+        border: 2px solid transparent;
+        width: 96px !important;
+        height: 72px !important;
+        display:flex; align-items:center; justify-content:center;
+    }
+
+    .thumb-slider .swiper-slide:hover { transform: translateY(-4px); opacity: 0.95 }
+
+    .thumb-slider .swiper-slide-thumb-active {
+        opacity: 1;
+        border-color: var(--lime);
+        box-shadow: 0 8px 24px rgba(15, 30, 50, 0.08);
+        transform: scale(1.04);
+    }
+
+    .thumb-slider img { width:100%; height:100%; object-fit:cover }
+
+    /* Swiper navigation arrows - clearer and visible above header */
+    .swiper-button-next, .swiper-button-prev {
+        width:44px; height:44px; border-radius:999px; background:#fff; color:var(--navy);
+        display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(2,6,23,0.12);
+        border:1px solid rgba(10,25,47,0.06); z-index:60;
+    }
+    .swiper-button-next::after, .swiper-button-prev::after{ font-size:16px; }
+    .swiper-button-next{ right:16px }
+    .swiper-button-prev{ left:16px }
+
+    /* Empty placeholder */
+    .no-image-placeholder{ display:flex; align-items:center; justify-content:center; height:420px; background:linear-gradient(180deg,#fbfbfd,#f2f6fb); border-radius:10px; color:var(--slate); font-weight:700 }
+
+    /* --- ADMIN SUITE --- */
+    .admin-suite {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--bg-soft);
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .admin-title { font-size: 0.9rem; font-weight: 800; color: var(--navy); text-transform: uppercase; }
+
+    .action-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .btn-mgmt {
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--navy);
+        cursor: pointer;
+    }
+
+    .btn-mgmt:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(12,34,56,0.06) }
+    .btn-edit{ background: linear-gradient(90deg,#eef8ff,#f0f9ff); border-color:#dbeeff }
+    .btn-delete{ background: linear-gradient(90deg,#fff5f5,#fff8f8); border-color:#ffd7d7 }
+
+    .btn-mgmt:hover { background: var(--bg-soft); transform: translateY(-2px); }
+    .btn-status-active { background: var(--navy) !important; color: white !important; }
+    .btn-edit { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+    .btn-delete { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+
+    /* IMAGE MANAGER GRID */
+    .image-manager-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--bg-soft);
+    }
+
+    .img-manage-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .img-manage-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .img-del-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(239, 68, 68, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: 0.2s;
+        color: white;
+        text-decoration: none;
+    }
+
+    .img-manage-item:hover .img-del-overlay { opacity: 1; }
+
+    /* --- PRODUCT INFO --- */
+    .product-info-card {
+        background: var(--white);
+        padding: 35px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .product-price {
+        font-size: 2.4rem;
+        font-weight: 900;
+        color: var(--navy);
+        margin: 18px 0;
+        display:flex; align-items:baseline; gap:8px
+    }
+
+    .price-k{ font-size:1.2rem; color:var(--slate); font-weight:700 }
+
+    .inquiry-card {
+        background: linear-gradient(180deg,#0b2540,#072033);
+        color: white;
+        padding: 28px;
+        border-radius: 14px;
+        margin-top: 26px;
+        position: sticky;
+        top: 28px;
+        box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+        border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .custom-input {
+        width: 100%;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(90deg,#bef264,#9ed23a);
+        color: var(--navy);
+        border: none;
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform .15s ease, box-shadow .15s ease;
+        box-shadow: 0 8px 20px rgba(30,80,30,0.08);
+    }
+
+    .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(30,80,30,0.12) }
+
+    @media (max-width: 1000px) {
+        .detail-grid { grid-template-columns: 1fr; }
+        .main-slider { height: 420px; }
+        .thumb-slider .swiper-slide{ width:72px !important; height:56px !important }
+        .detail-wrapper { padding-top: 120px; }
+    }
+</style>
+
+<!-- compact gallery overrides + Swiper emergency fixes -->
+<style>
+        /* compact gallery overrides */
+        .detail-wrapper { max-width: 1100px !important; padding: 140px 16px 24px 16px !important; margin-bottom: 40px !important }
+        .detail-grid { grid-template-columns: 1fr 360px !important; gap: 28px !important }
+        .main-slider { height: 380px !important }
+        .main-slider img { max-width: 88% !important; max-height: 88% !important }
+        .thumb-slider { height: 72px !important }
+        .thumb-slider .swiper-slide { width: 72px !important; height: 56px !important; border-radius: 8px !important }
+        @media (max-width: 1000px) {
+                .main-slider { height: 320px !important }
+                .thumb-slider .swiper-slide { width: 64px !important; height: 44px !important }
+                .detail-wrapper { padding-top: 110px !important }
+        }
+
+        /* --- Swiper emergency layout fix overrides --- */
+
+        /* 1) Stop the huge inline width on slides from breaking layout.
+             Use !important to override inline styles emitted by JS. */
+        #mainSlider .swiper-slide {
+            width: 100% !important;      /* full width of the slider viewport */
+            max-width: 100% !important;  /* prevent any overflow */
+            flex: 0 0 100% !important;   /* ensure slide occupies exactly one viewport */
+        }
+
+        /* Optional: if you display multiple slides at once, adjust this:
+             Example for 3 slides per view:
+        #mainSlider .swiper-slide {
+            width: calc(100% / 3) !important;
+            flex: 0 0 calc(100% / 3) !important;
+        }
+        */
+
+        /* 2) Make wrapper sizing predictable and prevent side overflow in flex/grid containers */
+        #mainSlider .swiper-wrapper {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            min-width: 0 !important;     /* critical for overflow in flex/grid contexts */
+        }
+
+        /* 3) Ensure the slider itself has a sane width and height */
+        #mainSlider {
+            width: 100% !important;
+            height: 320px !important;    /* pick ONE height; matches your last rule */
+            overflow: hidden !important; /* hide any residual overflow during transitions */
+            border-radius: 14px;         /* keep your styling */
+        }
+
+        /* 4) Guard against parents causing overflow (grid/flex wrappers) */
+        .detail-grid,
+        .gallery-container,
+        .gallery-col,
+        .detail-wrapper,
+        main {
+            min-width: 0 !important;     /* resolves overflow from long children in CSS Grid/Flex */
+            box-sizing: border-box !important;
+        }
+
+        /* 5) If slides contain images, make them behave */
+        #mainSlider .swiper-slide img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;            /* or 'contain' depending on your design */
+        }
+
+</style>
+
+{% endblock %}
 
 {% block content %}
-<h1>{{ product['name'] }}</h1>
+<div class="detail-wrapper">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('market_place.home') }}"><i class="fas fa-home"></i> Marketplace</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span>{{ product['name'] }}</span>
+    </nav>
 
-{% if product['image'] %}
-<img src="{{ url_for('static', filename='uploads/products/' + product['image']) }}"
-     style="max-width:400px;">
-{% endif %}
+    {% if session.get('role') in ['admin', 'super_admin'] %}
+    <div class="admin-suite">
+        <div class="admin-header">
+            <div class="admin-title"><i class="fas fa-user-shield"></i> Listing Manager</div>
+            <div class="product-id">ID: #{{ product['id'] }}</div>
+        </div>
 
-<p>{{ product['description'] }}</p>
-<p><strong>Price:</strong> ZMW {{ product['price'] }}</p>
+        <div class="action-row">
+            <form method="POST" style="display: flex; gap: 8px;">
+                <input type="hidden" name="update_status" value="1">
+                <button type="submit" name="status" value="available" 
+                    class="btn-mgmt {{ 'btn-status-active' if product['status'] == 'available' else '' }}">
+                    <i class="fas fa-check-circle"></i> Available
+                </button>
+                <button type="submit" name="status" value="sold" 
+                    class="btn-mgmt {{ 'btn-status-active' if product['status'] == 'sold' else '' }}">
+                    <i class="fas fa-lock"></i> Sold
+                </button>
+            </form>
 
-<hr>
+            <div style="width: 1px; background: var(--border); margin: 0 10px;"></div>
 
-<h3>Contact Admin About This Product</h3>
-<form method="POST">
-    <textarea name="message" rows="4" required
-              placeholder="Your message..."></textarea><br>
-    <button type="submit">Send Inquiry</button>
-</form>
+            <a href="{{ url_for('market_place.edit_product', product_id=product['id']) }}" class="btn-mgmt btn-edit">
+                <i class="fas fa-edit"></i> Edit Content
+            </a>
+            
+            <a href="{{ url_for('market_place.delete_product', product_id=product['id']) }}" 
+               class="btn-mgmt btn-delete" onclick="return confirm('Delete permanently?')">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+
+        <div class="image-manager-grid">
+            {% for img in get_images(product['image']) %}
+            <div class="img-manage-item">
+                <img src="{{ url_for('static', filename='uploads/products/' + img) }}">
+                <a href="{{ url_for('market_place.delete_product_image', product_id=product['id'], filename=img) }}" 
+                   class="img-del-overlay" onclick="return confirm('Remove this image?')">
+                    <i class="fas fa-times fa-lg"></i>
+                </a>
+            </div>
+            {% endfor %}
+            <a href="{{ url_for('market_place.edit_product', product_id=product['id']) }}" 
+               class="img-manage-item" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; border: 2px dashed #cbd5e1; color: #64748b; text-decoration: none;">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="detail-grid">
+        <div class="gallery-col">
+            <div class="gallery-container">
+                <div class="image-counter" id="imgCounter">1 / {{ get_images(product['image'])|length }}</div>
+                
+                <div class="swiper main-slider" id="mainSlider">
+                    <div class="swiper-wrapper">
+                        {% for img in get_images(product['image']) %}
+                        <div class="swiper-slide">
+                            <img src="{{ url_for('static', filename='uploads/products/' + img) }}" alt="Product Image">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next" style="color: var(--navy);"></div>
+                    <div class="swiper-button-prev" style="color: var(--navy);"></div>
+                </div>
+
+                {% if session.get('role') in ['admin', 'super_admin'] %}
+                <div style="margin-top:12px; font-size:0.9rem; color:var(--navy);">
+                    <strong>Debug — image URLs</strong>
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                        {% for img in get_images(product['image']) %}
+                        <a href="{{ url_for('static', filename='uploads/products/' + img) }}" target="_blank" style="color:#2563eb; text-decoration:underline;">{{ url_for('static', filename='uploads/products/' + img) }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div thumbsSlider="" class="swiper thumb-slider">
+                    <div class="swiper-wrapper">
+                        {% for img in get_images(product['image']) %}
+                        <div class="swiper-slide">
+                            <img src="{{ url_for('static', filename='uploads/products/' + img) }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-col">
+            <div class="product-info-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="background: var(--lime); color: var(--navy); padding: 5px 12px; border-radius: 6px; font-weight: 800; font-size: 0.7rem;">
+                        {{ product['status']|upper }}
+                    </span>
+                    <span style="color: var(--slate); font-size: 0.8rem;">Added {{ product['created_at'][:10] }}</span>
+                </div>
+
+                <h1 style="font-size: 2.2rem; color: var(--navy); margin: 20px 0 10px;">{{ product['name'] }}</h1>
+                
+                <div class="product-price">
+                    <span class="price-k">K</span>{{ "{:,.2f}".format(product['price'] or 0) }}
+                </div>
+
+                <div style="border-top: 1px solid var(--border); padding-top: 25px; color: var(--slate); line-height: 1.8;">
+                    {{ product['description'] }}
+                </div>
+            </div>
+
+            <div class="inquiry-card">
+                <h3 style="color: var(--lime); margin-bottom: 10px;"><i class="fas fa-paper-plane"></i> Interested?</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Send an inquiry and our team will call you.</p>
+                
+                <form method="POST">
+                    <input type="tel" name="phone" class="custom-input" placeholder="+260971234567" pattern="\+260[0-9]{8,12}" title="Enter phone number starting with +260 followed by digits only (e.g. +260971234567)" required>
+                    <textarea name="message" class="custom-input" rows="3" placeholder="I am interested in this product..."></textarea>
+                    <button type="submit" class="submit-btn">SEND INQUIRY</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbs = new Swiper(".thumb-slider", {
+            spaceBetween: 10,
+            slidesPerView: 4,
+            watchSlidesProgress: true,
+        });
+
+        const main = new Swiper("#mainSlider", {
+            spaceBetween: 10,
+            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+            thumbs: { swiper: thumbs },
+            on: {
+                slideChange: function() {
+                    const counter = document.getElementById('imgCounter');
+                    if (counter) {
+                        counter.innerText = (this.activeIndex + 1) + " / " + this.slides.length;
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

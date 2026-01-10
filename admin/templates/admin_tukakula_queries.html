@@ -1,0 +1,1559 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Client Inquiries - Tukakula Admin{% endblock %}
+
+{% block content %}
+<div class="admin-inquiries-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <div class="d-flex align-items-center">
+                <div class="header-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <h1 class="page-title">Client Inquiries</h1>
+                    <p class="page-subtitle">Manage incoming business leads and marketplace requests</p>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            {% set new_count = 0 %}
+                            {% for q in queries %}
+                                {% if q.status == 'new' %}
+                                    {% set new_count = new_count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ new_count }}
+                        </div>
+                        <div class="stat-label">New</div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            {% set resolved_count = 0 %}
+                            {% for q in queries %}
+                                {% if q.status == 'resolved' %}
+                                    {% set resolved_count = resolved_count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ resolved_count }}
+                        </div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">{{ queries|length if queries else 0 }}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="adminSearch" placeholder="Search inquiries...">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-filter" onclick="filterInquiry('all', this)">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn-export" onclick="exportToCSV()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Filter Tabs -->
+    <div class="filter-tabs-container">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all" onclick="filterInquiry('all', this)">
+                All Services <span class="tab-count">{{ queries|length if queries else 0 }}</span>
+            </button>
+            <button class="filter-tab" data-filter="marketplace" onclick="filterInquiry('marketplace', this)">
+                <i class="fas fa-shopping-cart"></i> Marketplace
+                <span class="tab-count">
+                    {% set marketplace_count = 0 %}
+                    {% for q in queries %}
+                        {% if q.service == 'marketplace' %}
+                            {% set marketplace_count = marketplace_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ marketplace_count }}
+                </span>
+            </button>
+            <button class="filter-tab" data-filter="developers" onclick="filterInquiry('developers', this)">
+                <i class="fas fa-code"></i> Developers
+                <span class="tab-count">
+                    {% set developers_count = 0 %}
+                    {% for q in queries %}
+                        {% if q.service == 'developers' %}
+                            {% set developers_count = developers_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ developers_count }}
+                </span>
+            </button>
+            <button class="filter-tab" data-filter="finance" onclick="filterInquiry('finance', this)">
+                <i class="fas fa-chart-line"></i> Finance
+                <span class="tab-count">
+                    {% set finance_count = 0 %}
+                    {% for q in queries %}
+                        {% if q.service == 'finance' %}
+                            {% set finance_count = finance_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ finance_count }}
+                </span>
+            </button>
+            <button class="filter-tab" data-filter="advisory" onclick="filterInquiry('advisory', this)">
+                <i class="fas fa-briefcase"></i> Advisory
+                <span class="tab-count">
+                    {% set advisory_count = 0 %}
+                    {% for q in queries %}
+                        {% if q.service == 'advisory' %}
+                            {% set advisory_count = advisory_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ advisory_count }}
+                </span>
+            </button>
+            <button class="filter-tab" data-filter="brand" onclick="filterInquiry('brand', this)">
+                <i class="fas fa-palette"></i> Brand
+                <span class="tab-count">
+                    {% set brand_count = 0 %}
+                    {% for q in queries %}
+                        {% if q.service == 'brand' %}
+                            {% set brand_count = brand_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ brand_count }}
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-header">
+            <div class="content-title">
+                <h3>All Inquiries</h3>
+                <span class="badge" id="visibleCount">{{ queries|length if queries else 0 }}</span>
+            </div>
+            <div class="content-actions">
+                <div class="sort-dropdown">
+                    <label>Sort by:</label>
+                    <select onchange="sortTable(this.value)">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name">Client Name</option>
+                        <option value="status">Status</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inquiries Table -->
+        <div class="inquiries-table-container">
+            {% if queries %}
+            <table class="inquiries-table" id="inquiryTable">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Message</th>
+                        <th>Contact</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in queries %}
+                    <tr class="inquiry-row" 
+                        data-target="{{ q.inquiry_target }}" 
+                        data-service="{{ q.service }}"
+                        data-status="{{ q.status }}"
+                        data-date="{{ q.created_at }}"
+                        data-inquiry-id="{{ q.id }}">
+                        
+                        <td>
+                            <div class="client-cell">
+                                <div class="client-avatar">
+                                    {{ q.full_name[0]|upper if q.full_name else '?' }}
+                                </div>
+                                <div class="client-info">
+                                    <div class="client-name">{{ q.full_name }}</div>
+                                    <div class="client-email">{{ q.email }}</div>
+                                    {% if q.phone %}
+                                    <div class="client-phone">
+                                        <i class="fas fa-phone"></i> {{ q.phone }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="service-cell">
+                                <span class="service-badge {{ q.service }}">
+                                    {% if q.inquiry_target == 'tukakula' %}
+                                        <i class="fas fa-building"></i> General
+                                    {% elif q.service %}
+                                        <i class="fas fa-{% if q.service == 'developers' %}code{% elif q.service == 'finance' %}chart-line{% elif q.service == 'advisory' %}briefcase{% elif q.service == 'brand' %}palette{% elif q.service == 'marketplace' %}shopping-cart{% else %}tag{% endif %}"></i>
+                                        {{ q.service|replace('_', ' ')|title }}
+                                    {% else %}
+                                        <i class="fas fa-tag"></i> General
+                                    {% endif %}
+                                </span>
+                                <div class="inquiry-date">
+                                    {{ q.created_at[:10] if q.created_at else 'N/A' }}
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="message-cell">
+                                <div class="message-subject">
+                                    {{ q.subject or q.reason|title if q.subject or q.reason else 'No subject' }}
+                                </div>
+                                <div class="message-preview">
+                                    {{ q.message[:100] if q.message else 'No message' }}...
+                                </div>
+                                <a href="javascript:void(0)" class="view-details" onclick="showInquiryDetails(this)">
+                                    View Details
+                                </a>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="contact-actions">
+                                {% if q.email %}
+                                <a href="mailto:{{ q.email }}?subject=Re: {{ q.subject or 'Your Inquiry' }}" 
+                                   class="contact-action email" title="Send Email">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                {% endif %}
+                                {% if q.whatsapp %}
+                                <a href="https://wa.me/{{ q.whatsapp|replace('+', '')|replace(' ', '') }}" 
+                                   target="_blank" class="contact-action whatsapp" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                {% endif %}
+                                {% if q.phone %}
+                                <a href="tel:{{ q.phone }}" class="contact-action phone" title="Call">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="action-cell">
+                                <form action="{{ url_for('admin.toggle_query_status', query_id=q.id) }}" method="POST" class="status-form">
+                                    <button type="submit" class="status-badge status-{{ q.status }}">
+                                        {{ q.status|title }}
+                                    </button>
+                                </form>
+                                <div class="quick-actions">
+                                    {% if q.email %}
+                                    <button class="action-btn reply-btn" onclick="quickReply('{{ q.email }}', '{{ q.full_name }}')" title="Quick Reply">
+                                        <i class="fas fa-reply"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="action-btn delete-btn" onclick="deleteInquiry('{{ q.id }}')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h4>No inquiries yet</h4>
+                <p>When clients submit inquiries, they'll appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Inquiry Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-alt me-2"></i>Inquiry Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="clearModalData()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-layout">
+                    <div class="modal-left">
+                        <div class="message-section">
+                            <h6>Message</h6>
+                            <div class="message-content" id="modalMessage"></div>
+                        </div>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <label>Subject</label>
+                                <p id="modalSubject">No subject</p>
+                            </div>
+                            <div class="detail-item">
+                                <label>Reason</label>
+                                <p id="modalReason">Not specified</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-right">
+                        <div class="client-section">
+                            <h6>Client Information</h6>
+                            <div class="client-card">
+                                <div class="client-avatar-lg">
+                                    <span id="modalAvatar">?</span>
+                                </div>
+                                <div class="client-details">
+                                    <h5 id="modalClientName">Unknown Client</h5>
+                                    <p id="modalClientEmail">No email</p>
+                                </div>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-item" id="modalPhone" style="display: none;"></div>
+                                <div class="contact-item" id="modalWhatsApp" style="display: none;"></div>
+                                <div class="contact-item" id="modalService"></div>
+                            </div>
+                        </div>
+                        <div class="timeline-section">
+                            <h6>Timeline</h6>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Inquiry Received</div>
+                                        <div class="timeline-date" id="modalDate">N/A</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" id="modalEmailBtn" disabled>
+                                <i class="fas fa-envelope"></i> Reply via Email
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="markAsResolved()" id="markResolvedBtn">
+                                <i class="fas fa-check"></i> Mark as Resolved
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Reset and Base Styles */
+.admin-inquiries-container {
+    padding: 24px;
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.header-left {
+    flex: 1;
+    min-width: 300px;
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.header-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a2a40;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    color: #64748b;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a2a40;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #a2d242 0%, #8ab82d 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+/* Header Right */
+.header-right {
+    min-width: 300px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+    min-width: 200px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 20px 12px 48px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #a2d242;
+    box-shadow: 0 0 0 3px rgba(162, 210, 66, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-filter, .btn-export {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn-filter {
+    background: white;
+    color: #1a2a40;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-filter:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    color: white;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(26, 42, 64, 0.2);
+}
+
+/* Filter Tabs */
+.filter-tabs-container {
+    margin-bottom: 32px;
+    background: white;
+    border-radius: 16px;
+    padding: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 4px;
+    scrollbar-width: thin;
+}
+
+.filter-tabs::-webkit-scrollbar {
+    height: 6px;
+}
+
+.filter-tabs::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.filter-tabs::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.filter-tab {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.filter-tab:hover {
+    background: #f8fafc;
+    color: #1a2a40;
+}
+
+.filter-tab.active {
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    color: white;
+}
+
+.tab-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Main Content */
+.main-content {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.content-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.content-title h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #1a2a40;
+    font-weight: 600;
+}
+
+.content-title .badge {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sort-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sort-dropdown label {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sort-dropdown select {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #1a2a40;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sort-dropdown select:focus {
+    outline: none;
+    border-color: #a2d242;
+    box-shadow: 0 0 0 3px rgba(162, 210, 66, 0.1);
+}
+
+/* Inquiries Table */
+.inquiries-table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.inquiries-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+.inquiries-table thead {
+    background: #f8fafc;
+}
+
+.inquiries-table th {
+    padding: 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.inquiries-table th:first-child {
+    border-radius: 12px 0 0 0;
+}
+
+.inquiries-table th:last-child {
+    border-radius: 0 12px 0 0;
+}
+
+.inquiries-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.inquiries-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.inquiries-table td {
+    padding: 20px;
+    vertical-align: top;
+}
+
+/* Client Cell */
+.client-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.client-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.client-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-name {
+    font-weight: 600;
+    color: #1a2a40;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.client-email {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.client-phone {
+    color: #475569;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.client-phone i {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* Service Cell */
+.service-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.service-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.service-badge i {
+    font-size: 12px;
+}
+
+.service-badge.general {
+    background: rgba(26, 42, 64, 0.1);
+    color: #1a2a40;
+}
+
+.service-badge.marketplace {
+    background: rgba(162, 210, 66, 0.1);
+    color: #8ab82d;
+}
+
+.service-badge.developers {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.service-badge.finance {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.service-badge.advisory {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.service-badge.brand {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.inquiry-date {
+    color: #94a3b8;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Message Cell */
+.message-cell {
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.message-subject {
+    font-weight: 600;
+    color: #1a2a40;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.message-preview {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.view-details {
+    color: #1a2a40;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.view-details:hover {
+    color: #a2d242;
+}
+
+/* Contact Actions */
+.contact-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.contact-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
+    background: white;
+}
+
+.contact-action.email {
+    color: #3b82f6;
+}
+
+.contact-action.email:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.contact-action.whatsapp {
+    color: #25D366;
+}
+
+.contact-action.whatsapp:hover {
+    background: #25D366;
+    color: white;
+    border-color: #25D366;
+}
+
+.contact-action.phone {
+    color: #1a2a40;
+}
+
+.contact-action.phone:hover {
+    background: #1a2a40;
+    color: white;
+    border-color: #1a2a40;
+}
+
+/* Action Cell */
+.action-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.status-form {
+    margin: 0;
+}
+
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.status-badge.status-new {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.status-badge.status-resolved {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.action-btn.reply-btn {
+    color: #3b82f6;
+}
+
+.action-btn.reply-btn:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.action-btn.delete-btn {
+    color: #ef4444;
+}
+
+.action-btn.delete-btn:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 64px 32px;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.empty-icon i {
+    font-size: 32px;
+    color: #94a3b8;
+}
+
+.empty-state h4 {
+    color: #1a2a40;
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #64748b;
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    padding: 32px 32px 0;
+    border: none;
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    color: white;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 0;
+}
+
+.modal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 500px;
+}
+
+.modal-left {
+    padding: 32px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    border-radius: 0 0 0 20px;
+}
+
+.modal-right {
+    padding: 32px;
+    background: #f8fafc;
+    border-radius: 0 0 20px 0;
+}
+
+.message-section, .client-section, .timeline-section {
+    margin-bottom: 32px;
+}
+
+.message-section h6, .client-section h6, .timeline-section h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.message-content {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a2a40;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.detail-item p {
+    font-size: 15px;
+    color: #1a2a40;
+    margin: 0;
+    font-weight: 500;
+}
+
+.client-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+}
+
+.client-avatar-lg {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.client-details h5 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a2a40;
+    margin: 0 0 4px 0;
+}
+
+.client-details p {
+    color: #64748b;
+    margin: 0;
+    font-size: 15px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #1a2a40;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 24px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -32px;
+    top: 8px;
+    width: 16px;
+    height: 16px;
+    background: #a2d242;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px rgba(162, 210, 66, 0.2);
+}
+
+.timeline-content {
+    font-size: 15px;
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: #1a2a40;
+    margin-bottom: 4px;
+}
+
+.timeline-date {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.modal-actions .btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.modal-actions .btn-primary {
+    background: linear-gradient(135deg, #1a2a40 0%, #2a3a55 100%);
+    border: none;
+}
+
+.modal-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(26, 42, 64, 0.2);
+}
+
+.modal-actions .btn-outline-primary {
+    border-color: #1a2a40;
+    color: #1a2a40;
+}
+
+.modal-actions .btn-outline-primary:hover {
+    background: #1a2a40;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .modal-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-left {
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 0;
+    }
+    
+    .modal-right {
+        border-radius: 0 0 20px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-inquiries-container {
+        padding: 16px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+    }
+    
+    .header-right {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        padding: 20px;
+    }
+    
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .filter-tabs {
+        gap: 8px;
+    }
+    
+    .filter-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+</style>
+
+<script>
+// Keep all your existing JavaScript functions from the previous version
+// They will work with the new HTML structure
+// Just make sure to update any class selectors if needed
+
+// Search functionality
+document.getElementById('adminSearch').addEventListener('keyup', function() {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll('.inquiry-row');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+        let shouldShow = text.includes(value);
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleCount++;
+    });
+    
+    document.getElementById('visibleCount').textContent = visibleCount;
+});
+
+// Filter functionality
+function filterInquiry(filter, element) {
+    const rows = document.querySelectorAll('.inquiry-row');
+    let visibleCount = 0;
+    
+    // Update active tab
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    if (element) {
+        element.classList.add('active');
+    }
+    
+    rows.forEach(row => {
+        const target = row.getAttribute('data-target') || '';
+        const service = row.getAttribute('data-service') || '';
+        
+        let shouldShow = false;
+        
+        switch(filter) {
+            case 'all':
+                shouldShow = true;
+                break;
+            case 'tukakula':
+                shouldShow = target === 'tukakula';
+                break;
+            case 'marketplace':
+                shouldShow = service === 'marketplace';
+                break;
+            case 'developers':
+            case 'finance':
+            case 'advisory':
+            case 'brand':
+                shouldShow = service === filter;
+                break;
+            default:
+                shouldShow = true;
+        }
+        
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleCount++;
+    });
+    
+    document.getElementById('visibleCount').textContent = visibleCount;
+    document.getElementById('adminSearch').value = '';
+}
+
+// Sort table
+function sortTable(criteria) {
+    const tbody = document.querySelector('#inquiryTable tbody');
+    const rows = Array.from(tbody.querySelectorAll('.inquiry-row:not([style*="display: none"])'));
+    
+    rows.sort((a, b) => {
+        switch(criteria) {
+            case 'newest':
+                return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+            case 'oldest':
+                return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+            case 'name':
+                const nameA = a.querySelector('.client-name').textContent.toLowerCase();
+                const nameB = b.querySelector('.client-name').textContent.toLowerCase();
+                return nameA.localeCompare(nameB);
+            case 'status':
+                return a.getAttribute('data-status').localeCompare(b.getAttribute('data-status'));
+            default:
+                return 0;
+        }
+    });
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Show inquiry details
+function showInquiryDetails(element) {
+    const row = element.closest('tr');
+    currentInquiryId = row.getAttribute('data-inquiry-id');
+    
+    // Get data from the row
+    const clientName = row.querySelector('.client-name').textContent;
+    const clientEmail = row.querySelector('.client-email').textContent;
+    const messagePreview = row.querySelector('.message-preview').textContent;
+    const messageSubject = row.querySelector('.message-subject').textContent;
+    const serviceBadge = row.querySelector('.service-badge');
+    const serviceText = serviceBadge ? serviceBadge.textContent.trim() : 'General';
+    
+    // Get phone if available
+    const phoneElement = row.querySelector('.client-phone');
+    const phone = phoneElement ? phoneElement.textContent.trim() : null;
+    
+    // Get date
+    const dateElement = row.querySelector('.inquiry-date');
+    const date = dateElement ? dateElement.textContent.trim() : 'N/A';
+    
+    // Populate modal
+    document.getElementById('modalClientName').textContent = clientName;
+    document.getElementById('modalClientEmail').textContent = clientEmail;
+    document.getElementById('modalAvatar').textContent = clientName[0].toUpperCase();
+    document.getElementById('modalMessage').textContent = messagePreview;
+    document.getElementById('modalSubject').textContent = messageSubject;
+    document.getElementById('modalReason').textContent = serviceText;
+    document.getElementById('modalDate').textContent = date;
+    
+    // Phone
+    const phoneEl = document.getElementById('modalPhone');
+    if (phone) {
+        phoneEl.innerHTML = `<i class="fas fa-phone"></i> ${phone}`;
+        phoneEl.style.display = 'flex';
+    }
+    
+    // Service
+    const serviceEl = document.getElementById('modalService');
+    serviceEl.innerHTML = `<i class="fas fa-tag"></i> ${serviceText}`;
+    
+    // Email button
+    const emailBtn = document.getElementById('modalEmailBtn');
+    if (clientEmail && clientEmail !== 'No email') {
+        emailBtn.disabled = false;
+        emailBtn.onclick = function() {
+            const subject = encodeURIComponent(`Re: ${messageSubject || 'Your Inquiry'}`);
+            window.location.href = `mailto:${clientEmail}?subject=${subject}`;
+        };
+    } else {
+        emailBtn.disabled = true;
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+}
+
+// Clear modal data
+function clearModalData() {
+    currentInquiryId = null;
+    document.getElementById('modalEmailBtn').disabled = true;
+}
+
+// Quick reply function
+function quickReply(email, name) {
+    const subject = prompt('Email subject:', `Re: Inquiry from ${name || 'Client'}`);
+    if (subject) {
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+    }
+}
+
+// Mark as resolved
+function markAsResolved() {
+    if (currentInquiryId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/tukakula/queries/toggle-status/${currentInquiryId}`;
+        form.style.display = 'none';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Delete inquiry
+function deleteInquiry(inquiryId) {
+    if (confirm('Are you sure you want to delete this inquiry? This action cannot be undone.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/tukakula/queries/delete/${inquiryId}`;
+        form.style.display = 'none';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Export to CSV
+function exportToCSV() {
+    alert('Export functionality would be implemented with a backend endpoint');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips if any
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize with all inquiries shown
+    filterInquiry('all');
+});
+</script>
+{% endblock %}

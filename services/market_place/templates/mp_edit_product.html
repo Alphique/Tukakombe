@@ -1,0 +1,47 @@
+{% extends "mp_base.html" %}
+{% block content %}
+<style>
+    .edit-container { max-width: 800px; margin: 50px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #0a192f; }
+    .form-control { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; }
+    .btn-save { background: #0a192f; color: white; padding: 15px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+</style>
+
+<div class="edit-container">
+    <h2>Edit Listing: {{ product.name }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" name="name" value="{{ product.name }}" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Price (ZMW)</label>
+            <input type="number" step="0.01" name="price" value="{{ product.price }}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status" class="form-control">
+                <option value="available" {% if product.status == 'available' %}selected{% endif %}>Available</option>
+                <option value="sold" {% if product.status == 'sold' %}selected{% endif %}>Mark as Sold</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="5" class="form-control">{{ product.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Add More Images (Optional)</label>
+            <input type="file" name="images" multiple class="form-control" accept="image/*">
+            <small>Current images will be kept. These will be added to the gallery.</small>
+        </div>
+
+        <button type="submit" class="btn-save">Save Changes</button>
+        <a href="{{ url_for('market_place.product_detail', product_id=product.id) }}" style="display:block; text-align:center; margin-top:15px; color: #64748b;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

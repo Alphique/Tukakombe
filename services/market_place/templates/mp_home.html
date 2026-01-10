@@ -1,163 +1,315 @@
-{% extends "base.html" %}
+{% extends "mp_base.html" %}
 {% block title %}Marketplace | Tukakombe{% endblock %}
 
 {% block content %}
 <style>
-    /* === YOUR EXISTING STYLES (UNCHANGED) === */
     :root {
-        --navy: #1a2a40;
-        --navy-dark: #0d1621;
-        --navy-light: #2c3e5a;
-        --lime: #a2d242;
-        --lime-light: #c5e86c;
+        --navy-dark: #0a192f;
+        --navy-light: #112240;
+        --lime: #bef264;
+        --slate: #64748b;
         --white: #ffffff;
-        --off-white: #f8fafc;
-        --gray-light: #e2e8f0;
-        --transition: all 0.3s ease;
+        --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .market-items {
+    .market-hero {
+        background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-light) 100%);
+        padding: 80px 0;
+        text-align: center;
+        color: white;
+    }
+
+    .market-hero h1 span { color: var(--lime); }
+
+    /* GRID LAYOUT */
+    .market-items-section { padding: 60px 0; background: #f8fafc; }
+    
+    .market-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
         max-width: 1200px;
         margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 30px;
+        padding: 0 20px;
     }
 
-    .market-item {
+    /* CARD STYLING */
+    .market-card {
         background: var(--white);
-        border-radius: 15px;
+        border-radius: 20px;
         overflow: hidden;
-        border: 1px solid var(--gray-light);
+        box-shadow: var(--shadow);
         transition: var(--transition);
-        box-shadow: 0 5px 15px rgba(0,0,0,.05);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #e2e8f0;
+        height: 100%;
     }
 
-    .market-item:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px rgba(162,210,66,.15);
-        border-color: var(--lime);
+    .market-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     }
 
-    .item-image img {
+    /* IMAGE SECTION */
+    .card-image-wrapper {
+        position: relative;
+        height: 240px;
+        overflow: hidden;
+        background: #e2e8f0; /* Shimmer background */
+    }
+
+    .card-image-wrapper img {
         width: 100%;
-        height: 200px;
+        height: 100%;
         object-fit: cover;
+        transition: var(--transition);
     }
 
-    .item-info {
-        padding: 25px;
+    .market-card:hover .card-image-wrapper img {
+        transform: scale(1.05);
     }
 
-    .item-info h3 {
-        margin-bottom: 10px;
-        font-size: 1.3rem;
+    /* MULTI-IMAGE BADGE */
+    .image-indicator-badge {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(10, 25, 47, 0.85);
+        color: var(--lime);
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.75rem;
         font-weight: 700;
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        z-index: 3;
+        border: 1px solid rgba(190, 242, 100, 0.2);
+    }
+
+    /* STATUS BADGES */
+    .status-pill {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        z-index: 5;
+        letter-spacing: 0.5px;
+    }
+    .pill-available { background: var(--lime); color: var(--navy-dark); }
+    .pill-sold { background: #ef4444; color: white; }
+    
+    .hidden-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: #ef4444;
+        z-index: 4;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    /* INFO SECTION */
+    .card-content {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .card-content h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.25rem;
         color: var(--navy-dark);
+        font-weight: 700;
     }
 
-    .item-description {
-        font-size: .95rem;
-        color: var(--navy-light);
+    .card-description {
+        color: var(--slate);
+        font-size: 0.9rem;
         line-height: 1.5;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
-    .item-price {
+    .card-footer {
+        margin-top: auto;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-top: 1px solid var(--gray-light);
         padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
     }
 
-    .price {
-        font-size: 1.4rem;
+    .card-price {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .price-amt {
+        font-size: 1.2rem;
         font-weight: 800;
-        color: var(--navy);
+        color: var(--navy-dark);
     }
 
-    .btn-view {
-        background: var(--navy);
+    .btn-details {
+        background: var(--navy-dark);
         color: white;
-        padding: 10px 18px;
-        border-radius: 8px;
+        padding: 10px 20px;
+        border-radius: 10px;
         text-decoration: none;
         font-weight: 600;
+        font-size: 0.85rem;
         transition: var(--transition);
     }
 
-    .btn-view:hover {
-        background: var(--navy-dark);
+    .btn-details:hover {
+        background: var(--lime);
+        color: var(--navy-dark);
     }
 
-    .empty-state {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 60px;
-        border: 2px dashed var(--gray-light);
-        border-radius: 15px;
-        background: var(--off-white);
+    /* ADMIN ACTIONS */
+    .admin-bar {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(10, 25, 47, 0.95);
+        padding: 10px;
+        display: flex;
+        justify-content: space-around;
+        transform: translateY(100%);
+        transition: var(--transition);
+        z-index: 10;
     }
+
+    .market-card:hover .admin-bar { transform: translateY(0); }
+
+    .admin-btn {
+        color: white;
+        font-size: 0.75rem;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 6px 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .admin-del { background: #ef4444; }
+    .admin-toggle { background: var(--navy-light); border: 1px solid rgba(255,255,255,0.1); }
 </style>
 
-<!-- HERO -->
 <section class="market-hero">
-    <h1>Tukakombe <span>Marketplace</span></h1>
-    <p>Browse available assets and products listed by our administrators.</p>
-</section>
-
-<!-- PRODUCTS -->
-<section class="market-items-section">
-    <div class="market-items">
-
-        {% if products %}
-            {% for product in products %}
-            <div class="market-item">
-
-                <div class="item-image">
-                    {% if product['image'] %}
-                        <img src="{{ product['image'] }}" alt="{{ product['name'] }}">
-                    {% else %}
-                        <img src="https://via.placeholder.com/600x400?text=No+Image" alt="No image">
-                    {% endif %}
-                </div>
-
-                <div class="item-info">
-                    <h3>{{ product['name'] }}</h3>
-
-                    <p class="item-description">
-                        {{ product['description'][:120] }}
-                        {% if product['description']|length > 120 %}...{% endif %}
-                    </p>
-
-                    <div class="item-price">
-                        <span class="price">K {{ product['price'] }}</span>
-
-                        <a href="{{ url_for('market_place.product_detail', product_id=product['id']) }}"
-                           class="btn-view">
-                            View Details →
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <h3>No products available</h3>
-                <p>Items added by the administrator will appear here.</p>
-            </div>
-        {% endif %}
-
+    <div class="container">
+        <h1>Tukakombe <span>Marketplace</span></h1>
+        <p>Verified Assets & Premium Investment Opportunities</p>
     </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-banner">
-    <h2>Want to list an item?</h2>
-    <p>Admin access is required to add products to the marketplace.</p>
-    <a href="{{ url_for('admin.login') }}" class="btn-view">Admin Login</a>
+<section class="market-items-section">
+    <div class="market-grid">
+        {% if products %}
+            {% for product in products %}
+            <article class="market-card">
+                
+                <span class="status-pill {{ 'pill-sold' if product.status == 'sold' else 'pill-available' }}">
+                    {{ product.status }}
+                </span>
+
+                {% if not product.is_active %}
+                <div class="hidden-overlay">
+                    <span><i class="fas fa-eye-slash"></i> Hidden from Public</span>
+                </div>
+                {% endif %}
+
+                <div class="card-image-wrapper">
+                    {% if product.image %}
+                        {# Improved split logic to handle spaces and trailing commas #}
+                        {% set img_list = product.image.split(',') | map('trim') | select('ne', '') | list %}
+                        {% if img_list %}
+                            <img src="{{ url_for('static', filename='uploads/products/' + img_list[0]) }}" alt="{{ product.name }}" loading="lazy">
+                            
+                            {% if img_list|length > 1 %}
+                            <div class="image-indicator-badge">
+                                <i class="fas fa-images"></i>
+                                <span>+{{ img_list|length - 1 }}</span>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <img src="https://via.placeholder.com/600x400?text=No+Image+Found" alt="Placeholder">
+                        {% endif %}
+                    {% else %}
+                        <img src="https://via.placeholder.com/600x400?text=No+Image+Available" alt="No image">
+                    {% endif %}
+
+                    {% if session.get('role') in ['admin', 'super_admin'] %}
+                    <div class="admin-bar">
+                        <a href="{{ url_for('market_place.toggle_product', product_id=product.id) }}" class="admin-btn admin-toggle">
+                            <i class="fas {{ 'fa-eye-slash' if product.is_active else 'fa-eye' }}"></i> 
+                            {{ 'Hide' if product.is_active else 'Show' }}
+                        </a>
+                        <a href="{{ url_for('market_place.delete_product', product_id=product.id) }}" class="admin-btn admin-del" onclick="return confirm('Delete this product and all its images permanently?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-content">
+                    <h3>{{ product.name }}</h3>
+                    <p class="card-description">{{ product.description }}</p>
+
+                    <div class="card-footer">
+                        <div class="card-price">
+                            <small style="font-size: 0.65rem; color: var(--slate); text-transform: uppercase; font-weight: 700;">Investment Value</small>
+                            <span class="price-amt">K {{ "{:,.2f}".format(product.price or 0) }}</span>
+                        </div>
+                        <a href="{{ url_for('market_place.product_detail', product_id=product.id) }}" class="btn-details">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px 0;">
+                <div style="font-size: 4rem; color: #e2e8f0; margin-bottom: 20px;"><i class="fas fa-box-open"></i></div>
+                <h3 style="color: var(--slate);">No active listings available right now.</h3>
+                <p>Check back later for new investment opportunities.</p>
+            </div>
+        {% endif %}
+    </div>
 </section>
 
+{% if session.get('role') in ['admin', 'super_admin'] %}
+<div style="max-width: 1200px; margin: 0 auto 60px; padding: 0 20px;">
+    <div style="background: var(--navy-dark); border-radius: 24px; padding: 40px; text-align: center; border: 2px solid var(--lime); box-shadow: var(--shadow);">
+        <h2 style="color: white; margin-bottom: 10px;">Inventory Control</h2>
+        <p style="color: var(--slate); margin-bottom: 30px;">You are viewing the marketplace as an Administrator.</p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('market_place.add_product') }}" class="btn-details" style="background: var(--lime); color: var(--navy-dark); padding: 15px 35px; font-size: 1rem; border-radius: 12px;">
+                <i class="fas fa-plus-circle"></i> Add New Listing
+            </a>
+            <a href="{{ url_for('market_place.admin_products') }}" class="btn-details" style="background: transparent; border: 2px solid var(--lime); color: var(--lime); padding: 15px 35px; font-size: 1rem; border-radius: 12px;">
+                <i class="fas fa-list"></i> Full Inventory List
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

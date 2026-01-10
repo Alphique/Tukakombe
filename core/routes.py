@@ -1,5 +1,9 @@
 # core/routes.py
-from flask import Blueprint, render_template
+from datetime import datetime, timezone
+import uuid
+from flask import Blueprint, flash, redirect, render_template, request
+
+from utils.database import get_db_connection
 
 # Blueprint for core pages
 core_bp = Blueprint('core', __name__, template_folder='templates')
@@ -13,17 +17,50 @@ def home():
     """Render the home page."""
     return render_template('home.html')
 
-
+    
 @core_bp.route('/about')
 def about():
     """Render the about page."""
     return render_template('about.html')
 
-
-@core_bp.route('/contact')
+@core_bp.route("/contact", methods=["GET", "POST"])
 def contact():
-    """Render the contact page."""
-    return render_template('contact.html')
+    if request.method == "POST":
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                INSERT INTO tukakula_queries (
+                    id, full_name, company_name, email, phone, whatsapp,
+                    inquiry_target, service, subject, reason, message, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                str(uuid.uuid4()),
+                request.form.get("full_name"),
+                request.form.get("company_name"),
+                request.form.get("email"),
+                request.form.get("phone"),
+                request.form.get("whatsapp"),
+                request.form.get("inquiry_target"),
+                request.form.get("service"),
+                request.form.get("subject", "General Inquiry"), # Default if empty
+                request.form.get("reason"),
+                request.form.get("message"),
+                datetime.now(timezone.utc).isoformat() # Fixed timezone issue
+            ))
+
+            conn.commit()
+            flash("Your inquiry has been sent successfully.", "success")
+        except Exception as e:
+            conn.rollback()
+            flash(f"An error occurred: {str(e)}", "error")
+        finally:
+            conn.close()
+
+        return redirect("contact")
+
+    return render_template("contact.html")
 
 
 # -----------------------------

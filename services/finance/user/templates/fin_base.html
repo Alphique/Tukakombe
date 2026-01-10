@@ -22,22 +22,22 @@
             
             <ul class="nav-links">
                 <li><a href="{{ url_for('finance.home') }}" class="{% if request.endpoint == 'finance.home' %}active{% endif %}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <i class="fas fa-tachometer-alt"></i> Home
                 </a></li>
                 <li><a href="{{ url_for('finance.loans') }}" class="{% if request.endpoint == 'finance.loans' %}active{% endif %}">
-                    <i class="fas fa-hand-holding-usd"></i> Loans
+                    <i class="fas fa-hand-holding-usd"></i> Loan Application
                 </a></li>
                 <li><a href="{{ url_for('finance.eligibility') }}" class="{% if request.endpoint == 'finance.eligibility' %}active{% endif %}">
-                    <i class="fas fa-clipboard-check"></i> Eligibility
+                    <i class="fas fa-clipboard-check"></i> Eligibility Check
                 </a></li>
                 <li><a href="{{ url_for('finance.faq') }}" class="{% if request.endpoint == 'finance.faq' %}active{% endif %}">
                     <i class="fas fa-question-circle"></i> FAQ
                 </a></li>
                 <li><a href="{{ url_for('finance.contact') }}" class="cta-nav">
-                    <i class="fas fa-headset"></i> Support
+                    <i class="fas fa-headset"></i> Tuka Fin Support
                 </a></li>
                 <li><a href="{{ url_for('market_place.home') }}" class="cta-nav">
-                    <i class="fas fa-headset"></i> Market Place
+                    <i class="fas fa-headset"></i> Buy Collateral
                 </a></li>
             </ul>
         </nav>
@@ -866,6 +866,52 @@
         
         .finance-footer-logo-text {
             font-size: 1.3rem;
+        }
+    }
+
+    /* Extra small devices tweaks */
+    @media (max-width: 420px) {
+        .finance-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2000;
+        }
+
+        .finance-main-content {
+            margin-top: 64px;
+        }
+
+        .finance-content-area {
+            padding: 0.9rem;
+        }
+
+        .finance-container {
+            padding: 0 12px;
+        }
+
+        .finance-footer {
+            padding: 40px 12px 15px;
+        }
+
+        .finance-footer-bottom p {
+            font-size: 0.9rem;
+        }
+
+        .finance-header .nav-links {
+            top: 60px;
+            max-height: calc(100vh - 60px);
+        }
+
+        .finance-header .nav-links a {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .finance-footer-logo-img {
+            width: 44px;
+            height: 44px;
         }
     }
 </style>

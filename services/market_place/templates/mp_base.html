@@ -1,19 +1,557 @@
-<!-- services/brand_studio/templates/br_base.html -->
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tukakula Marketplace{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --lime: #a2d242;
+            --lime-light: #c9ff66;
+            --lime-dark: #8ab82d;
+            --navy: #1a2a40;
+            --navy-dark: #0d1621;
+            --navy-light: #2a3a55;
+            --white: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --gray-light: #f8fafc;
+            --gray-medium: #e2e8f0;
+            --gray-dark: #64748b;
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+        }
 
-{% block content %}
-<nav class="brand-nav">
-    <ul>
-        <li><a href="/">TUKAKOMBE</a></li>
-        <li><a href="/brand-studio">Home</a></li>
-        <li><a href="/brand-studio/services">Services</a></li>
-        <li><a href="/brand-studio/portfolio">Portfolio</a></li>
-        <li><a href="/brand-studio/process">Process</a></li>
-        <li><a href="/brand-studio/contact">Contact</a></li>
-    </ul>
-</nav>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<hr>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--white);
+            color: var(--navy);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-{% block br_content %}{% endblock %}
-{% endblock %}
+        /* --- Header & Logo --- */
+        .blog-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            color: var(--white);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: var(--lime);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--navy-dark);
+            font-size: 1.5rem; font-weight: 800;
+        }
+
+        .logo-text h1 { font-size: 1.3rem; font-weight: 800; line-height: 1.2; }
+        .logo-text h1 a {
+            color: var(--white);
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--white) 0%, var(--lime-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-text p { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* --- Marketplace Navigation --- */
+        .marketplace-nav {
+            background: var(--gray-light);
+            padding: 15px 5%;
+            border-bottom: 2px solid var(--lime);
+            position: sticky;
+            top: 70px;
+            z-index: 999;
+        }
+
+        .marketplace-nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .marketplace-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .marketplace-nav a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            color: var(--navy);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            background: rgba(162, 210, 66, 0.1);
+            border: 1px solid transparent;
+        }
+
+        .marketplace-nav a:hover,
+        .marketplace-nav a.active {
+            background: var(--lime);
+            color: var(--navy-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--lime-dark);
+        }
+
+        .marketplace-nav a i {
+            font-size: 0.9rem;
+        }
+
+        /* --- Main Navigation --- */
+        .main-nav { display: flex; align-items: center; gap: 20px; }
+        .nav-links { display: flex; align-items: center; gap: 10px; list-style: none; }
+        
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--lime);
+            background: rgba(162, 210, 66, 0.1);
+        }
+
+        /* --- Solutions Dropdown --- */
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--navy-light);
+            min-width: 220px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            list-style: none;
+            padding: 10px 0;
+            z-index: 1100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu li a {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            border-radius: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .dropdown-menu li:last-child a { border-bottom: none; }
+
+        .dropdown-menu li a:hover {
+            background: rgba(162, 210, 66, 0.15);
+            color: var(--lime);
+            padding-left: 25px;
+        }
+
+        /* --- User Identity Display --- */
+        .user-actions { display: flex; align-items: center; gap: 12px; }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            padding-right: 12px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            margin-right: 5px;
+        }
+
+        .user-info { display: flex; flex-direction: column; align-items: flex-end; }
+
+        .user-name {
+            color: var(--lime);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-role-tag {
+            background: rgba(162, 210, 66, 0.2);
+            color: var(--lime);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(162, 210, 66, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn.primary { background: var(--lime); color: var(--navy-dark); }
+        .nav-btn:hover { transform: translateY(-2px); background: var(--lime-dark); color: var(--navy-dark); }
+
+        /* --- Cart Badge --- */
+        .cart-badge {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--navy);
+        }
+
+        /* --- Mobile Responsive --- */
+        .mobile-toggle {
+            display: none;
+            background: var(--lime);
+            color: var(--navy-dark);
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .main-nav {
+                position: fixed; top: 70px; left: 0; right: 0; bottom: 0;
+                background: var(--navy-dark);
+                flex-direction: column;
+                padding: 30px 5%;
+                transform: translateX(100%);
+                transition: transform 0.4s ease;
+                overflow-y: auto;
+                z-index: 999;
+            }
+            .main-nav.active { transform: translateX(0); }
+            .nav-links { flex-direction: column; width: 100%; gap: 5px; }
+            .nav-links li { width: 100%; }
+            .nav-links a { font-size: 1.1rem; padding: 15px; width: 100%; justify-content: space-between; }
+            
+            .marketplace-nav { top: 70px; }
+            .marketplace-nav ul { flex-direction: column; }
+            .marketplace-nav a { width: 100%; }
+            
+            .dropdown-menu {
+                position: static; opacity: 1; visibility: visible;
+                transform: none; display: none; width: 100%;
+                background: rgba(255, 255, 255, 0.05);
+                box-shadow: none; margin-top: 5px;
+            }
+            .dropdown.open .dropdown-menu { display: block; }
+            
+            .user-actions { width: 100%; flex-direction: column; margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+            .user-profile-badge { border-right: none; margin: 0 0 15px 0; padding: 0; width: 100%; justify-content: center; }
+            .nav-btn { width: 100%; justify-content: center; padding: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            .marketplace-nav { position: static; }
+        }
+
+        /* Marketplace mobile tweaks */
+        @media (max-width: 768px) {
+            .market-hero { padding: 40px 0; }
+            .market-grid { gap: 16px; padding: 0 12px; }
+            .card-image-wrapper { height: 160px; }
+            .card-content { padding: 18px; }
+            .logo-text h1 { font-size: 1.1rem; }
+            .header-container { padding: 0 16px; }
+            .marketplace-nav { top: 60px; }
+        }
+
+        /* --- Flash Messages --- */
+        .flashes { list-style: none; max-width: 1400px; margin: 20px auto; padding: 0 5%; }
+        .flashes li {
+            padding: 16px 20px; margin-bottom: 12px; border-radius: var(--radius-md);
+            animation: slideIn 0.3s ease-out; display: flex; align-items: center; gap: 10px;
+        }
+        .flashes .success { background: rgba(162, 210, 66, 0.1); color: var(--lime); border-left: 5px solid var(--lime); }
+        .flashes .error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-left: 5px solid #ef4444; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        main { flex: 1; }
+
+        /* --- Footer --- */
+        .blog-footer { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%); color: var(--white); padding: 60px 5% 30px; margin-top: 60px; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
+        .footer-section h3 { color: var(--lime); margin-bottom: 25px; font-size: 1.2rem; font-weight: 700; }
+        .footer-links { list-style: none; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; transition: 0.3s; }
+        .footer-links a:hover { color: var(--lime); transform: translateX(5px); }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="blog-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="logo-text">
+                    <h1><a href="{{ url_for('core.home') }}">Tukakula Marketplace</a></h1>
+                    <p>Premium Digital Solutions & Services</p>
+                </div>
+            </div>
+
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="main-nav" id="mainNav">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('core.home') }}" class="{% if request.endpoint == 'core.home' %}active{% endif %}">
+                        <i class="fas fa-home"></i> Home
+                    </a></li>
+                    
+                    <li class="dropdown" id="solutionsDropdown">
+                        <a href="#" id="solutionsDropdownLink">
+                            <span><i class="fas fa-cogs"></i> Solutions</span>
+                            <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/finance"><i class="fas fa-chart-line"></i> Tuka Finance</a></li>
+                            <li><a href="/developers"><i class="fas fa-code"></i> Tuka Developers</a></li>
+                            <li><a href="/advisory"><i class="fas fa-briefcase"></i> Tuka Advisory</a></li>
+                            <li><a href="/brand_studio"><i class="fas fa-palette"></i> Tuka Studio</a></li>
+                            <li><a href="/market_place" class="active"><i class="fas fa-shopping-cart"></i> Marketplace</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="{{ url_for('blog.blog_home') }}" class="{% if request.endpoint == 'blog.blog_home' %}active{% endif %}">
+                        <i class="fas fa-newspaper"></i> Insights
+                    </a></li>
+                </ul>
+
+                <div class="user-actions">
+                    {% if session.get('user_id') %}
+                        <div class="user-profile-badge">
+                            <div class="user-info">
+                                {% if session.get('role') in ['admin', 'super_admin', 'blog_admin'] %}
+                                    <span class="user-role-tag">
+                                        <i class="fas fa-shield-alt"></i> {{ session.get('role')|replace('_', ' ')|title }}
+                                    </span>
+                                {% else %}
+                                    <span class="user-name">
+                                        <i class="fas fa-user-circle"></i> {{ session.get('username', 'Customer') }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if session.get('role') in ['admin', 'blog_admin', 'super_admin'] %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="nav-btn" title="Admin Panel">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                        {% endif %}
+
+                        <!-- Cart Button -->
+                        <a href="{{ url_for('market_place.cart') }}" class="nav-btn cart-badge">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            {% if session.get('cart_count', 0) > 0 %}
+                                <span class="cart-count">{{ session.get('cart_count', 0) }}</span>
+                            {% endif %}
+                        </a>
+                        
+                        <a href="{{ url_for('auth.logout') }}" class="nav-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-btn">Sign In</a>
+                        <a href="{{ url_for('auth.register') }}" class="nav-btn primary">Join Now</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}"><i class="fas fa-info-circle"></i> {{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block marketplace_content %}{% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="blog-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Tukakula Marketplace</h3>
+                <p>Your premier destination for digital solutions, services, and premium goods. Quality products from trusted vendors.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Marketplace</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('market_place.home') }}">Marketplace Home</a></li>
+                    <li><a href="{{ url_for('market_place.categories') }}">Browse Categories</a></li>
+                    <li><a href="{{ url_for('market_place.products') }}">All Products</a></li>
+                    <li><a href="{{ url_for('market_place.services') }}">Services</a></li>
+                    <li><a href="{{ url_for('market_place.digital_goods') }}">Digital Goods</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Customer Support</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('market_place.orders') }}"><i class="fas fa-receipt"></i> My Orders</a></li>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+                    <li><a href="#"><i class="fas fa-shipping-fast"></i> Shipping Policy</a></li>
+                    <li><a href="#"><i class="fas fa-exchange-alt"></i> Returns & Refunds</a></li>
+                    <li><a href="mailto:support@tukakombe.com"><i class="fas fa-envelope"></i> support@tukakombe.com</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:marketplace@tukakombe.com"><i class="fas fa-envelope"></i> marketplace@tukakombe.com</a></li>
+                    <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                    <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 50px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 25px;">
+            &copy; 2026 Tukakula Marketplace. All rights reserved. | <a href="#" style="color: var(--lime); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--lime); text-decoration: none;">Terms of Service</a>
+        </div>
+    </footer>
+
+    <script>
+        // --- Mobile Menu Logic ---
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mainNav = document.getElementById('mainNav');
+        
+        mobileToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            mobileToggle.innerHTML = mainNav.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // --- Dropdown Mobile Toggle ---
+        const solutionsDropdown = document.getElementById('solutionsDropdown');
+        const solutionsLink = document.getElementById('solutionsDropdownLink');
+
+        solutionsLink.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                e.preventDefault();
+                solutionsDropdown.classList.toggle('open');
+            }
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mainNav.contains(e.target) && !mobileToggle.contains(e.target)) {
+                mainNav.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // Auto-hide flash messages
+        setTimeout(() => {
+            const flashList = document.querySelector('.flashes');
+            if(flashList) {
+                flashList.style.transition = 'opacity 0.5s ease';
+                flashList.style.opacity = '0';
+                setTimeout(() => flashList.remove(), 500);
+            }
+        }, 4000);
+
+        // Highlight active marketplace nav link
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.marketplace-nav a');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>
