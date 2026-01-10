@@ -1043,47 +1043,382 @@
         position: relative;
     }
 
-    .form-input {
+    /* Contact Form Styles */
+    .contact-form-wrapper {
         width: 100%;
-        padding: 18px 24px;
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .steps {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #64748b;
+        font-size: 16px;
+        margin-bottom: 8px;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-number {
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .step.completed .step-number {
+        background: var(--lime);
+        color: var(--navy-dark);
+    }
+
+    .step-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #64748b;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-label {
+        color: var(--navy-dark);
+        font-weight: 600;
+    }
+
+    .step-connector {
+        flex: 1;
+        height: 2px;
+        background: #e2e8f0;
+        margin: 0 10px;
+        position: relative;
+        top: -20px;
+        max-width: 100%;
+    }
+
+    .step-connector.completed {
+        background: var(--lime);
+    }
+
+    /* Form Steps */
+    .form-step {
+        display: none;
+        animation: slideIn 0.3s ease;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-step-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-step-header {
         margin-bottom: 25px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .form-step-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--navy-dark);
+        margin-bottom: 5px;
+    }
+
+    .form-step-description {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .form-step-content {
+        margin-bottom: 25px;
+    }
+
+    .form-step-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 25px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--navy-dark);
+        margin-bottom: 6px;
+        font-size: 13px;
+    }
+
+    .required {
+        color: #ef4444;
+    }
+
+    .optional {
+        color: #64748b;
+        font-weight: normal;
+        font-size: 11px;
+    }
+
+    .form-control, .form-select {
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+        width: 100%;
         background: var(--off-white);
         font-family: inherit;
-        font-size: 1rem;
-        transition: var(--transition);
         color: var(--navy);
     }
 
-    .form-input:focus {
+    .form-control:focus, .form-select:focus {
         outline: none;
         border-color: var(--lime);
         background: var(--white);
         box-shadow: 0 0 0 3px rgba(162, 210, 66, 0.2);
     }
 
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #ef4444;
+    }
+
+    .invalid-feedback {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        display: none;
+    }
+
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+
+    .form-help {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-next, .btn-submit {
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+        color: white;
+        min-width: 120px;
+    }
+
+    .btn-next:hover, .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(26, 42, 64, 0.3);
+    }
+
+    .btn-outline {
+        background: white;
+        color: var(--navy-dark);
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-outline:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
     .btn-submit {
         background: linear-gradient(135deg, var(--lime) 0%, var(--lime-light) 100%);
         color: var(--navy-dark);
-        padding: 20px 40px;
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        cursor: pointer;
-        width: 100%;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        box-shadow: 0 10px 30px rgba(162, 210, 66, 0.3);
     }
 
     .btn-submit:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(162, 210, 66, 0.4);
+        box-shadow: 0 8px 20px rgba(162, 210, 66, 0.3);
+    }
+
+    /* Review Section */
+    .review-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .review-section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--navy-dark);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .review-section-title i {
+        color: var(--lime);
+    }
+
+    .review-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .review-item {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .review-label {
+        font-weight: 500;
+        color: #64748b;
+        min-width: 100px;
+        font-size: 13px;
+    }
+
+    .review-value {
+        color: var(--navy-dark);
+        font-weight: 500;
+        flex: 1;
+        font-size: 14px;
+    }
+
+    .review-item.full-width {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .review-message {
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .review-notice {
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        border-radius: 10px;
+        padding: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 25px;
+        font-size: 13px;
+    }
+
+    .review-notice i {
+        color: var(--navy);
+        font-size: 16px;
+        margin-top: 2px;
+    }
+
+    .review-notice strong {
+        color: var(--navy);
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .review-notice p {
+        color: #475569;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    /* Alert Messages */
+    .alert-container {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+        padding: 14px 18px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Row layout for forms */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
 
     /* Responsive Design for Homepage Content */
@@ -1161,6 +1496,21 @@
         .service-header {
             flex-direction: row;
             text-align: left;
+        }
+        
+        .form-step-footer {
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn, .btn-outline {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
     }
 
@@ -1245,6 +1595,20 @@
         
         .analytics-number {
             font-size: 3rem;
+        }
+        
+        .step-label {
+            font-size: 10px;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+        
+        .step-connector {
+            margin: 0 5px;
         }
     }
 
@@ -1756,7 +2120,7 @@
         </div>
     </section>
 
-    <!-- Enhanced Contact Section -->
+    <!-- Enhanced Contact Section with Multi-Step Form -->
     <section id="contact" class="contact-section">
         <div class="contact-container">
             <div class="contact-cta">
@@ -1782,25 +2146,311 @@
             </div>
             
             <div class="contact-form-side">
-                <form id="contactForm">
-                    <input type="text" class="form-input" placeholder="Full Name" required>
-                    <input type="email" class="form-input" placeholder="Work Email" required>
-                    
-                    <select class="form-input" required>
-                        <option value="">Select Solution</option>
-                        <option value="finance">Tuka Finance</option>
-                        <option value="technology">Tuka Developers</option>
-                        <option value="advisory">Tuka Advisory</option>
-                        <option value="branding">Tuka Studio</option>
-                        <option value="multiple">Multiple Solutions</option>
-                    </select>
-                    
-                    <textarea class="form-input" rows="4" placeholder="How can we help accelerate your business growth?" required></textarea>
-                    
-                    <button type="submit" class="btn-submit">
-                        Submit Inquiry
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                        <div class="alert-content">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }} me-2"></i>
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="steps">
+                        <div class="step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Personal</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Company</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Inquiry</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Review</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi-step Contact Form -->
+                <form method="post" action="{{ url_for('core.contact') }}" id="homeContactForm" class="contact-form-wrapper" novalidate>
+                    <!-- Step 1: Personal Information -->
+                    <div class="form-step active" id="step1">
+                        <div class="form-step-card">
+                            <div class="form-step-header">
+                                <h2 class="form-step-title">Personal Information</h2>
+                                <p class="form-step-description">Let's start with your contact details</p>
+                            </div>
+
+                            <div class="form-step-content">
+                                <div class="form-group">
+                                    <label for="full_name" class="form-label">
+                                        Full Name <span class="required">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" 
+                                           placeholder="Enter your full name" required>
+                                    <div class="invalid-feedback">Please enter your full name</div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">
+                                            Email Address <span class="required">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               placeholder="your.email@example.com" required>
+                                        <div class="invalid-feedback">Please enter a valid email address</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" 
+                                               placeholder="+260 000 000000">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="whatsapp" class="form-label">
+                                        WhatsApp Number <span class="optional">(Optional)</span>
+                                    </label>
+                                    <input type="tel" class="form-control" id="whatsapp" name="whatsapp" 
+                                           placeholder="+260 000 000000">
+                                    <small class="form-help">For faster response and WhatsApp communication</small>
+                                </div>
+                            </div>
+
+                            <div class="form-step-footer">
+                                <button type="button" class="btn btn-next" data-next="2">
+                                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Company Information -->
+                    <div class="form-step" id="step2">
+                        <div class="form-step-card">
+                            <div class="form-step-header">
+                                <h2 class="form-step-title">Company Information</h2>
+                                <p class="form-step-description">Tell us about your organization</p>
+                            </div>
+
+                            <div class="form-step-content">
+                                <div class="form-group">
+                                    <label for="company_name" class="form-label">
+                                        Company / Organization <span class="optional">(Optional)</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                                           placeholder="Your company name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inquiry_target" class="form-label">
+                                        Who are you contacting? <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="inquiry_target" name="inquiry_target" required>
+                                        <option value="">Select an option</option>
+                                        <option value="tukakombe">Tukakombe (General Inquiry)</option>
+                                        <option value="service">Specific Service</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select who you want to contact</div>
+                                </div>
+
+                                <div class="form-group" id="service_selector_container" style="display: none;">
+                                    <label for="service" class="form-label">
+                                        Select Service <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="service" name="service">
+                                        <option value="">-- Select a service --</option>
+                                        <option value="finance">Tuka Finance</option>
+                                        <option value="developers">Tuka Developers</option>
+                                        <option value="advisory">Tuka Advisory</option>
+                                        <option value="brand">Tuka Studio</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a service</div>
+                                </div>
+                            </div>
+
+                            <div class="form-step-footer">
+                                <button type="button" class="btn btn-outline btn-prev" data-prev="1">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-next" data-next="3">
+                                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Inquiry Details -->
+                    <div class="form-step" id="step3">
+                        <div class="form-step-card">
+                            <div class="form-step-header">
+                                <h2 class="form-step-title">Inquiry Details</h2>
+                                <p class="form-step-description">Tell us about your request</p>
+                            </div>
+
+                            <div class="form-step-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="subject" class="form-label">
+                                            Subject <span class="optional">(Optional)</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="subject" name="subject" 
+                                               placeholder="Brief subject line">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reason" class="form-label">
+                                            Reason for Contact <span class="required">*</span>
+                                        </label>
+                                        <select class="form-select" id="reason" name="reason" required>
+                                            <option value="">Select a reason</option>
+                                            <option value="consultation">Consultation</option>
+                                            <option value="support">Support</option>
+                                            <option value="partnership">Partnership</option>
+                                            <option value="pricing">Pricing Inquiry</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a reason for contact</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message" class="form-label">
+                                        Message <span class="required">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="message" name="message" rows="5" 
+                                              placeholder="Please provide details about your inquiry..." required></textarea>
+                                    <div class="invalid-feedback">Please enter your message</div>
+                                    <small class="form-help">Be as detailed as possible to help us serve you better</small>
+                                </div>
+                            </div>
+
+                            <div class="form-step-footer">
+                                <button type="button" class="btn btn-outline btn-prev" data-prev="2">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-next" data-next="4">
+                                    Review <i class="fas fa-check-circle ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Submit -->
+                    <div class="form-step" id="step4">
+                        <div class="form-step-card">
+                            <div class="form-step-header">
+                                <h2 class="form-step-title">Review & Submit</h2>
+                                <p class="form-step-description">Please review all information before submitting</p>
+                            </div>
+
+                            <div class="form-step-content">
+                                <!-- Personal Information Review -->
+                                <div class="review-section">
+                                    <h5 class="review-section-title">
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        Personal Information
+                                    </h5>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <span class="review-label">Full Name:</span>
+                                            <span class="review-value" id="review_full_name"></span>
+                                        </div>
+                                        <div class="review-item">
+                                            <span class="review-label">Email:</span>
+                                            <span class="review-value" id="review_email"></span>
+                                        </div>
+                                        <div class="review-item">
+                                            <span class="review-label">Phone:</span>
+                                            <span class="review-value" id="review_phone">Not provided</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <span class="review-label">WhatsApp:</span>
+                                            <span class="review-value" id="review_whatsapp">Not provided</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Company Information Review -->
+                                <div class="review-section">
+                                    <h5 class="review-section-title">
+                                        <i class="fas fa-building me-2"></i>
+                                        Company Information
+                                    </h5>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <span class="review-label">Company:</span>
+                                            <span class="review-value" id="review_company">Not provided</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <span class="review-label">Contacting:</span>
+                                            <span class="review-value" id="review_target"></span>
+                                        </div>
+                                        <div class="review-item" id="review_service_item" style="display: none;">
+                                            <span class="review-label">Service:</span>
+                                            <span class="review-value" id="review_service"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Inquiry Details Review -->
+                                <div class="review-section">
+                                    <h5 class="review-section-title">
+                                        <i class="fas fa-envelope-open-text me-2"></i>
+                                        Inquiry Details
+                                    </h5>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <span class="review-label">Subject:</span>
+                                            <span class="review-value" id="review_subject">Not specified</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <span class="review-label">Reason:</span>
+                                            <span class="review-value" id="review_reason"></span>
+                                        </div>
+                                        <div class="review-item full-width">
+                                            <span class="review-label">Message:</span>
+                                            <div class="review-message" id="review_message"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Notice -->
+                                <div class="review-notice">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <div>
+                                        <strong>Response Time:</strong>
+                                        <p>We typically respond within 24-48 hours. Urgent inquiries with WhatsApp numbers may receive faster responses.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step-footer">
+                                <button type="button" class="btn btn-outline btn-prev" data-prev="3">
+                                    <i class="fas fa-arrow-left me-2"></i> Edit
+                                </button>
+                                <button type="submit" class="btn btn-submit">
+                                    <i class="fas fa-paper-plane me-2"></i> Send Inquiry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -1809,109 +2459,277 @@
 
 {% block extra_js %}
 <script>
-    // Form submission with animation
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const submitBtn = this.querySelector('.btn-submit');
-            const originalHTML = submitBtn.innerHTML;
-            
-            // Add loading animation
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Success animation
-                submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
-                submitBtn.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
-                
-                // Reset after 3 seconds
-                setTimeout(() => {
-                    this.reset();
-                    submitBtn.innerHTML = originalHTML;
-                    submitBtn.disabled = false;
-                    submitBtn.style.background = 'linear-gradient(135deg, var(--lime) 0%, var(--lime-light) 100%)';
-                    alert('Thank you for your inquiry! We will contact you shortly.');
-                }, 3000);
-            }, 2000);
-        });
-    }
-    
-    // Animated Counter Function
-    function animateCounter(element) {
-        const target = parseInt(element.getAttribute('data-target'));
-        const duration = 2000; // 2 seconds
-        const step = Math.ceil(target / (duration / 16)); // 60fps
-        let current = 0;
+    // Home Page Multi-Step Form Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = 1;
+        const form = document.getElementById('homeContactForm');
+        const steps = document.querySelectorAll('.form-step');
+        const stepElements = document.querySelectorAll('.step');
+        const inquiryTarget = document.getElementById('inquiry_target');
+        const serviceContainer = document.getElementById('service_selector_container');
+        const serviceSelect = document.getElementById('service');
         
-        const timer = setInterval(() => {
-            current += step;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
+        // Initialize service selector
+        function toggleServiceSelector() {
+            if (inquiryTarget.value === 'service') {
+                serviceContainer.style.display = 'block';
+                serviceSelect.required = true;
+            } else {
+                serviceContainer.style.display = 'none';
+                serviceSelect.required = false;
+                serviceSelect.value = '';
             }
-            element.textContent = current;
-        }, 16);
-    }
-    
-    // Intersection Observer for animations
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+        }
+        
+        inquiryTarget.addEventListener('change', toggleServiceSelector);
+        toggleServiceSelector(); // Initialize on load
+        
+        // Step navigation
+        document.querySelectorAll('.btn-next').forEach(button => {
+            button.addEventListener('click', function() {
+                const nextStep = parseInt(this.dataset.next);
+                if (validateStep(currentStep)) {
+                    if (nextStep === 4) {
+                        populateReview();
+                    }
+                    goToStep(nextStep);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.btn-prev').forEach(button => {
+            button.addEventListener('click', function() {
+                const prevStep = parseInt(this.dataset.prev);
+                goToStep(prevStep);
+            });
+        });
+        
+        function goToStep(step) {
+            // Hide all steps
+            steps.forEach(s => s.classList.remove('active'));
+            
+            // Show target step
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // Update progress indicators
+            stepElements.forEach(stepEl => {
+                stepEl.classList.remove('active', 'completed');
+                const stepNumber = parseInt(stepEl.dataset.step);
+                if (stepNumber < step) {
+                    stepEl.classList.add('completed');
+                } else if (stepNumber === step) {
+                    stepEl.classList.add('active');
+                }
+            });
+            
+            // Update step connectors
+            document.querySelectorAll('.step-connector').forEach((connector, index) => {
+                if (index < step - 1) {
+                    connector.classList.add('completed');
+                } else {
+                    connector.classList.remove('completed');
+                }
+            });
+            
+            currentStep = step;
+            scrollToTop();
+        }
+        
+        function validateStep(step) {
+            const currentForm = document.getElementById(`step${step}`);
+            const requiredFields = currentForm.querySelectorAll('[required]');
+            let isValid = true;
+            
+            // Clear previous validation
+            requiredFields.forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+            
+            // Validate each field
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else if (field.type === 'email' && !validateEmail(field.value)) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                }
+            });
+            
+            // Special validation for step 2
+            if (step === 2) {
+                if (inquiryTarget.value === 'service' && !serviceSelect.value) {
+                    serviceSelect.classList.add('is-invalid');
+                    serviceContainer.style.display = 'block';
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function populateReview() {
+            // Personal info
+            document.getElementById('review_full_name').textContent = document.getElementById('full_name').value;
+            document.getElementById('review_email').textContent = document.getElementById('email').value;
+            document.getElementById('review_phone').textContent = document.getElementById('phone').value || 'Not provided';
+            document.getElementById('review_whatsapp').textContent = document.getElementById('whatsapp').value || 'Not provided';
+            
+            // Company info
+            document.getElementById('review_company').textContent = document.getElementById('company_name').value || 'Not provided';
+            const targetText = inquiryTarget.options[inquiryTarget.selectedIndex].text;
+            document.getElementById('review_target').textContent = targetText;
+            
+            // Service info
+            if (inquiryTarget.value === 'service' && serviceSelect.value) {
+                const serviceText = serviceSelect.options[serviceSelect.selectedIndex].text;
+                document.getElementById('review_service').textContent = serviceText;
+                document.getElementById('review_service_item').style.display = 'flex';
+            } else {
+                document.getElementById('review_service_item').style.display = 'none';
+            }
+            
+            // Inquiry info
+            document.getElementById('review_subject').textContent = document.getElementById('subject').value || 'Not specified';
+            document.getElementById('review_reason').textContent = document.getElementById('reason').options[document.getElementById('reason').selectedIndex].text;
+            document.getElementById('review_message').textContent = document.getElementById('message').value;
+        }
+        
+        function scrollToTop() {
+            const formElement = document.querySelector('.form-step.active');
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // Phone number formatting
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length === 0) return '';
+            
+            // Format as +260 000 000000 (Zambian format)
+            let formatted = '';
+            if (value.length > 0) {
+                if (!value.startsWith('260') && value.length <= 9) {
+                    value = '260' + value;
+                }
+                formatted = '+';
+                formatted += value.substring(0, Math.min(value.length, 3)) + ' ';
+                if (value.length > 3) {
+                    formatted += value.substring(3, Math.min(value.length, 6)) + ' ';
+                }
+                if (value.length > 6) {
+                    formatted += value.substring(6, Math.min(value.length, 12));
+                }
+            }
+            input.value = formatted;
+        }
+        
+        // Add phone formatting
+        document.getElementById('phone').addEventListener('input', function() {
+            formatPhoneNumber(this);
+        });
+        
+        document.getElementById('whatsapp').addEventListener('input', function() {
+            formatPhoneNumber(this);
+        });
+        
+        // Initialize with step 1
+        goToStep(1);
+        
+        // Form submission animation
+        form.addEventListener('submit', function(e) {
+            if (validateStep(currentStep)) {
+                const submitBtn = this.querySelector('.btn-submit');
+                const originalHTML = submitBtn.innerHTML;
                 
-                // Animate analytics counters when section comes into view
-                if (entry.target.classList.contains('analytics-section')) {
-                    const counters = entry.target.querySelectorAll('.analytics-number');
+                // Add loading animation
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitBtn.disabled = true;
+                
+                // Let the form submit normally
+                // The server will handle the response and flash messages
+            }
+        });
+        
+        // Animated Counter Function (for analytics section)
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000; // 2 seconds
+            const step = Math.ceil(target / (duration / 16)); // 60fps
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = current;
+            }, 16);
+        }
+        
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Animate analytics counters when section comes into view
+                    if (entry.target.classList.contains('analytics-section')) {
+                        const counters = entry.target.querySelectorAll('.analytics-number');
+                        counters.forEach(counter => {
+                            animateCounter(counter);
+                        });
+                    }
+                    
+                    // Start animations for cards
+                    if (entry.target.classList.contains('unit-card') || 
+                        entry.target.classList.contains('value-card') || 
+                        entry.target.classList.contains('analytics-card') ||
+                        entry.target.classList.contains('value-pillar') || 
+                        entry.target.classList.contains('market-map')) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        // Observe all animated elements
+        document.querySelectorAll('.unit-card, .value-card, .analytics-card, .value-pillar, .market-map, .analytics-section').forEach(element => {
+            observer.observe(element);
+        });
+        
+        // Initialize animations on page load
+        window.addEventListener('load', () => {
+            // Trigger initial animation for elements already in view
+            document.querySelectorAll('.unit-card, .value-card, .analytics-card, .value-pillar, .market-map').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    card.style.animationPlayState = 'running';
+                }
+            });
+            
+            // Check if analytics section is already in view
+            const analyticsSection = document.querySelector('.analytics-section');
+            if (analyticsSection) {
+                const rect = analyticsSection.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const counters = analyticsSection.querySelectorAll('.analytics-number');
                     counters.forEach(counter => {
                         animateCounter(counter);
                     });
                 }
-                
-                // Start animations for cards
-                if (entry.target.classList.contains('unit-card') || 
-                    entry.target.classList.contains('value-card') || 
-                    entry.target.classList.contains('analytics-card') ||
-                    entry.target.classList.contains('value-pillar') || 
-                    entry.target.classList.contains('market-map')) {
-                    entry.target.style.animationPlayState = 'running';
-                }
             }
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    // Observe all animated elements
-    document.querySelectorAll('.unit-card, .value-card, .analytics-card, .value-pillar, .market-map, .analytics-section').forEach(element => {
-        observer.observe(element);
-    });
-    
-    // Initialize animations on page load
-    window.addEventListener('load', () => {
-        // Trigger initial animation for elements already in view
-        document.querySelectorAll('.unit-card, .value-card, .analytics-card, .value-pillar, .market-map').forEach(card => {
-            const rect = card.getBoundingClientRect();
-            if (rect.top < window.innerHeight && rect.bottom > 0) {
-                card.style.animationPlayState = 'running';
-            }
-        });
-        
-        // Check if analytics section is already in view
-        const analyticsSection = document.querySelector('.analytics-section');
-        if (analyticsSection) {
-            const rect = analyticsSection.getBoundingClientRect();
-            if (rect.top < window.innerHeight && rect.bottom > 0) {
-                const counters = analyticsSection.querySelectorAll('.analytics-number');
-                counters.forEach(counter => {
-                    animateCounter(counter);
-                });
-            }
-        }
     });
 </script>
 {% endblock %}

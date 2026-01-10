@@ -1,8 +1,7 @@
 # core/routes.py
 from datetime import datetime, timezone
 import uuid
-from flask import Blueprint, flash, redirect, render_template, request
-
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from utils.database import get_db_connection
 
 # Blueprint for core pages
@@ -25,11 +24,29 @@ def about():
 
 @core_bp.route("/contact", methods=["GET", "POST"])
 def contact():
+    """Handle contact form submissions from both contact page and home page."""
     if request.method == "POST":
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
+            # Get form data
+            full_name = request.form.get("full_name")
+            company_name = request.form.get("company_name", "")
+            email = request.form.get("email")
+            phone = request.form.get("phone", "")
+            whatsapp = request.form.get("whatsapp", "")
+            inquiry_target = request.form.get("inquiry_target")
+            service = request.form.get("service", "")
+            subject = request.form.get("subject", "General Inquiry")
+            reason = request.form.get("reason")
+            message = request.form.get("message")
+            
+            # Validate required fields
+            if not all([full_name, email, inquiry_target, reason, message]):
+                flash("Please fill in all required fields.", "error")
+                return redirect(request.referrer or url_for('core.contact'))
+            
             cursor.execute("""
                 INSERT INTO tukakula_queries (
                     id, full_name, company_name, email, phone, whatsapp,
@@ -37,31 +54,33 @@ def contact():
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 str(uuid.uuid4()),
-                request.form.get("full_name"),
-                request.form.get("company_name"),
-                request.form.get("email"),
-                request.form.get("phone"),
-                request.form.get("whatsapp"),
-                request.form.get("inquiry_target"),
-                request.form.get("service"),
-                request.form.get("subject", "General Inquiry"), # Default if empty
-                request.form.get("reason"),
-                request.form.get("message"),
-                datetime.now(timezone.utc).isoformat() # Fixed timezone issue
+                full_name,
+                company_name,
+                email,
+                phone,
+                whatsapp,
+                inquiry_target,
+                service,
+                subject,
+                reason,
+                message,
+                datetime.now(timezone.utc).isoformat()
             ))
 
             conn.commit()
-            flash("Your inquiry has been sent successfully.", "success")
+            flash("Thank you for your inquiry! We will contact you shortly.", "success")
+            
         except Exception as e:
             conn.rollback()
             flash(f"An error occurred: {str(e)}", "error")
         finally:
             conn.close()
 
-        return redirect("contact")
+        # Redirect back to the page the form was submitted from
+        return redirect(request.referrer or url_for('core.contact'))
 
+    # GET request - render contact page
     return render_template("contact.html")
-
 
 # -----------------------------
 # ERROR HANDLERS
