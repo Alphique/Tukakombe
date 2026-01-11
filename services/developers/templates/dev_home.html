@@ -1999,7 +1999,7 @@
             </div>
 
             <!-- Multi-step Contact Form -->
-            <form method="post" action="{{ url_for('core.contact') }}" id="developerContactForm" class="contact-form-wrapper" novalidate>
+            <form method="post" action="{{ url_for('developers.contact') }}" id="developerContactForm" class="contact-form-wrapper" novalidate>
                 <!-- Step 1: Personal Information -->
                 <div class="form-step active" id="step1">
                     <div class="form-step-card">
@@ -2030,6 +2030,11 @@
                                 <div class="form-group">
                                     <label for="phone" class="form-label">Phone Number</label>
                                     <input type="tel" class="form-control" id="phone" name="phone" 
+                                           placeholder="+260 000 000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="whatsapp" class="form-label">WhatsApp Number</label>
+                                    <input type="tel" class="form-control" id="whatsapp" name="whatsapp" 
                                            placeholder="+260 000 000000">
                                 </div>
                             </div>
@@ -2554,7 +2559,15 @@
                                 'X-Requested-With': 'XMLHttpRequest'
                             }
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            const ct = response.headers.get('content-type') || '';
+                            if (ct.includes('application/json')) return response.json();
+                            return response.text().then(text => {
+                                console.error('Non-JSON response from server:', text);
+                                // Throw an error so downstream catch() runs
+                                throw new Error('Server returned non-JSON response');
+                            });
+                        })
                         .then(data => {
                             if (data.success) {
                                 // Show success message

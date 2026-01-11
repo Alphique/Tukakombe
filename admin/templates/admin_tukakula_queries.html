@@ -304,6 +304,9 @@
     </div>
 </div>
 
+<!-- Anchor to reliably scroll to the modal area -->
+<div id="detailsModalAnchor" style="width:1px;height:1px;overflow:hidden;position:relative;top:0;left:0;" aria-hidden="true"></div>
+
 <!-- Inquiry Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1433,8 +1436,18 @@ function updateCategoryCounts() {
 
     counts.all = rows.length;
     rows.forEach(r => {
-        const svc = (r.getAttribute('data-service') || '').toLowerCase();
-        if (svc && counts.hasOwnProperty(svc)) counts[svc] += 1;
+        let svc = (r.getAttribute('data-service') || '').toLowerCase();
+        if (!svc || svc === 'none') {
+            const badge = r.querySelector('.service-badge');
+            svc = badge ? badge.textContent.toLowerCase() : '';
+        }
+
+        // Normalize common service names/aliases so badges count correctly
+        if (svc.includes('market')) counts.marketplace += 1;
+        else if (svc.includes('dev') || svc.includes('developer')) counts.developers += 1;
+        else if (svc.includes('finance') || svc.includes('financ')) counts.finance += 1;
+        else if (svc.includes('advis') || svc.includes('advise')) counts.advisory += 1;
+        else if (svc.includes('brand')) counts.brand += 1;
     });
 
     document.querySelectorAll('.filter-tab').forEach(tab => {
@@ -1525,31 +1538,34 @@ function showInquiryDetails(element) {
         emailBtn.disabled = true;
     }
     
-    // Scroll viewport to the modal's DOM location, then show modal
+    // Scroll to a small anchor placed before the modal markup, then show modal
     const modalEl = document.getElementById('detailsModal');
     const modal = new bootstrap.Modal(modalEl);
-    if (modalEl) {
-        // Prefer scrolling the nearest scrollable container so the viewport
-        // actually moves in layouts where the body isn't scrolling.
-        const scrollable = document.querySelector('.admin-inquiries-container') || document.scrollingElement || document.documentElement;
+    const anchor = document.getElementById('detailsModalAnchor');
+
+    if (anchor) {
         try {
-            if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
-                // If it's a container element, use its scrollTo
-                if (typeof scrollable.scrollTo === 'function') {
-                    scrollable.scrollTo({ top: scrollable.scrollHeight, behavior: 'smooth' });
+            anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (e) {
+            // Fallback to scrolling container or document bottom
+            const scrollable = document.querySelector('.admin-inquiries-container') || document.scrollingElement || document.documentElement;
+            try {
+                if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+                    if (typeof scrollable.scrollTo === 'function') {
+                        scrollable.scrollTo({ top: scrollable.scrollHeight, behavior: 'smooth' });
+                    } else {
+                        scrollable.scrollTop = scrollable.scrollHeight;
+                    }
                 } else {
-                    scrollable.scrollTop = scrollable.scrollHeight;
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 }
-            } else {
+            } catch (e2) {
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             }
-        } catch (e) {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-
-        // Ensure modal opens after scrolling animation
+        // Open modal after scroll animation completes
         setTimeout(() => modal.show(), 350);
-    } else {
+    } else if (modalEl) {
         modal.show();
     }
 }
