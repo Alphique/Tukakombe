@@ -21,6 +21,20 @@
     }
 
     /* 3D Animated Hero Section */
+    /* Slight global zoom-out for deployment (subtle) */
+    body {
+        zoom: 0.98; /* non-Firefox browsers */
+    }
+
+    @supports not (zoom: 1) {
+        html {
+            transform: scale(0.98);
+            transform-origin: top center;
+        }
+        body {
+            width: calc(100% / 0.98);
+        }
+    }
     .dev-hero {
         min-height: 100vh;
         display: flex;
@@ -2356,8 +2370,9 @@
             const stepElements = document.querySelectorAll('.step');
             
             // Initialize form
-            function initForm() {
-                goToStep(1);
+                function initForm() {
+                // Initialize without auto-scrolling on first load
+                goToStep(1, false);
                 
                 // Phone number formatting
                 function formatPhoneNumber(input) {
@@ -2411,7 +2426,7 @@
                 });
             });
             
-            function goToStep(step) {
+            function goToStep(step, shouldScroll = true) {
                 // Hide all steps
                 steps.forEach(s => s.classList.remove('active'));
                 
@@ -2442,7 +2457,9 @@
                 });
                 
                 currentStep = step;
-                scrollToFormTop();
+                if (shouldScroll) {
+                    scrollToFormTop();
+                }
             }
             
             function validateStep(step) {
@@ -2560,7 +2577,8 @@
                                 
                                 // Reset form
                                 form.reset();
-                                goToStep(1);
+                                // Reset to step 1 without auto-scrolling
+                                goToStep(1, false);
                                 
                                 // Scroll to success message
                                 window.scrollTo({

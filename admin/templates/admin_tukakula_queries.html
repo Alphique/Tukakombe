@@ -194,7 +194,8 @@
                         data-service="{{ q.service }}"
                         data-status="{{ q.status }}"
                         data-date="{{ q.created_at }}"
-                        data-inquiry-id="{{ q.id }}">
+                        data-inquiry-id="{{ q.id }}"
+                        data-message="{{ q.message|e }}">
                         
                         <td>
                             <div class="client-cell">
@@ -375,6 +376,7 @@
         </div>
     </div>
 </div>
+ 
 
 <style>
 /* Reset and Base Styles */
@@ -1134,7 +1136,7 @@
     font-size: 15px;
     line-height: 1.6;
     color: #1a2a40;
-    max-height: 200px;
+    max-height: 360px;
     overflow-y: auto;
     white-space: pre-wrap;
 }
@@ -1307,6 +1309,12 @@
     }
 }
 
+@media (max-width: 992px) {
+    .inquiry-full-view .full-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     .admin-inquiries-container {
         padding: 16px;
@@ -1418,6 +1426,26 @@ function filterInquiry(filter, element) {
     document.getElementById('adminSearch').value = '';
 }
 
+// Update tab counts based on current submissions in the DOM
+function updateCategoryCounts() {
+    const rows = Array.from(document.querySelectorAll('.inquiry-row'));
+    const counts = { all: 0, marketplace: 0, developers: 0, finance: 0, advisory: 0, brand: 0 };
+
+    counts.all = rows.length;
+    rows.forEach(r => {
+        const svc = (r.getAttribute('data-service') || '').toLowerCase();
+        if (svc && counts.hasOwnProperty(svc)) counts[svc] += 1;
+    });
+
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        const filter = tab.getAttribute('data-filter');
+        const badge = tab.querySelector('.tab-count');
+        if (badge) {
+            badge.textContent = counts.hasOwnProperty(filter) ? counts[filter] : 0;
+        }
+    });
+}
+
 // Sort table
 function sortTable(criteria) {
     const tbody = document.querySelector('#inquiryTable tbody');
@@ -1451,7 +1479,8 @@ function showInquiryDetails(element) {
     // Get data from the row
     const clientName = row.querySelector('.client-name').textContent;
     const clientEmail = row.querySelector('.client-email').textContent;
-    const messagePreview = row.querySelector('.message-preview').textContent;
+    // Prefer full message from data attribute; fallback to preview if not present
+    const fullMessage = row.getAttribute('data-message') || row.querySelector('.message-preview').textContent;
     const messageSubject = row.querySelector('.message-subject').textContent;
     const serviceBadge = row.querySelector('.service-badge');
     const serviceText = serviceBadge ? serviceBadge.textContent.trim() : 'General';
@@ -1468,7 +1497,7 @@ function showInquiryDetails(element) {
     document.getElementById('modalClientName').textContent = clientName;
     document.getElementById('modalClientEmail').textContent = clientEmail;
     document.getElementById('modalAvatar').textContent = clientName[0].toUpperCase();
-    document.getElementById('modalMessage').textContent = messagePreview;
+    document.getElementById('modalMessage').textContent = fullMessage;
     document.getElementById('modalSubject').textContent = messageSubject;
     document.getElementById('modalReason').textContent = serviceText;
     document.getElementById('modalDate').textContent = date;
@@ -1496,9 +1525,33 @@ function showInquiryDetails(element) {
         emailBtn.disabled = true;
     }
     
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
-    modal.show();
+    // Scroll viewport to the modal's DOM location, then show modal
+    const modalEl = document.getElementById('detailsModal');
+    const modal = new bootstrap.Modal(modalEl);
+    if (modalEl) {
+        // Prefer scrolling the nearest scrollable container so the viewport
+        // actually moves in layouts where the body isn't scrolling.
+        const scrollable = document.querySelector('.admin-inquiries-container') || document.scrollingElement || document.documentElement;
+        try {
+            if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+                // If it's a container element, use its scrollTo
+                if (typeof scrollable.scrollTo === 'function') {
+                    scrollable.scrollTo({ top: scrollable.scrollHeight, behavior: 'smooth' });
+                } else {
+                    scrollable.scrollTop = scrollable.scrollHeight;
+                }
+            } else {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
+        } catch (e) {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Ensure modal opens after scrolling animation
+        setTimeout(() => modal.show(), 350);
+    } else {
+        modal.show();
+    }
 }
 
 // Clear modal data
@@ -1554,6 +1607,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize with all inquiries shown
     filterInquiry('all');
+    // Update the category tab counts from the current DOM
+    updateCategoryCounts();
 });
 </script>
 {% endblock %}
