@@ -21,20 +21,7 @@
     }
 
     /* 3D Animated Hero Section */
-    /* Slight global zoom-out for deployment (subtle) */
-    body {
-        zoom: 0.98; /* non-Firefox browsers */
-    }
-
-    @supports not (zoom: 1) {
-        html {
-            transform: scale(0.98);
-            transform-origin: top center;
-        }
-        body {
-            width: calc(100% / 0.98);
-        }
-    }
+    /* Use default page scale for development-like appearance */
     .dev-hero {
         min-height: 100vh;
         display: flex;
